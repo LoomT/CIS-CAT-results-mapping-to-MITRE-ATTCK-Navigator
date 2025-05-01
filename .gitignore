@@ -1,7 +1,8 @@
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/*
+!.idea/runConfigurations/
 .DS_Store
 *.suo
 *.ntvs*
