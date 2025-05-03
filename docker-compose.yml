@@ -8,3 +8,4 @@ services:
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production
+      - FLASK_STATIC_FOLDER=static

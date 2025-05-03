@@ -1,8 +1,11 @@
+import os
 import time
+
 from flask import Flask, send_from_directory
+from flask.cli import load_dotenv
 
-
-app = Flask(__name__, static_folder='static', static_url_path='/')
+load_dotenv()
+app = Flask(__name__, static_folder=os.getenv('FLASK_STATIC_FOLDER'), static_url_path='/')
 
 @app.route('/api/time')
 def get_current_time():
