@@ -22,6 +22,7 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
+      "indent": ["error", 2],
       ...reactHooks.configs.recommended.rules,
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'react-refresh/only-export-components': [
