@@ -3,15 +3,19 @@ import './App.css';
 import UserScreen from './UserScreen';
 
 function App() {
-    const [showUserScreen, setShowUserScreen] = useState(false);
-    const handleUserClick = () => {
-    setShowUserScreen(true);  // Show the UserScreen when the User button is clicked
+  const [showUserScreen, setShowUserScreen] = useState(false);
+
+  const handleUserClick = () => {
+    setShowUserScreen(true);
+  };
+
+  const handleBackClick = () => {
+    setShowUserScreen(false);
   };
 
   return (
     <div>
       {!showUserScreen ? (
-        // Home Screen (with Admin and User buttons)
         <div className="home-screen">
           <h2>Choose your screen:</h2>
           <div className="button-container">
@@ -20,12 +24,10 @@ function App() {
           </div>
         </div>
       ) : (
-        // User Screen will be shown when `showUserScreen` is true
-        <UserScreen />
+        <UserScreen onBack={handleBackClick} />
       )}
     </div>
   );
 }
-
 
 export default App;
