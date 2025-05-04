@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './AdminLogin.css';
 
-function AdminLogin({ onBack }) {
+function AdminLogin({ onBack, onSuccess }) {
   const [token, setToken] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -13,7 +13,7 @@ function AdminLogin({ onBack }) {
     const placeholderToken = 'correct-token'; // Placeholder token
     if (token === placeholderToken) {
       // Navigate to admin overview when token is correct
-      onBack('admin-overview'); // Pass 'admin-overview' to navigate to the Admin Overview screen
+      onSuccess(); // Pass 'admin-overview' to navigate to the Admin Overview screen
     } else {
       setErrorMessage('Token Incorrect');
     }
