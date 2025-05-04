@@ -6,7 +6,7 @@
   font-family: 'Roboto', cursive, sans-serif;
 }
 
-/* Top Bar - Span full width, rounded */
+/* Top Bar */
 .top-bar {
   display: flex;
   align-items: center;
@@ -19,7 +19,7 @@
   top: 0;
   z-index: 10;
   font-weight: bold;
-  width: 100%;  /* Make it span the whole screen */
+  width: 100%;
 }
 
 .back-text {
@@ -35,24 +35,23 @@
   color: #2d3436;
 }
 
-/* Upload Section on the Left */
+/* Content Layout - Upload & Table side by side */
+.content-area {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Upload Section */
 .upload-section {
-  width: 40%;  /* Narrower than the table */
+  flex: 1;
   text-align: center;
 }
 
-/* File Table Section on the Right */
+/* File Table Section */
 .file-table-section {
-  width: 55%;  /* Wider than the upload section */
+  flex: 2;
   text-align: center;
-  margin-left: 20px; /* Space between left and right sections */
-}
-
-/* Layout for Upload & File Table */
-.user-screen > .upload-section,
-.user-screen > .file-table-section {
-  display: inline-block;
-  vertical-align: top;
 }
 
 /* Table */
