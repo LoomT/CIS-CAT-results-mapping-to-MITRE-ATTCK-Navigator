@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './UserScreen.css';
 
 function UserScreen({ onBack }) {
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handleVisualizeClick = () => {
+    setShowPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
+
   return (
     <div className="user-screen">
 
@@ -32,13 +42,12 @@ function UserScreen({ onBack }) {
               </tr>
             </thead>
             <tbody>
-              {/* Placeholder rows */}
               <tr>
                 <td>File 1</td>
                 <td>Department 1</td>
                 <td>2025-05-04</td>
                 <td>
-                  <button className="view-button">Visualize</button>
+                  <button className="view-button" onClick={handleVisualizeClick}>Visualize</button>
                   <button className="download-button">Download</button>
                 </td>
               </tr>
@@ -47,7 +56,7 @@ function UserScreen({ onBack }) {
                 <td>Department 2</td>
                 <td>2025-05-04</td>
                 <td>
-                  <button className="view-button">Visualize</button>
+                  <button className="view-button" onClick={handleVisualizeClick}>Visualize</button>
                   <button className="download-button">Download</button>
                 </td>
               </tr>
@@ -55,6 +64,20 @@ function UserScreen({ onBack }) {
           </table>
         </div>
       </div>
+
+      {/* Visualization Popup */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3 className="popup-heading">Choose a format to visualize</h3>
+            <div className="popup-buttons">
+              <button className="popup-button">SVG</button>
+              <button className="popup-button">PNG</button>
+              <button className="popup-cancel" onClick={handleClosePopup}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
