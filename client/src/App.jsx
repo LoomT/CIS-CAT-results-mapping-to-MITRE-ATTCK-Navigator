@@ -1,31 +1,39 @@
 import React, { useState } from 'react';
 import './App.css';
 import UserScreen from './UserScreen';
+import AdminLogin from './AdminLogin';
+import AdminOverview from './AdminOverview';
 
 function App() {
-  const [showUserScreen, setShowUserScreen] = useState(false);
+  const [currentScreen, setCurrentScreen] = useState('home'); // Track the current screen
 
   const handleUserClick = () => {
-    setShowUserScreen(true);
+    setCurrentScreen('user');
   };
 
-  const handleBackClick = () => {
-    setShowUserScreen(false);
+  const handleAdminClick = () => {
+    setCurrentScreen('admin-login');
+  };
+
+  const handleBackClick = (screen) => {
+    setCurrentScreen(screen); // Handle navigation back to specific screens
   };
 
   return (
     <div>
-      {!showUserScreen ? (
+      {currentScreen === 'home' && (
         <div className="home-screen">
           <h2>Choose your screen:</h2>
           <div className="button-container">
-            <button className="button">Admin</button>
+            <button className="button" onClick={handleAdminClick}>Admin</button>
             <button className="button" onClick={handleUserClick}>User</button>
           </div>
         </div>
-      ) : (
-        <UserScreen onBack={handleBackClick} />
       )}
+
+      {currentScreen === 'user' && <UserScreen onBack={() => handleBackClick('home')} />}
+      {currentScreen === 'admin-login' && <AdminLogin onBack={handleBackClick} />}
+      {currentScreen === 'admin-overview' && <AdminOverview />}
     </div>
   );
 }
