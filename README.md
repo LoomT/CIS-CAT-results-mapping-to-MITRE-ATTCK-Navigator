@@ -1,6 +1,33 @@
 # CIS-CAT results mapping to MITRE ATTCK Navigator
 
+## Running the app
 
+### Client
+
+In the client directory
+
+For the first time execute `npm install` to install dependencies
+
+Execute `npm run dev` to start the frontend for development
+
+
+### Server
+
+In the api directory
+
+For the first time execute `python -m venv .venv`, `source .venv/bin/activate` (linux) or `.venv\Scripts\activate` (Windows) and `pip install -r requirements.txt` to install dependencies
+
+Execute `python -m flask run` to start Flask server for development
+
+### Deployment
+
+Docker should be installed
+
+Build and start the application `docker-compose up --build`
+
+To run in detached mode `docker-compose up -d --build`
+
+To stop the application `docker-compose down`
 
 ## Getting started
 

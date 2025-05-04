@@ -1,0 +1,12 @@
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/*
+!.idea/runConfigurations/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.git
