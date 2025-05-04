@@ -65,40 +65,4 @@
   background-color: #a29bfe;
 }
 
-/* Popup for Token Incorrect */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
-.popup {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.popup h3 {
-  margin-bottom: 20px;
-  font-size: 18px;
-}
-
-.popup-close {
-  padding: 8px 16px;
-  background-color: #ff6b6b;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.popup-close:hover {
-  background-color: #ff4757;
-}
