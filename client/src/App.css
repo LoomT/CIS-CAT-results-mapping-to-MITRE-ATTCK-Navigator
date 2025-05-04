@@ -40,3 +40,29 @@
 .read-the-docs {
   color: #888;
 }
+
+.skeleton-screen {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+.button {
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  margin: 0 10px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background-color: #a29bfe;
+}
+
