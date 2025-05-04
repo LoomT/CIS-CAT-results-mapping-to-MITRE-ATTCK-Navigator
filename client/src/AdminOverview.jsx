@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './AdminOverview.css';
+import './popups.css';
 
 function AdminOverview({ onBack }) {
   const [showVisualizePopup, setShowVisualizePopup] = useState(false);
@@ -76,23 +77,27 @@ function AdminOverview({ onBack }) {
 
       {/* Visualize Popup */}
       {showVisualizePopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>Choose a format to visualize</h3>
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3 className="popup-heading">Choose a format to visualize</h3>
+            <div className="popup-buttons">
             <button className="popup-button">SVG</button>
             <button className="popup-button">PNG</button>
             <button className="popup-cancel" onClick={handlePopupClose}>Cancel</button>
+          </div>
           </div>
         </div>
       )}
 
       {/* Delete Confirmation Popup */}
       {showDeletePopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>Are you sure you want to delete {fileToDelete}?</h3>
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3 className="popup-heading">Are you sure you want to delete {fileToDelete}?</h3>
+            <div className="popup-buttons">
             <button className="popup-button" onClick={handleDeleteConfirm}>Yes</button>
             <button className="popup-cancel" onClick={handleDeleteCancel}>Cancel</button>
+          </div>
           </div>
         </div>
       )}

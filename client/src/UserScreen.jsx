@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './UserScreen.css';
+import './popups.css';
 
 function UserScreen({ onBack }) {
   const [showPopup, setShowPopup] = useState(false);
