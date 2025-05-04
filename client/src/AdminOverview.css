@@ -1,4 +1,4 @@
-/* Admin Overview Styles */
+/* Admin Overview Layout */
 .admin-overview {
   display: flex;
   flex-direction: column;
@@ -6,7 +6,7 @@
   font-family: 'Roboto', cursive, sans-serif;
 }
 
-/* Top Bar */
+/* Top Bar - Same as User Screen */
 .top-bar {
   display: flex;
   align-items: center;
@@ -35,38 +35,105 @@
   color: #2d3436;
 }
 
-/* Overview Content */
-.overview-content {
+/* File Table Section */
+.file-table-section {
+  width: 100%;
   text-align: center;
 }
 
-.overview-content h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
+/* Table Styling */
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-.overview-content p {
-  font-size: 18px;
-  margin-bottom: 20px;
+.file-table th,
+.file-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
-.admin-actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.action-button {
+.file-table th {
   background-color: #6c5ce7;
   color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
 }
 
-.action-button:hover {
-  background-color: #a29bfe;
+/* Button Styling */
+.file-table td button {
+  margin: 5px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.view-button {
+  background-color: #00b894;
+  color: white;
+}
+
+.download-button {
+  background-color: #0984e3;
+  color: white;
+}
+
+.delete-button {
+  background-color: #d63031;
+  color: white;
+}
+
+.view-button:hover {
+  background-color: #55efc4;
+}
+
+.download-button:hover {
+  background-color: #74b9ff;
+}
+
+.delete-button:hover {
+  background-color: #ff6b6b;
+}
+
+/* Popup Styling */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  width: 300px;
+  color: #2d3436;
+}
+
+.popup-button,
+.popup-cancel {
+  padding: 10px;
+  margin: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.popup-button {
+  background-color: #6c5ce7;
+  color: white;
+}
+
+.popup-cancel {
+  background-color: transparent;
+  border: 1px solid #d63031;
+  color: #d63031;
 }

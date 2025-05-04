@@ -1,4 +1,3 @@
-// App.jsx
 import React, { useState } from 'react';
 import './App.css';
 import UserScreen from './UserScreen';
@@ -17,8 +16,8 @@ function App() {
     setCurrentScreen('admin-login');
   };
 
-  const handleBackClick = (screen) => {
-    setCurrentScreen(screen); // Handle navigation back to specific screens
+  const handleBackClick = () => {
+    setCurrentScreen('home'); // Navigate back to home screen
   };
 
   return (
@@ -30,9 +29,16 @@ function App() {
         />
       )}
 
-      {currentScreen === 'user' && <UserScreen onBack={() => handleBackClick('home')} />}
-      {currentScreen === 'admin-login' && <AdminLogin onBack={handleBackClick} />}
-      {currentScreen === 'admin-overview' && <AdminOverview />}
+   {currentScreen === 'admin-login' && (
+  <AdminLogin
+    onBack={handleBackClick}
+    onSuccess={() => setCurrentScreen('admin-overview')}
+  />
+)}
+
+
+      {currentScreen === 'user' && <UserScreen onBack={handleBackClick} />}
+      {currentScreen === 'admin-overview' && <AdminOverview onBack={handleBackClick} />}
     </div>
   );
 }
