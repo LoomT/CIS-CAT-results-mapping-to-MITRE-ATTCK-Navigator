@@ -1,43 +1,31 @@
-import {useEffect, useState} from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import './App.css';
+import UserScreen from './UserScreen';
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [currentTime, setCurrentTime] = useState(0)
-
-  useEffect(() => {
-    console.log("useEffect")
-    fetch('/api/time').then(res => res.json()).then(data => {
-      setCurrentTime(data.time);
-    });
-  }, []);
+    const [showUserScreen, setShowUserScreen] = useState(false);
+    const handleUserClick = () => {
+    setShowUserScreen(true);  // Show the UserScreen when the User button is clicked
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          The current time is {currentTime}.
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      {!showUserScreen ? (
+        // Home Screen (with Admin and User buttons)
+        <div className="home-screen">
+          <h2>Choose your screen:</h2>
+          <div className="button-container">
+            <button className="button">Admin</button>
+            <button className="button" onClick={handleUserClick}>User</button>
+          </div>
+        </div>
+      ) : (
+        // User Screen will be shown when `showUserScreen` is true
+        <UserScreen />
+      )}
+    </div>
+  );
 }
 
-export default App
+
+export default App;

@@ -1,0 +1,76 @@
+.user-screen {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.upload-section {
+  width: 45%;
+  text-align: center;
+}
+
+.upload-button {
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  margin-top: 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.upload-button:hover {
+  background-color: #a29bfe;
+}
+
+.file-table-section {
+  width: 50%;
+  text-align: center;
+}
+
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.file-table th,
+.file-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.file-table th {
+  background-color: #6c5ce7;
+  color: white;
+}
+
+.file-table td button {
+  margin: 5px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.view-button {
+  background-color: #00b894;
+  color: white;
+}
+
+.download-button {
+  background-color: #0984e3;
+  color: white;
+}
+
+.view-button:hover {
+  background-color: #55efc4;
+}
+
+.download-button:hover {
+  background-color: #74b9ff;
+}
