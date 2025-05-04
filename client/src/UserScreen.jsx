@@ -28,6 +28,10 @@ function UserScreen({ onBack }) {
         <div className="upload-section">
           <h2>Upload a File</h2>
           <button className="upload-button">Upload File</button>
+
+          {/* Run Benchmark Section */}
+          <h2>Run Benchmark</h2>
+          <button className="upload-button">Run Benchmark</button> {/* Same styling as Upload File */}
         </div>
 
         {/* File Table Section */}
