@@ -1,8 +1,10 @@
+// App.jsx
 import React, { useState } from 'react';
 import './App.css';
 import UserScreen from './UserScreen';
 import AdminLogin from './AdminLogin';
 import AdminOverview from './AdminOverview';
+import HomeScreen from './HomeScreen';  // Import HomeScreen component
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('home'); // Track the current screen
@@ -22,13 +24,10 @@ function App() {
   return (
     <div>
       {currentScreen === 'home' && (
-        <div className="home-screen">
-          <h2>Choose your screen:</h2>
-          <div className="button-container">
-            <button className="button" onClick={handleAdminClick}>Admin</button>
-            <button className="button" onClick={handleUserClick}>User</button>
-          </div>
-        </div>
+        <HomeScreen
+          onAdminClick={handleAdminClick}
+          onUserClick={handleUserClick}
+        />
       )}
 
       {currentScreen === 'user' && <UserScreen onBack={() => handleBackClick('home')} />}
