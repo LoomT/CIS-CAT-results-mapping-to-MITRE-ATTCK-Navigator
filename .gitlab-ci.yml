@@ -35,6 +35,7 @@ js_lint:
   before_script:
     - cd client
     - npm ci # fails if lockfile and package.json differ
+    - cd ..
   script:
     - cd client
     - npx eslint . --ext .js,.jsx
