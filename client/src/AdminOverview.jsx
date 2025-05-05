@@ -116,10 +116,10 @@ function AdminOverview({ onBack }) {
           <div className="popup">
             <h3 className="popup-heading">Choose a format to visualize</h3>
             <div className="popup-buttons">
-            <button className="popup-button">SVG</button>
-            <button className="popup-button">PNG</button>
-            <button className="popup-cancel" onClick={handlePopupClose}>Cancel</button>
-          </div>
+              <button className="popup-button">SVG</button>
+              <button className="popup-button">PNG</button>
+              <button className="popup-cancel" onClick={handlePopupClose}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
@@ -130,9 +130,9 @@ function AdminOverview({ onBack }) {
           <div className="popup">
             <h3 className="popup-heading">Are you sure you want to delete {fileToDelete}?</h3>
             <div className="popup-buttons">
-            <button className="popup-button" onClick={handleDeleteConfirm}>Yes</button>
-            <button className="popup-cancel" onClick={handleDeleteCancel}>Cancel</button>
-          </div>
+              <button className="popup-button" onClick={handleDeleteConfirm}>Yes</button>
+              <button className="popup-cancel" onClick={handleDeleteCancel}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
