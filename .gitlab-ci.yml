@@ -1,0 +1,59 @@
+stages:
+  - lint
+  - test
+
+# LINT PYTHON – PEP 8 (flake8) on everything in api/
+python_lint:
+  stage: lint
+  image: python:3.13-slim
+  cache:
+    paths:
+      - .cache/pip/
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install flake8
+  script:
+    # fail fast on real errors, but still print the full report
+    - flake8 api --count --statistics
+  artifacts:
+    when: always
+    name: "flake8-report-${CI_JOB_ID}.txt"
+    paths:
+      - flake8-report.txt
+  allow_failure: false
+
+# LINT REACT – ESLint on everything in client/
+js_lint:
+  stage: lint
+  image: node:22
+  
+  # Save time and resources for whoever runs the gitlab ci 
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-node"
+    paths:
+      - client/node_modules/
+  before_script:
+    - cd client
+    - npm ci # fails if lockfile and package.json differ
+  script:
+    - cd client
+    - npx eslint . --ext .js,.jsx
+  allow_failure: false
+
+# PYTHON TESTS – pytest against the api/ package
+python_tests:
+  stage: test
+  image: python:3.13-slim
+  cache:
+    paths:
+      - .cache/pip/
+  before_script:
+    - python -m pip install --upgrade pip
+    - |
+      if [[ -f requirements.txt ]]; then
+        pip install -r requirements.txt
+      fi
+    # install test-time deps
+    - pip install pytest
+  script:
+    - pytest -q
