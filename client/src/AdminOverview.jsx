@@ -2,36 +2,71 @@ import React, { useState } from 'react';
 import './AdminOverview.css';
 import './popups.css';
 
+/**
+ * AdminOverview Component
+ * ------------------------
+ * This component renders an administrative view for managing uploaded files.
+ * It includes file listings, and actions to visualize, download, and delete files.
+ *
+ * Props:
+ * - onBack (function): Callback triggered when the "Back" button is clicked.
+ *
+ * State:
+ * - showVisualizePopup (boolean): Controls visibility of the visualization format selection popup.
+ * - showDeletePopup (boolean): Controls visibility of the delete confirmation popup.
+ * - fileToDelete (string|null): Holds the name of the file selected for deletion.
+ */
+
 function AdminOverview({ onBack }) {
+  // Visualization popup visibility
   const [showVisualizePopup, setShowVisualizePopup] = useState(false);
+  // Delete confirmation popup visibility
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  // Stores the file name to be deleted
   const [fileToDelete, setFileToDelete] = useState(null);
 
+  /**
+   * Triggers the visualize popup.
+   */
   const handleVisualizeClick = () => {
-    setShowVisualizePopup(true); // Show the visualize popup
+    setShowVisualizePopup(true);
   };
 
+  /**
+   * Opens the delete confirmation popup for a specific file.
+   * @param {string} fileName - The name of the file to be deleted.
+   */
   const handleDeleteClick = (fileName) => {
     setFileToDelete(fileName);
     setShowDeletePopup(true); // Show the delete confirmation popup
   };
 
+  /**
+   * Confirms deletion of the selected file.
+   * (Currently only shows an alert, replace with real logic.)
+   */
   const handleDeleteConfirm = () => {
     alert(`File ${fileToDelete} deleted!`); // Placeholder for delete logic
     setShowDeletePopup(false);
   };
 
+  /**
+   * Cancels the delete action and closes the confirmation popup.
+   */
   const handleDeleteCancel = () => {
     setShowDeletePopup(false);
   };
 
+  /**
+   * Closes the visualize popup.
+   */
   const handlePopupClose = () => {
     setShowVisualizePopup(false); // Close the visualize popup
   };
 
   return (
     <div className="admin-overview">
-      {/* Top Bar */}
+      {/* Navigation Bar */}
       <div className="top-bar">
         <div className="back-text" onClick={onBack}>← Back</div>
         <div className="title-text">Admin Overview</div>
