@@ -29,6 +29,32 @@ To run in detached mode `docker-compose up -d --build`
 
 To stop the application `docker-compose down`
 
+## Development
+
+### Testing
+
+First ensure `pytest` is installed (`pip install pytest`)
+
+Then run `python -m pytest` from the project root directory
+
+### Client Style Checking
+
+### Backend Style Checking
+
+First ensure `flake8` is installed (`pip install flake8`)
+
+Then run `python -m flake8 api tests`
+
+Alternatively install `flake8` in vscode
+
+### Frontend Style Checking
+
+Enter the client directory and make sure eslint is installed (i.e do a regular `npm install`)
+
+Then run `npx eslint . --ext .js,.jsx` to recursively check all `js` and `jsx`
+
+Alternatively install `eslint` in vscode
+
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.

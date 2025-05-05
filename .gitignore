@@ -10,3 +10,4 @@
 *.sln
 *.sw?
 .git
+__pycache__
