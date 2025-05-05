@@ -2,6 +2,7 @@ import pytest
 from api.app import app as flask_app
 
 
+# scope="session" means it creates one instance for the entire test run
 @pytest.fixture(scope="session")
 def client():
     flask_app.config.update({"TESTING": True})
@@ -11,5 +12,4 @@ def client():
 
 @pytest.fixture
 def runner():
-    """Example of invoking Flask CLI commands."""
     return flask_app.test_cli_runner()
