@@ -2,13 +2,31 @@ import React, { useState } from 'react';
 import './UserScreen.css';
 import './popups.css';
 
+/**
+ * UserScreen Component
+ * ---------------------
+ * Provides the main interface for regular users. Includes:
+ * - File upload and benchmarking actions (currently placeholders).
+ * - A list of files with actions for visualization and download.
+ * - A popup modal for choosing visualization formats.
+ *
+ * Props:
+ * - onBack (function): Callback to navigate back to the previous screen (typically home).
+ */
+
 function UserScreen({ onBack }) {
   const [showPopup, setShowPopup] = useState(false);
 
+  /**
+   * Opens the visualization popup.
+   */
   const handleVisualizeClick = () => {
     setShowPopup(true);
   };
 
+  /**
+   * Closes the visualization popup.
+   */
   const handleClosePopup = () => {
     setShowPopup(false);
   };
@@ -75,6 +93,7 @@ function UserScreen({ onBack }) {
         <div className="popup-overlay">
           <div className="popup">
             <h3 className="popup-heading">Choose a format to visualize</h3>
+            {/*Buttons in the popup*/}
             <div className="popup-buttons">
               <button className="popup-button">SVG</button>
               <button className="popup-button">PNG</button>
