@@ -1,6 +1,7 @@
 import os
 import threading
 import time
+import convert
 
 from flask import (Flask, send_from_directory, request, send_file,
                    make_response)
@@ -56,13 +57,7 @@ def convert_file():
             modified_filename = f"modified_{filename}"
             modified_file_path = os.path.join(UPLOAD_FOLDER, modified_filename)
 
-            # Example modification: create a copy with modified_ prefix
-            with open(file_path, 'rb') as f:
-                content = f.read()
-
-            # Save modified content
-            with open(modified_file_path, 'wb') as f:
-                f.write(content)
+            convert_cis_to_attack(file_path, modified_file_path)
 
             # Send the modified file back to client
             response = make_response(send_file(
