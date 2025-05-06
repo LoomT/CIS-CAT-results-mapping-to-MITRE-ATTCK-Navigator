@@ -1,7 +1,8 @@
 import pandas as pd
 import json
 
-excel_file = 'CIS_Controls_v8_to_Enterprise_ATTCK_v82_Master_Mapping__5262021.xlsx'
+excel_file = \
+   'CIS_Controls_v8_to_Enterprise_ATTCK_v82_Master_Mapping__5262021.xlsx'
 sheet_name = 'V8-ATT&CK Low (Sub-)Techniques'
 
 # Load mapping sheet
@@ -44,7 +45,8 @@ def convert_cis_to_attack(input_path, output_path):
 
         for _, row in matches.iterrows():
             tech = row.get(
-                'Combined ATT&CK (Sub-)Technique ID') or row.get('ATT&CK Technique ID')
+                'Combined ATT&CK (Sub-)Technique ID') \
+                    or row.get('ATT&CK Technique ID')
             if not tech or pd.isna(tech):
                 continue
             entry = aggregator.setdefault(
@@ -57,7 +59,8 @@ def convert_cis_to_attack(input_path, output_path):
     # Build Navigator layer - output
     layer = {
         "version": "4.5.0",
-        "name": cis_data.get('benchmark-title', "MITRE ATT&CK NAVIGATOR LAYER"),
+        "name": cis_data.get('benchmark-title',
+                             "MITRE ATT&CK NAVIGATOR LAYER"),
         "domain": "enterprise-attack",
         "description": "Aggregated CIS findings mapped to MITRE ATT&CK",
         "techniques": []
@@ -80,4 +83,5 @@ def convert_cis_to_attack(input_path, output_path):
         json.dump(layer, f, indent=2)
 
     print(
-        f"Navigator layer written to {output_path} with {len(layer['techniques'])} techniques.")
+        f"Navigator layer written to {output_path} with \
+            {len(layer['techniques'])} techniques.")
