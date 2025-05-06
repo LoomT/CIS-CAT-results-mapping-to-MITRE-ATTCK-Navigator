@@ -1,7 +1,7 @@
 import os
 import threading
 import time
-from convert import convert_cis_to_attack
+from .convert import convert_cis_to_attack
 
 from flask import (Flask, send_from_directory, request, send_file,
                    make_response)
