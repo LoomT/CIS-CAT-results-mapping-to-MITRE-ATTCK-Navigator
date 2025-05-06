@@ -9,17 +9,18 @@ df = pd.read_excel(excel_file, sheet_name=sheet_name, dtype=str)
 
 
 def gradient_color(fraction):
-        if fraction <= 0.5:
-            ratio = fraction / 0.5
-            r = 255
-            g = int(153 * ratio)
-            b = 51
-        else:
-            ratio = (fraction - 0.5) / 0.5
-            r = int(255 - 204 * ratio)
-            g = int(153 + 51 * ratio)
-            b = 51
-        return f"#{r:02x}{g:02x}{b:02x}"
+    if fraction <= 0.5:
+        ratio = fraction / 0.5
+        r = 255
+        g = int(153 * ratio)
+        b = 51
+    else:
+        ratio = (fraction - 0.5) / 0.5
+        r = int(255 - 204 * ratio)
+        g = int(153 + 51 * ratio)
+        b = 51
+    return f"#{r:02x}{g:02x}{b:02x}"
+
 
 def convert_cis_to_attack(input_path, output_path):
     cis_data = json.load(open(input_path))
@@ -36,16 +37,18 @@ def convert_cis_to_attack(input_path, output_path):
         segs = raw.split('.')
         high = segs[0]
         low = ".".join(segs[:2])
-        
+
         matches = df[df['CIS Safeguard'].fillna('').str.startswith(low)]
         if matches.empty:
             matches = df[df['CIS Control'] == high]
-        
+
         for _, row in matches.iterrows():
-            tech = row.get('Combined ATT&CK (Sub-)Technique ID') or row.get('ATT&CK Technique ID')
+            tech = row.get(
+                'Combined ATT&CK (Sub-)Technique ID') or row.get('ATT&CK Technique ID')
             if not tech or pd.isna(tech):
                 continue
-            entry = aggregator.setdefault(tech, {'pass': 0, 'total': 0, 'comments': []})
+            entry = aggregator.setdefault(
+                tech, {'pass': 0, 'total': 0, 'comments': []})
             entry['total'] += 1
             if result != 'fail':
                 entry['pass'] += 1
@@ -76,4 +79,5 @@ def convert_cis_to_attack(input_path, output_path):
     with open(output_path, 'w') as f:
         json.dump(layer, f, indent=2)
 
-    print(f"Navigator layer written to {output_path} with {len(layer['techniques'])} techniques.")
+    print(
+        f"Navigator layer written to {output_path} with {len(layer['techniques'])} techniques.")
