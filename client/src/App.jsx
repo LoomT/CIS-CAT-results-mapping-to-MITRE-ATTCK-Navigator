@@ -1,43 +1,74 @@
-import {useEffect, useState} from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import './App.css';
+import UserScreen from './UserScreen';
+import AdminLogin from './AdminLogin';
+import AdminOverview from './AdminOverview';
+import HomeScreen from './HomeScreen';  // Import HomeScreen component
 
+/**
+ * App Component
+ * --------------
+ * The central component of the application that manages navigation between different
+ * screens using internal state.
+ *
+ * Screens:
+ * - 'home': Entry point where the user can choose between admin or user view.
+ * - 'user': The user interface for non-admin users.
+ * - 'admin-login': A secure entryway for admin token validation.
+ * - 'admin-overview': Administrative dashboard with file control actions.
+ *
+ * State:
+ * - currentScreen (string): Tracks the active screen being displayed.
+ */
 function App() {
-  const [count, setCount] = useState(0)
-  const [currentTime, setCurrentTime] = useState(0)
+  /**
+   * Track the current screen
+   */
+  const [currentScreen, setCurrentScreen] = useState('home');
 
-  useEffect(() => {
-    console.log("useEffect")
-    fetch('/api/time').then(res => res.json()).then(data => {
-      setCurrentTime(data.time);
-    });
-  }, []);
+  /**
+   * Navigates to the User screen.
+   */
+  const handleUserClick = () => {
+    setCurrentScreen('user');
+  };
+
+  /**
+   * Navigates to the Admin Login screen.
+   */
+  const handleAdminClick = () => {
+    setCurrentScreen('admin-login');
+  };
+
+  /**
+   * Navigates back to the Home screen from any other screen.
+   */
+  const handleBackClick = () => {
+    setCurrentScreen('home'); // Navigate back to home screen
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          The current time is {currentTime}.
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      {/* Render the Home screen */}
+      {currentScreen === 'home' && (
+        <HomeScreen
+          onAdminClick={handleAdminClick}
+          onUserClick={handleUserClick}
+        />
+      )}
+      {/* Render the Admin Login screen */}
+      {currentScreen === 'admin-login' && (
+        <AdminLogin
+          onBack={handleBackClick}
+          onSuccess={() => setCurrentScreen('admin-overview')}
+        />
+      )}
+      {/* Render the User screen */}
+      {currentScreen === 'user' && <UserScreen onBack={handleBackClick} />}
+      {/* Render the Admin Overview screen */}
+      {currentScreen === 'admin-overview' && <AdminOverview onBack={handleBackClick} />}
+    </div>
+  );
 }
 
-export default App
+export default App;
