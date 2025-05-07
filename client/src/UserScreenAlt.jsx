@@ -58,10 +58,10 @@ function UserScreen({ onBack, t }) {
           <table className="file-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Date</th>
-                <th>Actions</th>
+                <th>{t.name}</th>
+                <th>{t.department}</th>
+                <th>{t.date}</th>
+                <th>{t.actions}</th>
               </tr>
             </thead>
             <tbody>

@@ -66,7 +66,7 @@ function AdminLogin({ onBack, onSuccess, t }) {
           value={token}
           onChange={handleTokenChange}
           onKeyDown={handleKeyDown}
-          placeholder="Enter your token"
+          placeholder={t.enterToken}
         />
         <button className="submit-button" onClick={handleSubmit}>{t.submit}</button>
 

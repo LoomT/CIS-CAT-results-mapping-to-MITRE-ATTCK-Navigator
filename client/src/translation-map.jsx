@@ -13,7 +13,13 @@ const translations = {
     back: '← Back',
     cancel: 'Cancel',
     confirmDelete: name => `Are you sure you want to delete ${name}?`,
-    chooseFormat: 'Choose a format to visualize'
+    chooseFormat: 'Choose a format to visualize',
+    name: 'Name',
+    department: 'Department',
+    date: 'Date',
+    actions: 'Actions',
+    yes: 'Yes',
+    enterToken: 'Enter your token'
   },
   nl: {
     adminToken: 'Voer admin token in',
@@ -28,7 +34,13 @@ const translations = {
     back: '← Terug',
     cancel: 'Annuleer',
     confirmDelete: name => `Weet je zeker dat je ${name} wilt verwijderen?`,
-    chooseFormat: 'Kies een formaat om te visualiseren'
+    chooseFormat: 'Kies een formaat om te visualiseren',
+    name: 'Naam',
+    department: 'Afdeling',
+    date: 'Datum',
+    actions: 'Acties',
+    yes: 'Ja',
+    enterToken: 'Voer uw token in'
   }
 };
 

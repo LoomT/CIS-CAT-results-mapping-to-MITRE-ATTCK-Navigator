@@ -69,7 +69,7 @@ function AdminOverview({ onBack, t }) {
       {/* Navigation Bar */}
       <div className="top-bar">
         <div className="back-text" onClick={onBack}>{t.back}</div>
-        <div className="title-text">Admin Overview</div>
+        <div className="title-text">{t.adminOverview}</div>
       </div>
 
       {/* File Table Section */}
@@ -78,10 +78,10 @@ function AdminOverview({ onBack, t }) {
         <table className="file-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Department</th>
-              <th>Date</th>
-              <th>Actions</th>
+              <th>{t.name}</th>
+              <th>{t.department}</th>
+              <th>{t.date}</th>
+              <th>{t.actions}</th>
             </tr>
           </thead>
           <tbody>
@@ -128,9 +128,9 @@ function AdminOverview({ onBack, t }) {
       {showDeletePopup && (
         <div className="popup-overlay">
           <div className="popup">
-            <h3 className="popup-heading">Are you sure you want to delete {fileToDelete}?</h3>
+            <h3 className="popup-heading">{t.confirmDelete(fileToDelete)}?</h3>
             <div className="popup-buttons">
-              <button className="popup-button" onClick={handleDeleteConfirm}>Yes</button>
+              <button className="popup-button" onClick={handleDeleteConfirm}>{t.yes}</button>
               <button className="popup-cancel" onClick={handleDeleteCancel}>{t.cancel}</button>
             </div>
           </div>
