@@ -10,8 +10,8 @@ import './popups.css';
  * - A list of files with actions for visualization and download.
  * - A popup modal for choosing visualization formats.
  *
- * Props:
- * - onBack (function): Callback to navigate back to the previous screen (typically home).
+ * @param {function} onBack - Callback to navigate back to the previous screen (typically home).
+ * @return {React.JSX.Element} - The rendered UserScreen component.
  */
 
 function UserScreen({ onBack }) {
@@ -35,6 +35,13 @@ function UserScreen({ onBack }) {
     setShowPopup(false);
   };
 
+  /**
+   * Handles drag events. Sets the dragActive state to true when dragging over the drop zone
+   * and false when leaving.
+   *
+   * @type {(function(*): void)|*} - The event handler function.
+   * @param e {object} - The drag event.
+   */
   const handleDrag = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -45,6 +52,12 @@ function UserScreen({ onBack }) {
     }
   }, []);
 
+  /**
+   * Handles file upload to the server and downloads the modified file from the response.
+   *
+   * @param file {File} - The file to be uploaded.
+   * @returns {Promise<void>} - A promise that resolves when the file is uploaded and downloaded.
+   */
   async function uploadFile(file) {
     try {
       setUploading(true);
@@ -86,11 +99,18 @@ function UserScreen({ onBack }) {
     }
   }
 
+  /**
+   * Handles file drop event.
+   *
+   * @type {(function(*): void)|*} - The event handler function.
+   * @param e {object} - The drop event, contains the files.
+   */
   const handleDrop = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); // Prevent default browser behavior (e.g., open file in new tab)
+    e.stopPropagation(); // Prevent event bubbling up to parent elements
     setDragActive(false);
-
+    if(uploading) return // Don't allow dropping a file if already uploading
+    console.log("Drop event:", e);
     const files = e.dataTransfer.files;
     if(files.length > 1) alert(
       "You can only upload one file at a time. Please try again."
@@ -100,8 +120,13 @@ function UserScreen({ onBack }) {
       console.log("File dropped:", files[0]);
       uploadFile(files[0]);
     }
-  }, []);
+  }, [uploading]);
 
+  /**
+   * Handles file upload from the file input element triggered by the button.
+   *
+   * @param e {object} - The input change event, contains the files.
+   */
   const handleFileInput = (e) => {
     const files = e.target.files;
     if (files && files[0]) {
@@ -121,11 +146,12 @@ function UserScreen({ onBack }) {
         <div className="title-text">User Overview</div>
       </div>
 
-      {/* Side-by-side Content Area */}
+      {/* Side-by-side Content Area container */}
       <div className="content-area">
-        {/* Upload Section */}
+        {/* Left section for file upload functionality */}
         <div className="upload-section">
           <h2>Upload a File</h2>
+          {/* Drop zone area with drag and drop event handlers */}
           <div
             className={`upload-area ${dragActive ? 'drag-active' : ''}`}
             onDragEnter={handleDrag}
@@ -133,33 +159,37 @@ function UserScreen({ onBack }) {
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <input
-              type="file"
-              id="file-input"
-              onChange={handleFileInput}
-              style={{ display: 'none' }}
-            />
-            <label htmlFor="file-input" className="upload-label">
-              <div className="upload-content">
-                {uploading ? (
-                  <p>Uploading...</p>
-                ) : (
-                  <>
-                    <p>Drag and drop files here</p>
-                    <p>or</p>
-                    <button className="upload-button" onClick={() => document.getElementById('file-input').click()}>
-                      Choose File
-                    </button>
-                  </>
-                )}
-              </div>
-            </label>
+            {/* Upload status and instructions */}
+            <div className="upload-content">
+              {uploading ? (
+                <p>Uploading...</p>
+              ) : (
+                <>
+                  {/* Instructions shown when not uploading */}
+                  <p>Drag and drop files here</p>
+                  <p>or</p>
+                  {/* Hidden file input element triggered by button */}
+                  <input
+                    type="file"
+                    id="file-input"
+                    onChange={handleFileInput}
+                    style={{display: 'none'}}
+                  />
+                  <button className="upload-button" onClick={
+                    () => document.getElementById('file-input').click()
+                  }>
+                    Choose File
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
 
           {/* Run Benchmark Section */}
           <h2>Run Benchmark</h2>
-          <button className="upload-button">Run Benchmark</button> {/* Same styling as Upload File */}
+          {/* Same styling as Upload File */}
+          <button className="upload-button">Run Benchmark</button>
         </div>
 
         {/* File Table Section */}

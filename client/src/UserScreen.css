@@ -107,18 +107,12 @@
   padding: 20px;
   text-align: center;
   background-color: #f8f8f8;
-  cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .upload-area.drag-active {
   border-color: #2196f3;
   background-color: rgba(33, 150, 243, 0.1);
-}
-
-.upload-label {
-  display: block;
-  cursor: pointer;
 }
 
 .upload-content {
