@@ -4,6 +4,7 @@ import UserScreen from './UserScreen';
 import AdminLogin from './AdminLogin';
 import AdminOverview from './AdminOverview';
 import HomeScreen from './HomeScreen';  // Import HomeScreen component
+import translations from './translation-map';
 
 /**
  * App Component
@@ -25,7 +26,12 @@ function App() {
    * Track the current screen
    */
   const [currentScreen, setCurrentScreen] = useState('home');
+  /**
+   * Sets the language to English by default
+   */
+  const[language, setLanguage] = useState('en');
 
+  const t = translations[language];
   /**
    * Navigates to the User screen.
    */
@@ -49,11 +55,19 @@ function App() {
 
   return (
     <div>
+      {/* Language Toggle */}
+      <div style={{ position: 'absolute', top: 10, right: 20 }}>
+        <button onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}>
+          {language === 'en' ? 'Nederlands' : 'English'}
+        </button>
+      </div>
+
       {/* Render the Home screen */}
       {currentScreen === 'home' && (
         <HomeScreen
           onAdminClick={handleAdminClick}
           onUserClick={handleUserClick}
+          t={t}
         />
       )}
       {/* Render the Admin Login screen */}
@@ -61,12 +75,13 @@ function App() {
         <AdminLogin
           onBack={handleBackClick}
           onSuccess={() => setCurrentScreen('admin-overview')}
+          t={t}
         />
       )}
       {/* Render the User screen */}
-      {currentScreen === 'user' && <UserScreen onBack={handleBackClick} />}
+      {currentScreen === 'user' && <UserScreen onBack={handleBackClick} t={t} />}
       {/* Render the Admin Overview screen */}
-      {currentScreen === 'admin-overview' && <AdminOverview onBack={handleBackClick} />}
+      {currentScreen === 'admin-overview' && <AdminOverview onBack={handleBackClick} t={t} />}
     </div>
   );
 }
