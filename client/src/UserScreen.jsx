@@ -62,17 +62,18 @@ function UserScreen({ onBack }) {
     try {
       setUploading(true);
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
       console.log("uploading file: " + formData)
-      const response = await fetch('/api/files', {
-        method: 'POST',
+      const response = await fetch("/api/files", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        console.error('Error uploading file:', response);
-        throw new Error('Upload failed');
+        console.error("Error uploading file:", response);
+        alert("Failed to upload file. Please try again.");
+        return
       }
 
       // Get the modified file from the response
@@ -80,10 +81,10 @@ function UserScreen({ onBack }) {
 
       // Create a download link for the modified file
       const downloadUrl = window.URL.createObjectURL(modifiedFile);
-      const fileName = response.headers.get('X-Modified-Filename') || 'modified_file.txt';
+      const fileName = response.headers.get("X-Modified-Filename") || "modified_file.txt";
 
       // Create a temporary link and trigger download
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = downloadUrl;
       a.download = fileName;
       document.body.appendChild(a);
@@ -92,8 +93,8 @@ function UserScreen({ onBack }) {
       window.URL.revokeObjectURL(downloadUrl);
 
     } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('Failed to upload file. Please try again.');
+      console.error("Error uploading file:", error);
+      alert("Failed to upload file. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -153,7 +154,7 @@ function UserScreen({ onBack }) {
           <h2>Upload a File</h2>
           {/* Drop zone area with drag and drop event handlers */}
           <div
-            className={`upload-area ${dragActive ? 'drag-active' : ''}`}
+            className={`upload-area ${dragActive ? "drag-active" : ""}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -173,10 +174,10 @@ function UserScreen({ onBack }) {
                     type="file"
                     id="file-input"
                     onChange={handleFileInput}
-                    style={{display: 'none'}}
+                    style={{display: "none"}}
                   />
                   <button className="upload-button" onClick={
-                    () => document.getElementById('file-input').click()
+                    () => document.getElementById("file-input").click()
                   }>
                     Choose File
                   </button>
