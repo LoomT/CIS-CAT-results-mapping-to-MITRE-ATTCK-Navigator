@@ -37,9 +37,12 @@ def get_file(file_id: str) -> tuple[str, int] | Response:
                     as_attachment=True,
                     download_name=files[0]
                 )
-            else:
-                # Should not happen
+
+            # Should not happen
+            elif len(files) > 1:
                 return "Multiple files found", 500
+            else:
+                return "No file found", 500
         else:
             return "No file by this id found", 404
     except Exception as e:
