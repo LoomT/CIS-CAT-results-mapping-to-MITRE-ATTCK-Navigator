@@ -1,8 +1,3 @@
-### 🐛 Bug Title
-[Short, descriptive name of the bug]
-
----
-
 ### 🔍 Description
 What’s going wrong? Include error messages, UI screenshots, etc.
 

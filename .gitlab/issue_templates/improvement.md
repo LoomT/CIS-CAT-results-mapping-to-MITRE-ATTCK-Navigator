@@ -1,8 +1,3 @@
-### ⚙️ Improvement Title
-[Brief name of the enhancement]
-
----
-
 ### 📈 Description
 What is being improved and why?
 

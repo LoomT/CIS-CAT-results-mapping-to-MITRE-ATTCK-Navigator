@@ -1,8 +1,3 @@
-### 🧹 Refactor / Tech Debt Task
-[Concise description of the tech debt or refactor target]
-
----
-
 ### 🤔 Reason
 Why is this needed? What problems or risks does this address?
 
