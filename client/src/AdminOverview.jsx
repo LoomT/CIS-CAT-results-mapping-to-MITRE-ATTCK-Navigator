@@ -17,7 +17,7 @@ import './popups.css';
  * - fileToDelete (string|null): Holds the name of the file selected for deletion.
  */
 
-function AdminOverview({ onBack }) {
+function AdminOverview({ onBack, t }) {
   // Visualization popup visibility
   const [showVisualizePopup, setShowVisualizePopup] = useState(false);
   // Delete confirmation popup visibility
@@ -68,13 +68,13 @@ function AdminOverview({ onBack }) {
     <div className="admin-overview">
       {/* Navigation Bar */}
       <div className="top-bar">
-        <div className="back-text" onClick={onBack}>← Back</div>
+        <div className="back-text" onClick={onBack}>{t.back}</div>
         <div className="title-text">Admin Overview</div>
       </div>
 
       {/* File Table Section */}
       <div className="file-table-section">
-        <h2>Files List</h2>
+        <h2>{t.filesList}</h2>
         <table className="file-table">
           <thead>
             <tr>
@@ -91,9 +91,9 @@ function AdminOverview({ onBack }) {
               <td>Department 1</td>
               <td>2025-05-04</td>
               <td>
-                <button className="view-button" onClick={handleVisualizeClick}>Visualize</button>
-                <button className="download-button">Download</button>
-                <button className="delete-button" onClick={() => handleDeleteClick('File 1')}>Delete</button>
+                <button className="view-button" onClick={handleVisualizeClick}>{t.visualize}</button>
+                <button className="download-button">{t.download}</button>
+                <button className="delete-button" onClick={() => handleDeleteClick('File 1')}>{t.delete}</button>
               </td>
             </tr>
             <tr>
@@ -101,9 +101,9 @@ function AdminOverview({ onBack }) {
               <td>Department 2</td>
               <td>2025-05-04</td>
               <td>
-                <button className="view-button" onClick={handleVisualizeClick}>Visualize</button>
-                <button className="download-button">Download</button>
-                <button className="delete-button" onClick={() => handleDeleteClick('File 2')}>Delete</button>
+                <button className="view-button" onClick={handleVisualizeClick}>{t.visualize}</button>
+                <button className="download-button">{t.download}</button>
+                <button className="delete-button" onClick={() => handleDeleteClick('File 2')}>{t.delete}</button>
               </td>
             </tr>
           </tbody>
@@ -114,11 +114,11 @@ function AdminOverview({ onBack }) {
       {showVisualizePopup && (
         <div className="popup-overlay">
           <div className="popup">
-            <h3 className="popup-heading">Choose a format to visualize</h3>
+            <h3 className="popup-heading">{t.chooseFormat}</h3>
             <div className="popup-buttons">
               <button className="popup-button">SVG</button>
               <button className="popup-button">PNG</button>
-              <button className="popup-cancel" onClick={handlePopupClose}>Cancel</button>
+              <button className="popup-cancel" onClick={handlePopupClose}>{t.cancel}</button>
             </div>
           </div>
         </div>
@@ -131,7 +131,7 @@ function AdminOverview({ onBack }) {
             <h3 className="popup-heading">Are you sure you want to delete {fileToDelete}?</h3>
             <div className="popup-buttons">
               <button className="popup-button" onClick={handleDeleteConfirm}>Yes</button>
-              <button className="popup-cancel" onClick={handleDeleteCancel}>Cancel</button>
+              <button className="popup-cancel" onClick={handleDeleteCancel}>{t.cancel}</button>
             </div>
           </div>
         </div>

@@ -12,7 +12,7 @@ import './popups.css';
  * - onBack (function): Callback to navigate back to the previous screen (e.g., home).
  * - onSuccess (function): Callback triggered when the token is successfully validated.
  */
-function AdminLogin({ onBack, onSuccess }) {
+function AdminLogin({ onBack, onSuccess, t }) {
   // State for storing the entered token
   const [token, setToken] = useState('');
   // State for showing error messages
@@ -54,7 +54,7 @@ function AdminLogin({ onBack, onSuccess }) {
     <div className="admin-login">
       {/* Top Navigation Bar */}
       <div className="top-bar">
-        <div className="back-text" onClick={() => onBack('home')}>← Back</div>
+        <div className="back-text" onClick={() => onBack('home')}>{t.back}</div>
         <div className="title-text">Admin Login</div>
       </div>
 
@@ -68,7 +68,7 @@ function AdminLogin({ onBack, onSuccess }) {
           onKeyDown={handleKeyDown}
           placeholder="Enter your token"
         />
-        <button className="submit-button" onClick={handleSubmit}>Submit</button>
+        <button className="submit-button" onClick={handleSubmit}>{t.submit}</button>
 
         {/* Error Message Display */}
         {errorMessage && <div className="error-message">{errorMessage}</div>}

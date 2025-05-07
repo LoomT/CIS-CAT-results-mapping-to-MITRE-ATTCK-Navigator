@@ -70,8 +70,8 @@ function UserScreen({ onBack, t }) {
                 <td>Department 1</td>
                 <td>2025-05-04</td>
                 <td>
-                  <button className="view-button" onClick={handleVisualizeClick}>Visualize</button>
-                  <button className="download-button">Download</button>
+                  <button className="view-button" onClick={handleVisualizeClick}>{t.visualize}</button>
+                  <button className="download-button">{t.download}</button>
                 </td>
               </tr>
               <tr>
@@ -79,8 +79,8 @@ function UserScreen({ onBack, t }) {
                 <td>Department 2</td>
                 <td>2025-05-04</td>
                 <td>
-                  <button className="view-button" onClick={handleVisualizeClick}>Visualize</button>
-                  <button className="download-button">Download</button>
+                  <button className="view-button" onClick={handleVisualizeClick}>{t.visualize}</button>
+                  <button className="download-button">{t.download}</button>
                 </td>
               </tr>
             </tbody>
@@ -92,12 +92,12 @@ function UserScreen({ onBack, t }) {
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup">
-            <h3 className="popup-heading">Choose a format to visualize</h3>
+            <h3 className="popup-heading">{t.chooseFormat}</h3>
             {/*Buttons in the popup*/}
             <div className="popup-buttons">
               <button className="popup-button">SVG</button>
               <button className="popup-button">PNG</button>
-              <button className="popup-cancel" onClick={handleClosePopup}>Cancel</button>
+              <button className="popup-cancel" onClick={handleClosePopup}>{t.cancel}</button>
             </div>
           </div>
         </div>
