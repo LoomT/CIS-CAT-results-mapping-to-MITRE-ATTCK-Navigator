@@ -1,8 +1,3 @@
-### ✅ Test Case Title
-[Short description of the test case or QA scenario]
-
----
-
 ### 🔍 Objective
 What is this test validating?
 
