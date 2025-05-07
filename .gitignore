@@ -11,3 +11,6 @@
 *.sw?
 .git
 __pycache__
+
+# Generated
+uploads
