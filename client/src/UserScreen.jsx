@@ -1,6 +1,8 @@
 import React, {useCallback, useState} from 'react';
 import './UserScreen.css';
 import './popups.css';
+import "./FileTableEntry.jsx";
+import FileTableEntry from "./FileTableEntry.jsx";
 
 /**
  * UserScreen Component
@@ -18,6 +20,7 @@ function UserScreen({ onBack }) {
   const [showPopup, setShowPopup] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [files, setFiles] = useState([]);
 
 
   /**
@@ -59,6 +62,12 @@ function UserScreen({ onBack }) {
    * @returns {Promise<void>} - A promise that resolves when the file is uploaded and downloaded.
    */
   async function uploadFile(file) {
+    // Make sure that the file is a JSON file
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      alert("Please upload a JSON file only");
+      return;
+    }
+
     try {
       setUploading(true);
       const formData = new FormData();
@@ -76,12 +85,41 @@ function UserScreen({ onBack }) {
         return
       }
 
-      // Get the modified file from the response
-      const modifiedFile = await response.blob();
+      const data = await response.json();
+      console.log("File uploaded successfully. File ID:", data.id);
+
+      // Append the new file to the files state
+      setFiles(prevFiles => [{
+        id: data.id,
+        filename: data.filename,
+        department: 'Default Department', // might want to make this dynamic
+        time: new Date().toISOString()
+      }, ...prevFiles]);
+
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("Failed to upload file. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  const handleDownload = async (fileId, fileName) => {
+    try {
+      console.log("downloading file: " + fileId)
+      const response = await fetch(`/api/files/${fileId}`);
+
+      if (!response.ok) {
+        console.error("Error downloading file:", response);
+        alert("Failed to download file. Please try again.");
+        return
+      }
+
+      // Get the converted file from the response
+      const file = await response.blob();
 
       // Create a download link for the modified file
-      const downloadUrl = window.URL.createObjectURL(modifiedFile);
-      const fileName = response.headers.get("X-Modified-Filename") || "modified_file.txt";
+      const downloadUrl = window.URL.createObjectURL(file);
 
       // Create a temporary link and trigger download
       const a = document.createElement("a");
@@ -91,12 +129,9 @@ function UserScreen({ onBack }) {
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(downloadUrl);
-
     } catch (error) {
-      console.error("Error uploading file:", error);
-      alert("Failed to upload file. Please try again.");
-    } finally {
-      setUploading(false);
+      console.error("Error downloading file:", error);
+      alert("Failed to download file. Please try again.");
     }
   }
 
@@ -174,6 +209,7 @@ function UserScreen({ onBack }) {
                     type="file"
                     id="file-input"
                     onChange={handleFileInput}
+                    accept=".json"
                     style={{display: "none"}}
                   />
                   <button className="upload-button" onClick={
@@ -201,29 +237,22 @@ function UserScreen({ onBack }) {
               <tr>
                 <th>Name</th>
                 <th>Department</th>
-                <th>Date</th>
+                <th>Time</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>File 1</td>
-                <td>Department 1</td>
-                <td>2025-05-04</td>
-                <td>
-                  <button className="view-button" onClick={handleVisualizeClick}>Visualize</button>
-                  <button className="download-button">Download</button>
-                </td>
-              </tr>
-              <tr>
-                <td>File 2</td>
-                <td>Department 2</td>
-                <td>2025-05-04</td>
-                <td>
-                  <button className="view-button" onClick={handleVisualizeClick}>Visualize</button>
-                  <button className="download-button">Download</button>
-                </td>
-              </tr>
+              {/* Map files to table rows*/}
+              {files.map((file) => (
+                <FileTableEntry
+                  key={file.id}
+                  filename={file.filename}
+                  department={file.department}
+                  time={file.time}
+                  onVisualize={() => handleVisualizeClick()}
+                  onDownload={() => handleDownload(file.id, file.filename)}
+                />
+              ))}
             </tbody>
           </table>
         </div>
