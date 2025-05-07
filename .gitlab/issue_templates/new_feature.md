@@ -14,9 +14,8 @@ Describe what this feature should accomplish. What is the business/user value?
 - [ ] Frontend implementation
 - [ ] Unit tests
 - [ ] Integration tests
-- [ ] Code review
 - [ ] Documentation updates
-- [ ] Merge and deploy
+- [ ] Merge request
 
 ---
 
