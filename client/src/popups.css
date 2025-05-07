@@ -70,3 +70,24 @@
 .popup-cancel:hover {
   background-color: #f0f0f0;
 }
+
+.popup-input {
+  width: 100%;
+  padding: 10px;
+  margin: 15px 0;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+.admin-button {
+  padding: 10px 20px;
+  background-color: #d63031;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.admin-button:hover {
+  background-color: #ff7675;
+}

@@ -2,38 +2,36 @@ import React, { useState } from 'react';
 import './UserScreen.css';
 import './popups.css';
 
-/**
- * UserScreen Component
- * ---------------------
- * Provides the main interface for regular users. Includes:
- * - File upload and benchmarking actions (currently placeholders).
- * - A list of files with actions for visualization and download.
- * - A popup modal for choosing visualization formats.
- *
- * Props:
- * - onBack (function): Callback to navigate back to the previous screen (typically home).
- */
-
-function UserScreen({ onBack, t }) {
+function UserScreenAlt({ onBack, onAdminSuccess, t }) {
   const [showPopup, setShowPopup] = useState(false);
+  const [showAdminPopup, setShowAdminPopup] = useState(false);
+  const [adminToken, setAdminToken] = useState('');
 
-  /**
-   * Opens the visualization popup.
-   */
   const handleVisualizeClick = () => {
     setShowPopup(true);
   };
 
-  /**
-   * Closes the visualization popup.
-   */
   const handleClosePopup = () => {
     setShowPopup(false);
   };
 
+  const handleAdminAccess = () => {
+    if (adminToken === 'correct-token') {
+      setShowAdminPopup(false);
+      onAdminSuccess(); // Navigate to admin overview
+    } else {
+      alert(t.tokenIncorrect || 'Token Incorrect'); // Optional translation
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleAdminAccess();
+    }
+  };
+
   return (
     <div className="user-screen">
-
       {/* Top Navigation Bar */}
       <div className="top-bar">
         <div className="back-text" onClick={onBack}>{t.back}</div>
@@ -42,17 +40,14 @@ function UserScreen({ onBack, t }) {
 
       {/* Side-by-side Content Area */}
       <div className="content-area">
-        {/* Upload Section */}
         <div className="upload-section">
           <h2>{t.uploadFile}</h2>
           <button className="upload-button">{t.uploadFile}</button>
 
-          {/* Run Benchmark Section */}
           <h2>{t.runBenchmark}</h2>
-          <button className="upload-button">{t.runBenchmark}</button> {/* Same styling as Upload File */}
+          <button className="upload-button">{t.runBenchmark}</button>
         </div>
 
-        {/* File Table Section */}
         <div className="file-table-section">
           <h2>{t.filesList}</h2>
           <table className="file-table">
@@ -93,7 +88,6 @@ function UserScreen({ onBack, t }) {
         <div className="popup-overlay">
           <div className="popup">
             <h3 className="popup-heading">{t.chooseFormat}</h3>
-            {/*Buttons in the popup*/}
             <div className="popup-buttons">
               <button className="popup-button">SVG</button>
               <button className="popup-button">PNG</button>
@@ -102,8 +96,40 @@ function UserScreen({ onBack, t }) {
           </div>
         </div>
       )}
+
+      {/* Admin Access Button */}
+      <div style={{ position: 'fixed', bottom: 20, left: 20 }}>
+        <button className="admin-button" onClick={() => setShowAdminPopup(true)}>
+          Admin
+        </button>
+      </div>
+
+      {/* Admin Token Popup */}
+      {showAdminPopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3 className="popup-heading">{t.enterToken}</h3>
+            <input
+              type="password"
+              value={adminToken}
+              onChange={(e) => setAdminToken(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="popup-input"
+              placeholder={t.enterToken}
+            />
+            <div className="popup-buttons">
+              <button className="popup-button" onClick={handleAdminAccess}>
+                {t.confirm}
+              </button>
+              <button className="popup-cancel" onClick={() => setShowAdminPopup(false)}>
+                {t.cancel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export default UserScreen;
+export default UserScreenAlt;
