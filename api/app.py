@@ -1,6 +1,5 @@
 import os
 import shutil
-import time
 import uuid
 
 from flask import (Flask, send_from_directory, request, send_file,
@@ -15,11 +14,6 @@ app = Flask(__name__, static_folder=os.getenv('FLASK_STATIC_FOLDER'),
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-
-
-@app.route('/api/time')
-def get_current_time():
-    return {'time': time.time()}
 
 
 @app.get("/api/files/<file_id>")
