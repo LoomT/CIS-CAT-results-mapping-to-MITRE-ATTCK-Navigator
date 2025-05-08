@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './UserScreen.css';
+import './globalstyle.css';
 import './popups.css';
 
 function UserScreenAlt({ onBack, onAdminSuccess, t }) {
