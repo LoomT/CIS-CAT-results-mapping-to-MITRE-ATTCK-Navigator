@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import './AdminOverview.css';
+import './UserScreen.css';
 import './popups.css';
+import backIcon from './assets/back.png';
+import downloadIcon from './assets/download.png';
+import visualIcon from './assets/visual.png';
 
 /**
  * AdminOverview Component
@@ -65,21 +68,39 @@ function AdminOverview({ onBack, t }) {
   };
 
   return (
-    <div className="admin-overview">
-      {/* Navigation Bar */}
-      <div className="top-bar">
-        <div className="back-text" onClick={onBack}>{t.back}</div>
-        <div className="title-text">{t.adminOverview}</div>
+    <div className="admin-panel">
+      {/* Top Center Title */}
+      <div className="user-title">
+        {t.adminOverview}
+      </div>
+
+      <div className="back-button">
+        <img
+          src={backIcon}
+          alt="Back"
+          className="back-icon"
+          onClick={onBack}
+        />
+      </div>
+
+      {/* Department Toggle Placeholder */}
+      <div className="department-toggle">
+        <label htmlFor="departmentFilter">Department Filter:</label>
+        <select id="departmentFilter" disabled>
+          <option>All Departments</option>
+        </select>
       </div>
 
       {/* File Table Section */}
-      <div className="file-table-section">
+      <div className="card file-table-section">
         <h2>{t.filesList}</h2>
-        <table className="file-table">
+        <p className="section-description">Description placeholder</p>
+        <table className="files-table">
           <thead>
             <tr>
               <th>{t.name}</th>
               <th>{t.department}</th>
+              <th>{t.size}</th>
               <th>{t.date}</th>
               <th>{t.actions}</th>
             </tr>
@@ -88,21 +109,41 @@ function AdminOverview({ onBack, t }) {
             {/* Placeholder rows */}
             <tr>
               <td>File 1</td>
-              <td>Department 1</td>
+              <td>
+                <span className="department-badge department-1">Department 1</span>
+              </td>
+              <td>2.1 MB</td>
               <td>2025-05-04</td>
               <td>
-                <button className="view-button" onClick={handleVisualizeClick}>{t.visualize}</button>
-                <button className="download-button">{t.download}</button>
+                <button className="btn-blue" onClick={handleVisualizeClick}>
+                  <img src={visualIcon} alt="visualize" className="icon" />
+                  {t.visualize}
+                </button>
+
+                <button className="btn-green">
+                  <img src={downloadIcon} alt="download" className="icon" />
+                  {t.download}
+                </button>
                 <button className="delete-button" onClick={() => handleDeleteClick('File 1')}>{t.delete}</button>
               </td>
             </tr>
             <tr>
               <td>File 2</td>
-              <td>Department 2</td>
+              <td>
+                <span className="department-badge department-2">Department 2</span>
+              </td>
+              <td>3 TB</td>
               <td>2025-05-04</td>
               <td>
-                <button className="view-button" onClick={handleVisualizeClick}>{t.visualize}</button>
-                <button className="download-button">{t.download}</button>
+                <button className="btn-blue" onClick={handleVisualizeClick}>
+                  <img src={visualIcon} alt="visualize" className="icon" />
+                  {t.visualize}
+                </button>
+
+                <button className="btn-green">
+                  <img src={downloadIcon} alt="download" className="icon" />
+                  {t.download}
+                </button>
                 <button className="delete-button" onClick={() => handleDeleteClick('File 2')}>{t.delete}</button>
               </td>
             </tr>

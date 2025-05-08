@@ -267,3 +267,8 @@ h2, h3 {
 .flip-vertical {
   transform: rotate(180deg);
 }
+
+.department-toggle {
+  margin: 1rem 2rem;
+  font-size: 0.95rem;
+}
