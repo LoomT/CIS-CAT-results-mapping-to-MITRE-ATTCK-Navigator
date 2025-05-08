@@ -182,7 +182,7 @@ body, .admin-panel {
 
 /* Headings */
 h2, h3 {
-  color: #1f2937; /* slate-800 for bolder headings */
+  color: #2d3436;
 }
 
 .header-bar {
@@ -217,4 +217,53 @@ h2, h3 {
   font-weight: bold;
   color: #2d3436; /* matches old top bar title */
   z-index: 100;
+}
+
+.section-header {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1f2937; /* dark slate */
+}
+
+.section-header p {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  color: #6b7280; /* gray-500 */
+}
+
+
+.department-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px; /* full rounded corners */
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/*PLACEHOLDER*/
+.department-1 {
+  background-color: #e0f2fe; /* blue-100 */
+  color: #1e3a8a; /* blue-900 */
+}
+/*PLACEHOLDER*/
+.department-2 {
+  background-color: #dcfce7; /* green-100 */
+  color: #065f46; /* green-800 */
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.flip-vertical {
+  transform: rotate(180deg);
 }

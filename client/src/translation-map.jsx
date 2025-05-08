@@ -19,7 +19,8 @@ const translations = {
     date: 'Date',
     actions: 'Actions',
     yes: 'Yes',
-    enterToken: 'Enter your token'
+    enterToken: 'Enter your token',
+    size: 'Filesize'
   },
   nl: {
     adminToken: 'Voer admin token in',
@@ -40,7 +41,8 @@ const translations = {
     date: 'Datum',
     actions: 'Acties',
     yes: 'Ja',
-    enterToken: 'Voer uw token in'
+    enterToken: 'Voer uw token in',
+    size: 'Bestandsgrootte'
   }
 };
 
