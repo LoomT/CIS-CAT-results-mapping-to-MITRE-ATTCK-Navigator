@@ -82,11 +82,9 @@ Alternatively install `eslint` in vscode
   - When no file is provided: `"No file part"`
   - When filename is empty: `"No selected file"`
   - When filename is invalid: `"Invalid filename"`
-  - When file upload fails: `"File upload failed"`
 
 - **Code**: `500 Internal Server Error`
-  - When server encounters an unexpected error
-  - Response will contain error message
+  - When server encounters an unexpected error: `"Unexpected error while processing file"`
 
 ### Download File
 - **URL**: `/api/files/<file_id>`
@@ -102,13 +100,16 @@ Alternatively install `eslint` in vscode
 - **Response Body**: File content as binary data
 
 #### Error Responses
+- **Code**: `400 Bad Request`
+  - When the file ID is invalid: `"Invalid file id"`
+
 - **Code**: `404 Not Found`
   - When file ID doesn't exist: `"No file by this id found"`
 
 - **Code**: `500 Internal Server Error`
   - When multiple files found: `"Multiple files found"`
   - When no files found in directory (dangling directory): `"No file found"`
-  - When server encounters an unexpected error: Error message
+  - When server encounters an unexpected error: `"Unexpected error while getting file"`
 
 ### Notes
 - All files are stored in a dedicated uploads directory
