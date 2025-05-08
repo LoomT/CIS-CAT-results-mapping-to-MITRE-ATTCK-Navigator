@@ -80,3 +80,11 @@ def test_get_file_exception(client, monkeypatch):
     response = client.get(f"/api/files/{test_file_id}")
     assert response.status_code == 500
     assert b"Unexpected error" in response.data
+
+
+def test_get_file_malicious_id(client):
+    test_file_id = "..%5c..%5csecret"
+
+    response = client.get(f"/api/files/{test_file_id}")
+    assert response.status_code == 400
+    assert response.data == b"Invalid file id"
