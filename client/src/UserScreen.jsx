@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './UserScreen.css';
 import './popups.css';
+import backIcon from './assets/back.png';
 
 /**
  * UserScreen Component
@@ -33,11 +34,18 @@ function UserScreen({ onBack, t }) {
 
   return (
     <div className="admin-panel">
+      {/* Top Center Title */}
+      <div className="user-title">
+        {t.userOverview}
+      </div>
 
-      {/* Top Navigation Bar */}
-      <div className="top-bar">
-        <div className="back-text" onClick={onBack}>{t.back}</div>
-        <div className="title-text">{t.userOverview}</div>
+      <div className="back-button">
+        <img
+          src={backIcon}
+          alt="Back"
+          className="back-icon"
+          onClick={onBack}
+        />
       </div>
 
       {/* Side-by-side Content Area */}
@@ -55,7 +63,7 @@ function UserScreen({ onBack, t }) {
         {/* File Table Section */}
         <div className="card file-table-section">
           <h2>{t.filesList}</h2>
-          <table className="file-table">
+          <table className="files-table">
             <thead>
               <tr>
                 <th>{t.name}</th>
