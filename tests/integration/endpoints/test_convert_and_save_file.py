@@ -1,5 +1,5 @@
+import io
 import os
-import tempfile
 
 import pytest
 
@@ -14,13 +14,10 @@ import pytest
 ])
 def test_convert_and_save_file_success(client, file_name, file_content,
                                        expected_status):
-    with tempfile.NamedTemporaryFile(delete=False) as temp:
-        temp.write(file_content)
-        temp.seek(0)
-        temp_path = temp.name
-    with open(temp_path, 'rb') as f:
-        response = client.post('/api/files',
-                               data={'file': (f, file_name)})
+    response = client.post('/api/files',
+                           data={
+                               'file': (io.BytesIO(file_content), file_name)
+                           })
     assert response.status_code == expected_status
     assert response.content_type == "application/json"
 
@@ -30,8 +27,6 @@ def test_convert_and_save_file_success(client, file_name, file_content,
     assert 'filename' in data
     assert data['filename'] == 'converted_' + file_name
 
-    os.unlink(temp_path)
-
 
 def test_convert_and_save_file_no_file(client):
     response = client.post('/api/files')
@@ -40,14 +35,14 @@ def test_convert_and_save_file_no_file(client):
 
 
 def test_convert_and_save_file_empty_filename(client):
-    data = {'file': (tempfile.TemporaryFile(), '')}
+    data = {'file': (io.BytesIO(b"Sample content"), '')}
     response = client.post('/api/files', data=data)
     assert response.status_code == 400
     assert response.data.decode() == 'No selected file'
 
 
 def test_convert_and_save_file_invalid_filename(client):
-    data = {'file': (tempfile.TemporaryFile(), '//')}
+    data = {'file': (io.BytesIO(b"Sample content"), '//')}
     response = client.post('/api/files', data=data)
     assert response.status_code == 400
     assert response.data.decode() == 'Invalid filename'
@@ -58,13 +53,12 @@ def test_convert_and_save_file_server_error(client, monkeypatch):
         raise OSError("Mocked error")
 
     monkeypatch.setattr(os, 'makedirs', mock_os_makedirs)
-    with tempfile.NamedTemporaryFile(delete=False) as temp:
-        temp.write(b"Sample content")
-        temp.seek(0)
-        temp_path = temp.name
-    with open(temp_path, 'rb') as f:
-        response = client.post('/api/files',
-                               data={'file': (f, "testfile.txt")})
+    response = client.post('/api/files',
+                           data={
+                               'file': (
+                                   io.BytesIO(b"Sample content"),
+                                   "testfile.txt"
+                               )
+                           })
     assert response.status_code == 500
-    assert "Mocked error" in response.data.decode()
-    os.unlink(temp_path)
+    assert "Unexpected error while processing file" in response.data.decode()
