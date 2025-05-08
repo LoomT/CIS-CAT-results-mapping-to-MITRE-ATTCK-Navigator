@@ -2,8 +2,7 @@ import os
 import shutil
 import uuid
 
-from flask import (Flask, send_from_directory, request, send_file,
-                   Response)
+from flask import (Flask, send_from_directory, request, send_file, Response)
 from flask.cli import load_dotenv
 from werkzeug.utils import secure_filename
 
@@ -20,27 +19,35 @@ if not os.path.exists(UPLOAD_FOLDER):
 def get_file(file_id: str) -> tuple[str, int] | Response:
     """Endpoint for retrieving a file by its unique id."""
     try:
+        # Ensure file_id is safe to use as a filename
+        secure_file_id = secure_filename(file_id)
+        if secure_file_id != file_id:
+            return "Invalid file id", 400
+
         file_dir = os.path.join(UPLOAD_FOLDER, file_id)
         # Check if a folder with the id exists
-        if os.path.isdir(file_dir):
-            # The folder should contain exactly one file
-            files = os.listdir(file_dir)
-            if len(files) == 1:
-                return send_file(
-                    os.path.join(file_dir, files[0]),
-                    as_attachment=True,
-                    download_name=files[0]
-                )
-
-            # Should not happen
-            elif len(files) > 1:
-                return "Multiple files found", 500
-            else:
-                return "No file found", 500
-        else:
+        if not os.path.isdir(file_dir):
             return "No file by this id found", 404
+
+        # The folder should contain exactly one file
+        files = os.listdir(file_dir)
+
+        # Should not happen
+        if len(files) > 1:
+            return "Multiple files found", 500
+        elif len(files) == 0:
+            return "No file found", 500
+
+        return send_file(
+            os.path.join(file_dir, files[0]),
+            as_attachment=True,
+            download_name=files[0]
+        )
+
     except Exception as e:
-        return str(e), 500
+        # TODO configure logging in the future
+        print(f"Unexpected error while getting file: {e}")
+        return "Unexpected error while getting file", 500
 
 
 @app.post('/api/files')
@@ -56,53 +63,48 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         if file.filename == '':
             return 'No selected file', 400
 
-        if file:
-            # Secure the filename to be able to safely store it
-            filename = secure_filename(file.filename)
+        # Secure the filename to be able to safely store it
+        filename = secure_filename(file.filename)
 
-            # Secure filename might become empty
-            if filename == '':
-                return 'Invalid filename', 400
+        # Secure filename might become empty
+        if filename == '':
+            return 'Invalid filename', 400
 
-            file_path = os.path.join(UPLOAD_FOLDER, unique_id, filename)
+        # Avoid collisions with existing files
+        while os.path.exists(os.path.join(UPLOAD_FOLDER, unique_id)):
+            unique_id = str(uuid.uuid4())
 
-            # Create a unique directory
-            os.makedirs(os.path.join(UPLOAD_FOLDER, unique_id))
+        # Create a unique directory
+        os.makedirs(os.path.join(UPLOAD_FOLDER, unique_id))
 
-            # Save the uploaded file
-            file.save(file_path)
+        # Process the file (modify as needed)
+        modified_filename = f"converted_{filename}"
+        modified_file_path = os.path.join(
+            UPLOAD_FOLDER, unique_id, modified_filename
+        )
 
-            # TODO assert that the file is of correct format
+        # Read the file content
+        # TODO assert that the file is of correct format
+        # TODO convert it to the desired format
+        content = file.stream.read()
 
-            # Process the file (modify as needed)
-            modified_filename = f"converted_{filename}"
-            modified_file_path = os.path.join(
-                UPLOAD_FOLDER, unique_id, modified_filename
-            )
+        # Save modified content
+        with open(modified_file_path, 'wb') as f:
+            f.write(content)
 
-            # Example modification: create a copy with modified_ prefix
-            with open(file_path, 'rb') as f:
-                content = f.read()
-
-            # Save modified content
-            with open(modified_file_path, 'wb') as f:
-                f.write(content)
-
-            os.remove(file_path)
-
-            # Send the id of the modified file back to the client
-            return {
-                'id': unique_id,
-                'filename': modified_filename,
-            }, 201
-
-        return 'File upload failed', 400
+        # Send the id of the modified file back to the client
+        return {
+            'id': unique_id,
+            'filename': modified_filename,
+        }, 201
 
     except Exception as e:
         # Clean up on error, remove the directory with all its files
         if os.path.exists(os.path.join(UPLOAD_FOLDER, unique_id)):
             shutil.rmtree(os.path.join(UPLOAD_FOLDER, unique_id))
-        return str(e), 500
+        # TODO configure logging in the future
+        print(f"Unexpected error while processing file: {e}")
+        return "Unexpected error while processing file", 500
 
 
 # Serve React App
