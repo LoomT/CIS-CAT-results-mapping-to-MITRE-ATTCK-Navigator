@@ -32,7 +32,7 @@ function UserScreen({ onBack, t }) {
   };
 
   return (
-    <div className="user-screen">
+    <div className="admin-panel">
 
       {/* Top Navigation Bar */}
       <div className="top-bar">
@@ -43,17 +43,17 @@ function UserScreen({ onBack, t }) {
       {/* Side-by-side Content Area */}
       <div className="content-area">
         {/* Upload Section */}
-        <div className="upload-section">
+        <div className="card upload-section">
           <h2>{t.uploadFile}</h2>
-          <button className="upload-button">{t.uploadFile}</button>
+          <button className="btn-purple">{t.uploadFile}</button>
 
           {/* Run Benchmark Section */}
           <h2>{t.runBenchmark}</h2>
-          <button className="upload-button">{t.runBenchmark}</button> {/* Same styling as Upload File */}
+          <button className="btn-purple">{t.runBenchmark}</button> {/* Same styling as Upload File */}
         </div>
 
         {/* File Table Section */}
-        <div className="file-table-section">
+        <div className="card file-table-section">
           <h2>{t.filesList}</h2>
           <table className="file-table">
             <thead>
@@ -70,8 +70,8 @@ function UserScreen({ onBack, t }) {
                 <td>Department 1</td>
                 <td>2025-05-04</td>
                 <td>
-                  <button className="view-button" onClick={handleVisualizeClick}>{t.visualize}</button>
-                  <button className="download-button">{t.download}</button>
+                  <button className="btn-blue" onClick={handleVisualizeClick}>{t.visualize}</button>
+                  <button className="btn-green">{t.download}</button>
                 </td>
               </tr>
               <tr>
@@ -79,8 +79,8 @@ function UserScreen({ onBack, t }) {
                 <td>Department 2</td>
                 <td>2025-05-04</td>
                 <td>
-                  <button className="view-button" onClick={handleVisualizeClick}>{t.visualize}</button>
-                  <button className="download-button">{t.download}</button>
+                  <button className="btn-blue" onClick={handleVisualizeClick}>{t.visualize}</button>
+                  <button className="btn-green">{t.download}</button>
                 </td>
               </tr>
             </tbody>
