@@ -1,6 +1,6 @@
-import React, {useCallback, useState} from 'react';
-import './UserScreen.css';
-import './popups.css';
+import React, {useCallback, useState} from "react";
+import "./UserScreen.css";
+import "./popups.css";
 import "./FileTableEntry.jsx";
 import FileTableEntry from "./FileTableEntry.jsx";
 
@@ -63,7 +63,7 @@ function UserScreen({ onBack }) {
    */
   async function uploadFile(file) {
     // Make sure that the file is a JSON file
-    if (!file.name.toLowerCase().endsWith('.json')) {
+    if (!file.name.toLowerCase().endsWith(".json")) {
       alert("Please upload a JSON file only");
       return;
     }
@@ -92,7 +92,7 @@ function UserScreen({ onBack }) {
       setFiles(prevFiles => [{
         id: data.id,
         filename: data.filename,
-        department: 'Default Department', // might want to make this dynamic
+        department: "Default Department", // might want to make this dynamic
         time: new Date().toISOString()
       }, ...prevFiles]);
 
@@ -145,10 +145,10 @@ function UserScreen({ onBack }) {
     e.preventDefault(); // Prevent default browser behavior (e.g., open file in new tab)
     e.stopPropagation(); // Prevent event bubbling up to parent elements
     setDragActive(false);
-    if(uploading) return // Don't allow dropping a file if already uploading
+    if (uploading) return // Don't allow dropping a file if already uploading
     console.log("Drop event:", e);
     const files = e.dataTransfer.files;
-    if(files.length > 1) alert(
+    if (files.length > 1) alert(
       "You can only upload one file at a time. Please try again."
     ) // Limit to one file for now
     if (files && files[0]) {

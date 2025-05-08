@@ -57,18 +57,18 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
     unique_id = str(uuid.uuid4())
     try:
         if 'file' not in request.files:
-            return 'No file part', 400
+            return "No file part", 400
 
         file = request.files['file']
         if file.filename == '':
-            return 'No selected file', 400
+            return "No selected file", 400
 
         # Secure the filename to be able to safely store it
         filename = secure_filename(file.filename)
 
         # Secure filename might become empty
         if filename == '':
-            return 'Invalid filename', 400
+            return "Invalid filename", 400
 
         # Avoid collisions with existing files
         while os.path.exists(os.path.join(UPLOAD_FOLDER, unique_id)):
@@ -78,7 +78,7 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         os.makedirs(os.path.join(UPLOAD_FOLDER, unique_id))
 
         # Process the file (modify as needed)
-        modified_filename = f"converted_{filename}"
+        modified_filename = f'converted_{filename}'
         modified_file_path = os.path.join(
             UPLOAD_FOLDER, unique_id, modified_filename
         )
