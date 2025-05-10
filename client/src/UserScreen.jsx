@@ -64,19 +64,37 @@ function UserScreen({ onBack }) {
   async function uploadFile(file) {
     // Make sure that the file is a JSON file
     if (!file.name.toLowerCase().endsWith(".json")) {
-      alert("Please upload a JSON file only");
+      alert("Please upload a JSON file");
       return;
     }
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    console.log("uploading file: " + formData)
-    fetch("/api/files", {
-      method: "POST",
-      body: formData,
-    }).then(response => {
+      console.log("uploading file: " + formData)
+      let response;
+      try {
+        response = await fetch("/api/files", {
+          method: "POST",
+          body: formData,
+        });
+      } catch (error) {
+        // TODO maybe try doing the fetch a few times before failing on some type of errors?
+        if (error instanceof DOMException && error.name === "AbortError") {
+          console.log("Upload was cancelled by the user.")
+        } else if (error instanceof TypeError) {
+          console.error("Error uploading file:", error);
+          alert("Network error occurred. Please check your internet connection and try again.");
+        } else {
+          // Fallback for unknown errors
+          console.error("Error uploading file:", error);
+          alert("Failed to upload file. Please try again.");
+        }
+        return;
+      }
+
       if (!response.ok) {
         console.error("Error uploading file:", response);
         switch (response.status) {
@@ -89,20 +107,12 @@ function UserScreen({ onBack }) {
         default:
           alert(`Upload failed: ${response.statusText}. Please try again.`);
         }
-        return
+        return;
       }
-
-      response.json().then(data => {
-        console.log("File uploaded successfully. File ID:", data.id);
-
-        // Append the new file to the files state
-        setFiles(prevFiles => [{
-          id: data.id,
-          filename: data.filename,
-          department: "Default Department", // might want to make this dynamic
-          time: new Date().toISOString()
-        }, ...prevFiles]);
-      }, error => {
+      let data;
+      try {
+        data = await response.json();
+      } catch (error) {
         if (error instanceof DOMException) {
           console.log("Upload was cancelled by the user.")
         } else if (error instanceof SyntaxError) {
@@ -113,79 +123,85 @@ function UserScreen({ onBack }) {
           console.error("Error accessing or decoding response body:", error);
           alert("Error accessing or decoding response body. Please try again.");
         }
-      });
-
-    }, error => {
-      if (error instanceof TypeError) {
-        console.error("Error uploading file:", error);
-        alert("Network error occurred. Please check your internet connection and try again.");
-      } else if (error instanceof DOMException && error.name === "AbortError") {
-        console.log("Upload was cancelled by the user.")
-      } else {
-        // Fallback for unknown errors
-        console.error("Error uploading file:", error);
-        alert("Failed to upload file. Please try again.");
+        return;
       }
-    }).finally(() => {
+
+      console.log("File uploaded successfully. File ID:", data.id);
+
+      // Append the new file to the files state
+      setFiles(prevFiles => [{
+        id: data.id,
+        filename: data.filename,
+        department: "Default Department", // might want to make this dynamic
+        time: new Date().toISOString()
+      }, ...prevFiles]);
+    } finally {
       setUploading(false);
-    });
+    }
   }
 
   const handleDownload = async (fileId, fileName) => {
     console.log("downloading file: " + fileId)
-    fetch(`/api/files/${fileId}`)
-      .then(response => {
-        if (!response.ok) {
-          console.error("Error downloading file:", response);
-          switch (response.status) {
-          case 400:
-            alert("Invalid file id");
-            break;
-          case 404:
-            alert("File not found");
-            break;
-          case 500:
-            alert("Server error occurred while downloading the file. Please try again later.");
-            break;
-          default:
-            alert(`Download failed: ${response.statusText}. Please try again.`);
-          }
-          return
-        }
+    let response;
+    try {
+      response = await fetch(`/api/files/${fileId}`);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      if (error.name === "AbortError") {
+        alert("Downloading was cancelled. Please try again.");
+      } else if (error instanceof TypeError) {
+        alert("Network error occurred. Please check your internet connection and try again.");
+      } else {
+        // Fallback for unknown errors
+        alert("Failed to download file. Please try again.");
+      }
+      return;
+    }
 
-        // Get the converted file from the response
-        response.blob().then(file => {
-          // Create a download link for the modified file
-          const downloadUrl = window.URL.createObjectURL(file);
+    if (!response.ok) {
+      console.error("Error downloading file:", response);
+      switch (response.status) {
+      case 400:
+        alert("Invalid file id");
+        break;
+      case 404:
+        alert("File not found");
+        break;
+      case 500:
+        alert("Server error occurred while downloading the file. Please try again later.");
+        break;
+      default:
+        alert(`Download failed: ${response.statusText}. Please try again.`);
+      }
+      return;
+    }
 
-          // Create a temporary link and trigger download
-          const a = document.createElement("a");
-          a.href = downloadUrl;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(downloadUrl);
-        }, error => {
-          if (error instanceof DOMException) {
-            console.log("Download was cancelled by the user.")
-          } else {
-            // Fallback for unknown errors
-            console.error("Error accessing or decoding response body:", error);
-            alert("Error accessing or decoding response body. Please try again.");
-          }
-        })
-      }, error => {
-        console.error("Error downloading file:", error);
-        if (error instanceof TypeError) {
-          alert("Network error occurred. Please check your internet connection and try again.");
-        } else if (error.name === "AbortError") {
-          alert("Downloading was cancelled. Please try again.");
-        } else {
-          // Fallback for unknown errors
-          alert("Failed to download file. Please try again.");
-        }
-      });
+    // Get the converted file from the response
+    let file;
+    try {
+      file = await response.blob();
+    } catch (error) {
+      if (error instanceof DOMException) {
+        console.log("Download was cancelled by the user.")
+      } else {
+        // Fallback for unknown errors
+        console.error("Error accessing or decoding response body:", error);
+        alert("Error accessing or decoding response body. Please try again.");
+      }
+      return;
+    }
+
+    // Create a download link for the modified file
+    const downloadUrl = window.URL.createObjectURL(file);
+
+    // Create a temporary link and trigger download
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(downloadUrl);
   }
 
   /**
