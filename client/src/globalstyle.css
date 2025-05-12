@@ -81,7 +81,11 @@
   white-space: nowrap; /* Prevents wrapping */
   overflow: hidden;
   text-overflow: ellipsis;
+}
 
+.files-table td:first-child, .files-table th:first-child {
+  text-align: center;
+  width: 60px;
 }
 
 .files-table td:last-child {
@@ -90,7 +94,6 @@
   gap: 0.5rem;
   align-items: center;
 }
-
 
 .files-table tbody tr {
   border-bottom: 1px solid #e5e7eb;
@@ -104,7 +107,6 @@
 .files-table tbody tr:hover {
   background-color: #f9fafb;
 }
-
 
 /* Button Styles */
 .view-button {
@@ -123,6 +125,20 @@
 
 .download-button:hover {
   background-color: #74b9ff;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* Space between icon and text */
+  vertical-align: middle;
+}
+
+button img, button svg {
+  height: 1em;
+  width: 1em;
+  vertical-align: middle;
 }
 
 /* Upload Button Styling */
@@ -166,30 +182,6 @@
   border-color: #999;
 }
 
-
-/* Popup Overlay */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-}
-
-/* Popup Box */
-.popup {
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}
-
 /* Group and file cards */
 .card {
   background-color: #ffffff;
@@ -205,7 +197,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-
+/* Button color styles */
 .btn-blue { background-color: #dbeafe; color: #1e40af; } /* blue-100 / blue-800 */
 .btn-green { background-color: #d1fae5; color: #065f46; } /* green-100 / green-800 */
 .btn-purple { background-color: #ede9fe; color: #5b21b6; } /* purple-100 / purple-800 */
@@ -275,77 +267,140 @@ h2, h3 {
 
 .department-badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 9999px; /* full rounded corners */
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-align: center;
+  padding: 6px 12px;
+  background-color: #eef2ff; /* subtle indigo tone */
+  color: #3730a3; /* indigo-800 */
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease;
 }
 
-/*PLACEHOLDER*/
-.department-1 {
-  background-color: #e0f2fe; /* blue-100 */
-  color: #1e3a8a; /* blue-900 */
-}
-/*PLACEHOLDER*/
-.department-2 {
-  background-color: #dcfce7; /* green-100 */
-  color: #065f46; /* green-800 */
+.department-badge:hover {
+  background-color: #e0e7ff; /* slightly brighter on hover */
 }
 
-.icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 6px;
+/* Password Field Styles */
+.password-field-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.password-field {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  padding-right: 3rem;
+  font-size: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background-colobutton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* Space between icon and text */
   vertical-align: middle;
 }
 
-.flip-vertical {
-  transform: rotate(180deg);
+button img, button svg {
+  height: 1em;
+  width: 1em;
+  vertical-align: middle;
 }
-
-.department-toggle {
-  margin: 1rem 2rem;
-  font-size: 0.95rem;
-}
-
-.files-table button {
-  margin-right: 8px;
-}
-
-.files-table button:last-child {
-  margin-right: 0;
-}
-
-.department-toggle {
-  margin: 1rem 2rem;
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: #f3f4f6;
-  padding: 8px 12px;
-  border-radius: 8px;
-  width: fit-content;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.department-toggle label {
-  font-weight: 500;
+r: #f9fafb;
   color: #374151;
+  font-family: 'Roboto', sans-serif;
 }
 
-.department-toggle select {
-  background-color: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 0.9rem;
-  color: #374151;
+.password-field::placeholder {
+  color: #6b7280; /* match paragraph gray */
 }
 
-.upload-feedback {
-  margin-top: 1rem;
+/* General icon size fix */
+img.back-icon,
+img.icon,
+img[src$=".png"],
+img[src$=".svg"] {
+  max-width: 24px;
+  max-height: 24px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Icon inside the field, clickable */
+.toggle-visibility-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  z-index: 2;
+  object-fit: contain;
+  pointer-events: auto;
+}
+
+/* Error Message Styling */
+.error-message {
   color: #6b7280;
   font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/*Host Search*/
+.search-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #ffffff;
+  padding: 1.25rem 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* softer shadow */
+  border: 1px solid #e5e7eb;
+}
+
+.search-section input {
+  padding: 0.6rem 1.25rem;
+  border: 1px solid #cbd5e1; /* slate-300 */
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  flex: 1;
+  transition: border-color 0.2s ease;
+}
+
+.search-section input:focus {
+  border-color: #6366f1; /* indigo */
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.square-button {
+  width: 40px;
+  height: 40px;
+  background-color: #6c5ce7;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(108, 92, 231, 0.2);
+}
+
+.square-button:hover {
+  background-color: #a29bfe;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+}
+
+.square-button svg,
+.square-button img {
+  height: 1.2rem;
+  width: 1.2rem;
 }

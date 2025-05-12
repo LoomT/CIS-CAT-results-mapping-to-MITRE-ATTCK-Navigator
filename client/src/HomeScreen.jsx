@@ -1,5 +1,5 @@
 import React from 'react';
-import './HomeScreen.css';
+import './globalstyle.css';
 
 /**
  * HomeScreen Component
@@ -13,11 +13,13 @@ import './HomeScreen.css';
 function HomeScreen({ onAdminClick, onUserClick }) {
   return (
     <div className="home-screen">
-      <h2>Choose your screen</h2>
-      {/* Buttons for role selection */}
-      <div className="button-container">
-        <button className="button" onClick={onAdminClick}>Admin</button>
-        <button className="button" onClick={onUserClick}>User</button>
+      <div className="card">
+        <h2 className="screen-title">Choose your screen</h2>
+        {/* Buttons for role selection */}
+        <div className="button-container">
+          <button className="btn-blue" onClick={onAdminClick}>Admin</button>
+          <button className="btn-blue" onClick={onUserClick}>User</button>
+        </div>
       </div>
     </div>
   );

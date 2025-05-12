@@ -5,89 +5,78 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 20;
 }
 
 /* Popup Box */
 .popup, .popup-content {
-  background-color: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  width: 300px;
+  background-color: #ffffff;
   color: #2d3436;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  width: 320px;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
 }
+
 
 /* Popup Heading */
 .popup-heading {
-  margin-bottom: 15px;
-  font-size: 18px;
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
   color: #2d3436;
 }
 
-/* Popup Buttons Container */
-.popup-buttons {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-/* Buttons - Confirm */
-.popup-button {
-  background-color: #6c5ce7;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-  transition: 0.3s;
-}
-
-.popup-button:hover {
-  background-color: #a29bfe;
-}
-
-/* Buttons - Cancel */
-.popup-cancel {
-  background-color: transparent;
-  border: 2px solid #6c5ce7;
-  color: #6c5ce7;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.popup-cancel:hover {
-  background-color: #f0f0f0;
-}
-
+/* Input Field */
 .popup-input {
   width: 100%;
-  padding: 10px;
+  padding: 10px 12px;
   margin: 15px 0;
-  border: 2px solid #ccc;
+  border: 2px solid #d1d5db;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 1rem;
+  color: #374151;
+  background-color: #f9fafb;
 }
-.admin-button {
-  padding: 10px 20px;
-  background-color: #d63031;
-  color: white;
+
+/* Confirm Button - Light orange with deeper orange text, no border initially */
+.popup-button {
+  background-color: #ffe0b2; /* soft pastel orange */
+  color: #e65100; /* deep orange text */
   border: none;
-  border-radius: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  font-weight: bold;
+  transition: border 0.3s ease;
 }
-.admin-button:hover {
-  background-color: #ff7675;
+
+/* On hover, show deeper orange border */
+.popup-button:hover {
+  border: 2px solid #e65100; /* appears on hover only */
+}
+
+/* Cancel Button - transparent with deep orange border and text */
+.popup-cancel {
+  background-color: transparent;
+  color: #e65100; /* matches confirm button text */
+  border: 2px solid #e65100;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-width 0.3s ease;
+}
+
+/* On hover, border becomes thicker */
+.popup-cancel:hover {
+  border-width: 3px;
 }
