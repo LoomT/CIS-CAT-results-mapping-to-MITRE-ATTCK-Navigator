@@ -46,7 +46,7 @@
 
 /* Upload Section */
 .upload-section {
-  width: 300px;
+  width: 260px;
   text-align: center;
 }
 
@@ -78,7 +78,19 @@
 .files-table th, .files-table td {
   padding: 0.75rem 1rem;
   border: none; /* Ensure no borders for cells */
+  white-space: nowrap; /* Prevents wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+
 }
+
+.files-table td:last-child {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 
 .files-table tbody tr {
   border-bottom: 1px solid #e5e7eb;
@@ -129,6 +141,31 @@
 .upload-button:hover {
   background-color: #a29bfe;
 }
+
+.upload-area {
+  border: 2px dotted #ccc;
+  background-color: #f9f9f9;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 12px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  color: #333;
+}
+
+.upload-area p {
+  margin: 0.5rem 0;
+  color: #2d3436;
+}
+
+.upload-area .btn-purple {
+  margin-top: 1rem;
+}
+
+.upload-area.drag-active {
+  background-color: #e6e6e6; /* slightly darker gray */
+  border-color: #999;
+}
+
 
 /* Popup Overlay */
 .popup-overlay {
@@ -230,12 +267,11 @@ h2, h3 {
   color: #1f2937; /* dark slate */
 }
 
-.section-header p {
+.section-header p, .upload-content p {
   margin: 4px 0 0;
   font-size: 0.875rem;
   color: #6b7280; /* gray-500 */
 }
-
 
 .department-badge {
   display: inline-block;
@@ -271,4 +307,45 @@ h2, h3 {
 .department-toggle {
   margin: 1rem 2rem;
   font-size: 0.95rem;
+}
+
+.files-table button {
+  margin-right: 8px;
+}
+
+.files-table button:last-child {
+  margin-right: 0;
+}
+
+.department-toggle {
+  margin: 1rem 2rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 8px;
+  width: fit-content;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.department-toggle label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.department-toggle select {
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.upload-feedback {
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
 }

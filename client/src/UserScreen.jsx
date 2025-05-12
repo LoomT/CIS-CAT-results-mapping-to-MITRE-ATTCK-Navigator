@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
@@ -20,6 +20,11 @@ import visualIcon from './assets/visual.png';
 
 function UserScreen({ onBack, t }) {
   const [showPopup, setShowPopup] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState('');
+
+
 
   /**
    * Opens the visualization popup.
@@ -34,6 +39,41 @@ function UserScreen({ onBack, t }) {
   const handleClosePopup = () => {
     setShowPopup(false);
   };
+
+  const handleDrag = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    console.log("File dropped (stub)");
+  }, []);
+
+  const handleFileInput = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUploadMessage(`Uploaded "${file.name}" successfully!`);
+      // TODO: Actually upload if needed
+      console.log("File selected:", file.name);
+    }
+  };
+
+  useEffect(() => {
+    if (uploadMessage) {
+      const timer = setTimeout(() => setUploadMessage(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [uploadMessage]);
+
+
 
   return (
     <div className="admin-panel">
@@ -57,17 +97,49 @@ function UserScreen({ onBack, t }) {
         <div className="card upload-section">
           <div className="section-header">
             <h2>{t.uploadFile}</h2>
-            {/*TODO: translate*/}
-            <p>Upload your files for conversion.</p>
+            <p>Drag and drop a file or click the area below to upload your JSON file.</p>
           </div>
-          <button className="btn-purple">
-            <img src={downloadIcon} alt="upload" className="icon flip-vertical" />
-            {t.uploadFile}
-          </button>
+
+          <div
+            className={`upload-area ${dragActive ? "drag-active" : ""}`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+          >
+            <div className="upload-content">
+              {uploading ? (
+                <p>Uploading...</p>
+              ) : (
+                <>
+                  <p>Drag & drop a file here</p>
+                  <p>or</p>
+                  <input
+                    type="file"
+                    id="file-input"
+                    onChange={handleFileInput}
+                    accept=".json"
+                    style={{ display: "none" }}
+                  />
+                  <button
+                    className="btn-purple"
+                    onClick={() => document.getElementById("file-input").click()}
+                  >
+                    <img src={downloadIcon} alt="upload" className="icon flip-vertical" />
+                    Choose File
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+          {uploadMessage && (
+            <div className="upload-feedback">
+              {uploadMessage}
+            </div>
+          )}
 
           <div className="section-header" style={{ marginTop: '2rem' }}>
             <h2>{t.runBenchmark}</h2>
-            {/*TODO: translate*/}
             <p>Run the benchmark and automatically convert the resulting CIS-CAT output to MITRE ATT&CK navigator.</p>
           </div>
           <button className="btn-purple">
@@ -75,6 +147,7 @@ function UserScreen({ onBack, t }) {
             {t.runBenchmark}
           </button>
         </div>
+
 
         {/* File Table Section */}
         <div className="card file-table-section">
