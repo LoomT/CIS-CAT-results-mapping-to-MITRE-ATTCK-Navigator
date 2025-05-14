@@ -88,7 +88,7 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         )
         file.save(original_file_path)
         convert_cis_to_attack(original_file_path, modified_file_path)
-        
+
         # Cleanup
         os.remove(original_file_path)
         # TODO assert that the file is of correct format

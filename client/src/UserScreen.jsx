@@ -98,14 +98,14 @@ function UserScreen({ onBack }) {
       if (!response.ok) {
         console.error("Error uploading file:", response);
         switch (response.status) {
-          case 400:
-            alert("Invalid file format or empty file. Please ensure you're uploading a valid JSON file.");
-            break;
-          case 500:
-            alert("Server error occurred while processing the file. Please try again later.");
-            break;
-          default:
-            alert(`Upload failed: ${response.statusText}. Please try again.`);
+        case 400:
+          alert("Invalid file format or empty file. Please ensure you're uploading a valid JSON file.");
+          break;
+        case 500:
+          alert("Server error occurred while processing the file. Please try again later.");
+          break;
+        default:
+          alert(`Upload failed: ${response.statusText}. Please try again.`);
         }
         return;
       }
@@ -161,17 +161,17 @@ function UserScreen({ onBack }) {
     if (!response.ok) {
       console.error("Error downloading file:", response);
       switch (response.status) {
-        case 400:
-          alert("Invalid file id");
-          break;
-        case 404:
-          alert("File not found");
-          break;
-        case 500:
-          alert("Server error occurred while downloading the file. Please try again later.");
-          break;
-        default:
-          alert(`Download failed: ${response.statusText}. Please try again.`);
+      case 400:
+        alert("Invalid file id");
+        break;
+      case 404:
+        alert("File not found");
+        break;
+      case 500:
+        alert("Server error occurred while downloading the file. Please try again later.");
+        break;
+      default:
+        alert(`Download failed: ${response.statusText}. Please try again.`);
       }
       return;
     }

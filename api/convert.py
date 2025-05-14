@@ -2,15 +2,15 @@ import pandas as pd
 import json
 import os
 
-excel_file = 'CIS_Controls_v8_to_Enterprise_ATTCK_v82_Master_Mapping__5262021.xlsx'
+ex_map = 'CIS_Controls_v8_to_Enterprise_ATTCK_v82_Master_Mapping__5262021.xlsx'
 if os.path.basename(os.getcwd()) != 'api':
-    excel_file = 'api/' + excel_file
+    ex_map = 'api/' + ex_map
 
 
 sheet_name = 'V8-ATT&CK Low (Sub-)Techniques'
 
 # Load mapping sheet
-df = pd.read_excel(excel_file, sheet_name=sheet_name, dtype=str)
+df = pd.read_excel(ex_map, sheet_name=sheet_name, dtype=str)
 
 
 def gradient_color(fraction):
