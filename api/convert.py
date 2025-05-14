@@ -1,8 +1,12 @@
 import pandas as pd
 import json
+import os
 
-excel_file = \
-   'api/CIS_Controls_v8_to_Enterprise_ATTCK_v82_Master_Mapping__5262021.xlsx'
+excel_file = 'CIS_Controls_v8_to_Enterprise_ATTCK_v82_Master_Mapping__5262021.xlsx'
+if os.path.basename(os.getcwd()) != 'api':
+    excel_file = 'api/' + excel_file
+
+
 sheet_name = 'V8-ATT&CK Low (Sub-)Techniques'
 
 # Load mapping sheet

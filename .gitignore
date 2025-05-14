@@ -13,3 +13,6 @@
 *.json
 venv/*
 __pycache__
+
+# Generated
+uploads

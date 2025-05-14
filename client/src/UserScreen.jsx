@@ -1,6 +1,6 @@
-import React, {useCallback, useState} from 'react';
-import './UserScreen.css';
-import './popups.css';
+import React, { useCallback, useState } from "react";
+import "./UserScreen.css";
+import "./popups.css";
 import "./FileTableEntry.jsx";
 import FileTableEntry from "./FileTableEntry.jsx";
 
@@ -63,76 +63,145 @@ function UserScreen({ onBack }) {
    */
   async function uploadFile(file) {
     // Make sure that the file is a JSON file
-    if (!file.name.toLowerCase().endsWith('.json')) {
-      alert("Please upload a JSON file only");
+    if (!file.name.toLowerCase().endsWith(".json")) {
+      alert("Please upload a JSON file");
       return;
     }
 
+    setUploading(true);
     try {
-      setUploading(true);
       const formData = new FormData();
       formData.append("file", file);
 
       console.log("uploading file: " + formData)
-      const response = await fetch("/api/files", {
-        method: "POST",
-        body: formData,
-      });
+      let response;
+      try {
+        response = await fetch("/api/files", {
+          method: "POST",
+          body: formData,
+        });
+      } catch (error) {
+        // TODO maybe try doing the fetch a few times before failing on some type of errors?
+        if (error instanceof DOMException && error.name === "AbortError") {
+          console.log("Upload was cancelled by the user.")
+        } else if (error instanceof TypeError) {
+          console.error("Error uploading file:", error);
+          alert("Network error occurred. Please check your internet connection and try again.");
+        } else {
+          // Fallback for unknown errors
+          console.error("Error uploading file:", error);
+          alert("Failed to upload file. Please try again.");
+        }
+        return;
+      }
 
       if (!response.ok) {
         console.error("Error uploading file:", response);
-        alert("Failed to upload file. Please try again.");
-        return
+        switch (response.status) {
+          case 400:
+            alert("Invalid file format or empty file. Please ensure you're uploading a valid JSON file.");
+            break;
+          case 500:
+            alert("Server error occurred while processing the file. Please try again later.");
+            break;
+          default:
+            alert(`Upload failed: ${response.statusText}. Please try again.`);
+        }
+        return;
+      }
+      let data;
+      try {
+        data = await response.json();
+      } catch (error) {
+        if (error instanceof DOMException) {
+          console.log("Upload was cancelled by the user.")
+        } else if (error instanceof SyntaxError) {
+          console.error("Error parsing JSON:", error);
+          alert("Response from server is not valid JSON. Please try again.");
+        } else {
+          // Fallback for unknown errors
+          console.error("Error accessing or decoding response body:", error);
+          alert("Error accessing or decoding response body. Please try again.");
+        }
+        return;
       }
 
-      const data = await response.json();
       console.log("File uploaded successfully. File ID:", data.id);
 
       // Append the new file to the files state
       setFiles(prevFiles => [{
         id: data.id,
         filename: data.filename,
-        department: 'Default Department', // might want to make this dynamic
+        department: "Default Department", // might want to make this dynamic
         time: new Date().toISOString()
       }, ...prevFiles]);
-
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      alert("Failed to upload file. Please try again.");
     } finally {
       setUploading(false);
     }
   }
 
   const handleDownload = async (fileId, fileName) => {
+    console.log("downloading file: " + fileId)
+    let response;
     try {
-      console.log("downloading file: " + fileId)
-      const response = await fetch(`/api/files/${fileId}`);
-
-      if (!response.ok) {
-        console.error("Error downloading file:", response);
-        alert("Failed to download file. Please try again.");
-        return
-      }
-
-      // Get the converted file from the response
-      const file = await response.blob();
-
-      // Create a download link for the modified file
-      const downloadUrl = window.URL.createObjectURL(file);
-
-      // Create a temporary link and trigger download
-      const a = document.createElement("a");
-      a.href = downloadUrl;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(downloadUrl);
+      response = await fetch(`/api/files/${fileId}`);
     } catch (error) {
       console.error("Error downloading file:", error);
-      alert("Failed to download file. Please try again.");
+      if (error.name === "AbortError") {
+        alert("Downloading was cancelled. Please try again.");
+      } else if (error instanceof TypeError) {
+        alert("Network error occurred. Please check your internet connection and try again.");
+      } else {
+        // Fallback for unknown errors
+        alert("Failed to download file. Please try again.");
+      }
+      return;
     }
+
+    if (!response.ok) {
+      console.error("Error downloading file:", response);
+      switch (response.status) {
+        case 400:
+          alert("Invalid file id");
+          break;
+        case 404:
+          alert("File not found");
+          break;
+        case 500:
+          alert("Server error occurred while downloading the file. Please try again later.");
+          break;
+        default:
+          alert(`Download failed: ${response.statusText}. Please try again.`);
+      }
+      return;
+    }
+
+    // Get the converted file from the response
+    let file;
+    try {
+      file = await response.blob();
+    } catch (error) {
+      if (error instanceof DOMException) {
+        console.log("Download was cancelled by the user.")
+      } else {
+        // Fallback for unknown errors
+        console.error("Error accessing or decoding response body:", error);
+        alert("Error accessing or decoding response body. Please try again.");
+      }
+      return;
+    }
+
+    // Create a download link for the modified file
+    const downloadUrl = window.URL.createObjectURL(file);
+
+    // Create a temporary link and trigger download
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(downloadUrl);
   }
 
   /**
@@ -145,10 +214,10 @@ function UserScreen({ onBack }) {
     e.preventDefault(); // Prevent default browser behavior (e.g., open file in new tab)
     e.stopPropagation(); // Prevent event bubbling up to parent elements
     setDragActive(false);
-    if(uploading) return // Don't allow dropping a file if already uploading
+    if (uploading) return // Don't allow dropping a file if already uploading
     console.log("Drop event:", e);
     const files = e.dataTransfer.files;
-    if(files.length > 1) alert(
+    if (files.length > 1) alert(
       "You can only upload one file at a time. Please try again."
     ) // Limit to one file for now
     if (files && files[0]) {
@@ -210,7 +279,7 @@ function UserScreen({ onBack }) {
                     id="file-input"
                     onChange={handleFileInput}
                     accept=".json"
-                    style={{display: "none"}}
+                    style={{ display: "none" }}
                   />
                   <button className="upload-button" onClick={
                     () => document.getElementById("file-input").click()
