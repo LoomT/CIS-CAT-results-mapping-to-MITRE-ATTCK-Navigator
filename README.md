@@ -31,13 +31,23 @@ To stop the application `docker-compose down`
 
 ## Development
 
-### Testing
+### Backend Testing
 
 First ensure `pytest` is installed (`pip install pytest`)
 
 Then run `python -m pytest` from the project root directory
 
-### Client Style Checking
+### End-to-End Testing
+
+The Flask server needs to be running with the static frontend files compiled before running these tests!
+To do that, run `npm run build` in the client directory, this will build static frontend files in client/dist.
+Then start the server as usual in the api directory `python -m flask run`.
+
+Navigate to `tests/e2e` and for the first time run `npm install`
+
+Then run `npm run test` to execute tests automatically
+
+Alternatively run `npm run open` to open a visual interface for running and debugging E2E tests
 
 ### Backend Style Checking
 

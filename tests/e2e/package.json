@@ -1,0 +1,20 @@
+{
+  "name": "untitled1",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "open": "cypress open",
+    "test:electron": "cypress run",
+    "test:chrome": "cypress run --browser chrome",
+    "test:firefox": "cypress run --browser firefox",
+    "test:edge": "cypress run --browser edge",
+    "test:all": "npm run test:electron && npm run test:chrome && npm run test:firefox && npm run test:edge",
+    "test": "npm run test:electron"
+  },
+  "devDependencies": {
+    "cypress": "^14.3.3",
+    "eslint": "^9.26.0",
+    "eslint-plugin-cypress": "^4.3.0"
+  }
+}
