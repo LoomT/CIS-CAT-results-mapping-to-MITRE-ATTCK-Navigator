@@ -10,7 +10,6 @@
 *.sln
 *.sw?
 .git
-*.json
 venv/*
 __pycache__
 
