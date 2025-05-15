@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from "react";
+import React, { useCallback, useState } from "react";
 import "./UserScreen.css";
 import "./popups.css";
 import "./FileTableEntry.jsx";
@@ -26,9 +26,72 @@ function UserScreen({ onBack }) {
   /**
    * Opens the visualization popup.
    */
-  const handleVisualizeClick = () => {
-    console.log("Visualize clicked!");
+  const handleExportClick = () => {
+    console.log("Export clicked!");
     setShowPopup(true);
+  };
+
+  /**
+   * Opens the visualization popup.
+   */
+  const handleVisualizeClick = (file) => {
+    console.log("Visualize clicked!");
+    let uri = new URL(location.href);
+
+    uri.pathname = `/api/files/${file.id}`;
+    let targetWindow = window.open("/attack-navigator/index.html")
+
+    let targetGlobal = targetWindow.window;
+
+    let newBlankConstructor = {
+      apply: (target, thisArg, argumentsList) => {
+        if (!Object.hasOwn(thisArg, "bannerContent")) {
+          console.log("Injecting url layer")
+          thisArg.loadLayerFromURL(uri.toString(), true)
+        }
+        return Reflect.apply(target, thisArg, argumentsList)
+      }
+    }
+
+    targetGlobal.Reflect.decorate = function decorate(
+      decorators,
+      target,
+      propertyKey,
+      desc
+    ) {
+      let argCount = arguments.length;
+      let result = argCount < 3 ? target :
+        desc === null ? (desc = Object.getOwnPropertyDescriptor(target, propertyKey)) : desc;
+
+      // Apply decorators from last to first (right-to-left)
+      for (let i = decorators.length - 1; i >= 0; --i) {
+        let decorator = decorators[i];
+        if (!decorator) continue;
+
+        if (argCount < 3) {
+          // Class decorator signature:  (target) => newTarget | void
+          result = decorator(result) || result;
+        } else if (argCount > 3) {
+          // Method/accessor/property decorator with descriptor: (target, key, desc) => newDesc | void
+          result = decorator(target, propertyKey, result) || result;
+        } else {
+          // Method/accessor/property decorator without descriptor: (target, key) => void
+          result = decorator(target, propertyKey) || result;
+        }
+      }
+
+      // If we were decorating a property and ended with a descriptor, re-define it.
+      if (argCount > 3 && result && Object.defineProperty) {
+        Object.defineProperty(target, propertyKey, result);
+      }
+
+      /* Check if this is the TabsComponent class, not the fastest, but it works */
+      if (result.toString().includes("latestDomains")) {
+        result.prototype.newBlankTab = new Proxy(result.prototype.newBlankTab, newBlankConstructor)
+      }
+      return result;
+    };
+
   };
 
   /**
@@ -279,7 +342,7 @@ function UserScreen({ onBack }) {
                     id="file-input"
                     onChange={handleFileInput}
                     accept=".json"
-                    style={{display: "none"}}
+                    style={{ display: "none" }}
                   />
                   <button className="upload-button" onClick={
                     () => document.getElementById("file-input").click()
@@ -318,7 +381,8 @@ function UserScreen({ onBack }) {
                   filename={file.filename}
                   department={file.department}
                   time={file.time}
-                  onVisualize={() => handleVisualizeClick()}
+                  onVisualize={() => handleVisualizeClick(file)}
+                  onExport={() => handleExportClick()}
                   onDownload={() => handleDownload(file.id, file.filename)}
                 />
               ))}
