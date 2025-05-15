@@ -1,6 +1,7 @@
 import os
 import shutil
 import uuid
+import json
 from .convert import convert_cis_to_attack
 
 from flask import (Flask, send_from_directory, request, send_file, Response)
@@ -83,15 +84,15 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         modified_file_path = os.path.join(
             UPLOAD_FOLDER, unique_id, modified_filename
         )
-        original_file_path = os.path.join(
-            UPLOAD_FOLDER, unique_id, filename
-        )
-        file.save(original_file_path)
-        convert_cis_to_attack(original_file_path, modified_file_path)
 
-        # Cleanup
-        os.remove(original_file_path)
-        # TODO assert that the file is of correct format
+        try:
+            cis_data = json.load(file.stream)
+        except json.JSONDecodeError:
+            return "Invalid file format", 500
+
+        attck_data = convert_cis_to_attack(cis_data)
+        with open(modified_file_path, 'w', encoding='utf-8') as F:
+            json.dump(attck_data, F, ensure_ascii=False, indent=2)
 
         # Send the id of the modified file back to the client
         return {
@@ -106,16 +107,6 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         # TODO configure logging in the future
         print(f"Unexpected error while processing file: {e}")
         return "Unexpected error while processing file", 500
-
-
-def cleanup_files(file_paths):
-    """Clean up temporary files after the response has been sent"""
-    for file_path in file_paths:
-        try:
-            if os.path.exists(file_path):
-                os.remove(file_path)
-        except Exception as e:
-            print(f"Error cleaning up file {file_path}: {e}")
 
 
 # Serve React App
