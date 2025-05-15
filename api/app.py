@@ -88,7 +88,7 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         try:
             cis_data = json.load(file.stream)
         except json.JSONDecodeError:
-            return "Invalid file format", 500
+            return "Invalid file format", 400
 
         attck_data = convert_cis_to_attack(cis_data)
         with open(modified_file_path, 'w', encoding='utf-8') as F:
