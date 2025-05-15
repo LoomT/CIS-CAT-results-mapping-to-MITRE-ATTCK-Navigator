@@ -243,18 +243,18 @@ function UserScreen({ onBack }) {
 
 
   return (
-    <div className="user-screen">
+    <div data-testid="user-screen" className="user-screen">
 
       {/* Top Navigation Bar */}
       <div className="top-bar">
         <div className="back-text" onClick={onBack}>← Back</div>
-        <div className="title-text">User Overview</div>
+        <div data-testid="user-screen-page-title" className="title-text">User Overview</div>
       </div>
 
       {/* Side-by-side Content Area container */}
       <div className="content-area">
         {/* Left section for file upload functionality */}
-        <div className="upload-section">
+        <div data-testid="user-screen-upload-section" className="upload-section">
           <h2>Upload a File</h2>
           {/* Drop zone area with drag and drop event handlers */}
           <div
@@ -299,7 +299,7 @@ function UserScreen({ onBack }) {
         </div>
 
         {/* File Table Section */}
-        <div className="file-table-section">
+        <div data-testid="user-screen-file-table-section" className="file-table-section">
           <h2>Files List</h2>
           <table className="file-table">
             <thead>
