@@ -2,6 +2,12 @@
 
 ## Running the app
 
+### Build attack navigator
+
+In the cloned submodule directory, `attack-navigator`, run `npm ci` to install dependencies
+
+Then run `npm run build -- --deploy-url /attack-navigator/ --base-href /attack-navigator/ --configuration production --aot=false --build-optimizer=false` to build the navigator
+
 ### Client
 
 In the client directory
@@ -37,8 +43,6 @@ First ensure `pytest` is installed (`pip install pytest`)
 
 Then run `python -m pytest` from the project root directory
 
-### Client Style Checking
-
 ### Backend Style Checking
 
 First ensure `flake8` is installed (`pip install flake8`)
@@ -51,7 +55,7 @@ Alternatively install `flake8` in vscode
 
 Enter the client directory and make sure eslint is installed (i.e do a regular `npm install`)
 
-Then run `npx eslint . --ext .js,.jsx` to recursively check all `js` and `jsx`
+Then run `npx eslint` to recursively check all `js` and `jsx`
 
 Alternatively install `eslint` in vscode
 

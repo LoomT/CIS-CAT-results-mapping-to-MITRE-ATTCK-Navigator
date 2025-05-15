@@ -87,6 +87,11 @@
   color: white;
 }
 
+.export-button {
+  background-color: #0068b8;
+  color: white;
+}
+
 .download-button {
   background-color: #0984e3;
   color: white;
@@ -94,6 +99,10 @@
 
 .view-button:hover {
   background-color: #55efc4;
+}
+
+.export-button:hover {
+  background-color: #0081b8;
 }
 
 .download-button:hover {
