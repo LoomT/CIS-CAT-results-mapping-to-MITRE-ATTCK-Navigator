@@ -11,3 +11,11 @@
 *.sw?
 .git
 __pycache__
+
+# Generated
+uploads
+
+# Tests
+tests/e2e/node_modules
+tests/e2e/screenshots
+tests/e2e/videos

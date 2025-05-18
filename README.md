@@ -31,13 +31,23 @@ To stop the application `docker-compose down`
 
 ## Development
 
-### Testing
+### Backend Testing
 
 First ensure `pytest` is installed (`pip install pytest`)
 
 Then run `python -m pytest` from the project root directory
 
-### Client Style Checking
+### End-to-End Testing
+
+The Flask server needs to be running with the static frontend files compiled before running these tests!
+To do that, run `npm run build` in the client directory, this will build static frontend files in client/dist.
+Then start the server as usual in the api directory `python -m flask run`.
+
+Navigate to `tests/e2e` and for the first time run `npm install`
+
+Then run `npm run test` to execute tests automatically
+
+Alternatively run `npm run open` to open a visual interface for running and debugging E2E tests
 
 ### Backend Style Checking
 
@@ -54,6 +64,69 @@ Enter the client directory and make sure eslint is installed (i.e do a regular `
 Then run `npx eslint . --ext .js,.jsx` to recursively check all `js` and `jsx`
 
 Alternatively install `eslint` in vscode
+
+# API Documentation
+
+## Endpoints
+
+### Upload File
+- **URL**: `/api/files`
+- **Method**: `POST`
+- **Content-Type**: `multipart/form-data`
+- **Request Body**:
+  - `file`: File to be uploaded (required)
+
+#### Successful Response
+- **Code**: `201 Created`
+- **Content-Type**: `application/json`
+- **Response Body**:
+  ```json
+  {
+    "id": "string",       // Unique identifier for the file
+    "filename": "string"  // Name of the converted file
+  }
+  ```
+
+#### Error Responses
+- **Code**: `400 Bad Request`
+  - When no file is provided: `"No file part"`
+  - When filename is empty: `"No selected file"`
+  - When filename is invalid: `"Invalid filename"`
+
+- **Code**: `500 Internal Server Error`
+  - When server encounters an unexpected error: `"Unexpected error while processing file"`
+
+### Download File
+- **URL**: `/api/files/<file_id>`
+- **Method**: `GET`
+- **URL Parameters**:
+  - `file_id`: Unique identifier of the file (required)
+
+#### Successful Response
+- **Code**: `200 OK`
+- **Content-Type**: Based on file type
+- **Headers**:
+  - `Content-Disposition`: `attachment; filename=<filename>`
+- **Response Body**: File content as binary data
+
+#### Error Responses
+- **Code**: `400 Bad Request`
+  - When the file ID is invalid: `"Invalid file id"`
+
+- **Code**: `404 Not Found`
+  - When file ID doesn't exist: `"No file by this id found"`
+
+- **Code**: `500 Internal Server Error`
+  - When multiple files found: `"Multiple files found"`
+  - When no files found in directory (dangling directory): `"No file found"`
+  - When server encounters an unexpected error: `"Unexpected error while getting file"`
+
+### Notes
+- All files are stored in a dedicated uploads directory
+- Each file is stored in its own unique directory identified by UUID
+- Filenames are sanitized for security
+- Original files are removed after processing
+- Error responses include cleanup of any partially created resources
 
 ## Getting started
 

@@ -6,3 +6,8 @@
 .gitignore
 **/.env
 **/.flaskenv
+
+# Generated
+**/uploads
+**/screenshots
+**/videos
