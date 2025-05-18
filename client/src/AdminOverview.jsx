@@ -53,9 +53,7 @@ function AdminOverview({ onBack, t }) {
               <option>Department 2</option>
             </select>
           </div>
-        </div>
 
-        <div className="card">
           <div className="section-header">
             <h2>{t.searchHosts}</h2>
             <input
@@ -66,6 +64,7 @@ function AdminOverview({ onBack, t }) {
             />
           </div>
         </div>
+
 
         {/* File Table Section */}
         <div className="card file-table-section">
@@ -108,7 +107,6 @@ function AdminOverview({ onBack, t }) {
                   </button>
                 </td>
               </tr>
-              {/* Add more rows as needed */}
             </tbody>
           </table>
         </div>
