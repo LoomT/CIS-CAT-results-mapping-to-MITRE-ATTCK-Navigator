@@ -142,7 +142,3 @@ cypress_e2e:
       - tests/e2e/screenshots
       - tests/e2e/videos
     expire_in: 1 week
-  # Lighten the heavy burden on the university's servers 💔🥀
-  only:
-    - main
-    - merge_requests
