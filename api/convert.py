@@ -10,7 +10,8 @@ def load_mapping(filename: str, sheet_name: str) -> pd.DataFrame:
     """
     Load the CIS-to-ATT&CK mapping Excel sheet, adding 'api/' prefix if needed.
     """
-    if os.path.basename(os.getcwd()) != 'api':
+
+    if not os.path.exists(filename):
         filename = os.path.join('api', filename)
     return pd.read_excel(filename, sheet_name=sheet_name, dtype=str)
 

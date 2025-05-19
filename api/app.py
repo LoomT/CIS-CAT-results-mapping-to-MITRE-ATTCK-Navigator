@@ -2,7 +2,11 @@ import os
 import shutil
 import uuid
 import json
-from .convert import convert_cis_to_attack
+try:
+    from convert import convert_cis_to_attack
+except ImportError:
+    from .convert import convert_cis_to_attack
+
 
 from flask import (Flask, send_from_directory, request, send_file, Response)
 from flask.cli import load_dotenv
