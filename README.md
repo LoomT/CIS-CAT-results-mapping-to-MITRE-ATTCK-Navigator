@@ -29,6 +29,17 @@ To run in detached mode `docker-compose up -d --build`
 
 To stop the application `docker-compose down`
 
+### Wrapper
+
+There are two ways to run the wrapper, the first is from any directory. In this case it expects as first argument the path to the actual CLI, (i.e `path/to/Assessor-CLI.sh` or `path\to\Assessor-CLI.bat`).  
+The second way is to make sure the respective `wrapper.sh` or `wrapper.ps1` is present in the same directory.  
+The remaining arguments are the same as for the normal `Assessor-CLI`.  
+On top of this a `.wrapper.env` must be present in the same directory as the wrapper. The format is as follows:
+```env
+POST_URL=http://localhost:5000/api/files
+POST_BEARER=TOKEN_sometoken_here
+```
+
 ## Development
 
 ### Backend Testing
