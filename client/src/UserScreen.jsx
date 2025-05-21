@@ -338,6 +338,7 @@ function UserScreen({ onBack, t }) {
                   time={file.time}
                   onVisualize={() => handleVisualizeClick()}
                   onDownload={() => handleDownload(file.id, file.filename)}
+                  t={{visualize: "visualize", download:"download"}}
                 />
               ))}
             </tbody>
