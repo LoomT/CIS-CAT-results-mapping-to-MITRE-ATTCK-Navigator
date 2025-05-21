@@ -44,7 +44,8 @@ js_lint:
     - cd ..
   script:
     - cd client
-    - npx eslint . --ext .js,.jsx
+    - npx eslint . --ext .js,.jsx --ignore-pattern 'cypress_cache/*'
+
   allow_failure: false
 
 # LINT REACT – ESLint on everything in client/
