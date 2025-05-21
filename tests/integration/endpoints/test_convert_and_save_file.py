@@ -7,11 +7,14 @@ import pytest
 # when proper file validation is added
 
 
-@pytest.mark.parametrize("file_name,file_content,expected_status", [
-    ("testinputcis.json", open('tests/cisinput.json', 'rb').read(),  201)
+@pytest.mark.parametrize("file_name,file_path,expected_status", [
+    ("testinputcis.json", 'tests/cisinput.json',  201)
 ])
-def test_convert_and_save_file_success(client, file_name, file_content,
+def test_convert_and_save_file_success(client, file_name, file_path,
                                        expected_status):
+
+    with open(file_path, "rb") as f:
+        file_content = f.read()
 
     response = client.post('/api/files',
                            data={
