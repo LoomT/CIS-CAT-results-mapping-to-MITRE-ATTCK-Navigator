@@ -20,8 +20,6 @@ RUN pip install -r requirements.txt
 # Copy the rest of the application
 COPY api .
 
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
 ENV FLASK_STATIC_FOLDER=static
 
 EXPOSE 5000

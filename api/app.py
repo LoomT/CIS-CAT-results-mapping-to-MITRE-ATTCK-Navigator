@@ -1,6 +1,12 @@
 import os
 import shutil
 import uuid
+import json
+try:
+    from convert import convert_cis_to_attack
+except ImportError:
+    from .convert import convert_cis_to_attack
+
 
 from flask import (Flask, send_from_directory, request, send_file, Response)
 from flask.cli import load_dotenv
@@ -83,14 +89,14 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
             UPLOAD_FOLDER, unique_id, modified_filename
         )
 
-        # Read the file content
-        # TODO assert that the file is of correct format
-        # TODO convert it to the desired format
-        content = file.stream.read()
+        try:
+            cis_data = json.load(file.stream)
+        except json.JSONDecodeError:
+            return "Invalid file format", 400
 
-        # Save modified content
-        with open(modified_file_path, 'wb') as f:
-            f.write(content)
+        attck_data = convert_cis_to_attack(cis_data)
+        with open(modified_file_path, 'w', encoding='utf-8') as F:
+            json.dump(attck_data, F, ensure_ascii=False, indent=2)
 
         # Send the id of the modified file back to the client
         return {

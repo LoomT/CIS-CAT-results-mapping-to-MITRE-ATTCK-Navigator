@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from "react";
+import React, { useCallback, useState } from "react";
 import "./UserScreen.css";
 import "./popups.css";
 import "./FileTableEntry.jsx";
@@ -279,7 +279,7 @@ function UserScreen({ onBack }) {
                     id="file-input"
                     onChange={handleFileInput}
                     accept=".json"
-                    style={{display: "none"}}
+                    style={{ display: "none" }}
                   />
                   <button className="upload-button" onClick={
                     () => document.getElementById("file-input").click()

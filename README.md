@@ -103,6 +103,7 @@ Alternatively install `eslint` in vscode
   - When no file is provided: `"No file part"`
   - When filename is empty: `"No selected file"`
   - When filename is invalid: `"Invalid filename"`
+  - When file contents are invalid: `"Invalid file format"`
 
 - **Code**: `500 Internal Server Error`
   - When server encounters an unexpected error: `"Unexpected error while processing file"`
@@ -138,6 +139,7 @@ Alternatively install `eslint` in vscode
 - Filenames are sanitized for security
 - Original files are removed after processing
 - Error responses include cleanup of any partially created resources
+- Mappings are loaded from an Excel spreadsheed. Currently included file is from [CIS Security](https://www.cisecurity.org/insights/white-papers/cis-controls-v8-master-mapping-to-mitre-enterprise-attck-v82)
 
 ## Getting started
 
