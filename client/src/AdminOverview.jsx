@@ -2,36 +2,83 @@ import React, { useState } from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
-import downloadIcon from './assets/download.png';
-import visualIcon from './assets/visual.png';
+import FileTableEntry from "./FileTableEntry.jsx";
 
 function AdminOverview({ onBack, t }) {
   const [showVisualizePopup, setShowVisualizePopup] = useState(false);
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [fileToDelete, setFileToDelete] = useState(null);
   const [hostSearch, setHostSearch] = useState('');
 
   const handleVisualizeClick = () => {
     setShowVisualizePopup(true);
   };
 
-  const handleDeleteClick = (fileName) => {
-    setFileToDelete(fileName);
-    setShowDeletePopup(true);
-  };
-
-  const handleDeleteConfirm = () => {
-    alert(`File ${fileToDelete} deleted!`);
-    setShowDeletePopup(false);
-  };
-
-  const handleDeleteCancel = () => {
-    setShowDeletePopup(false);
-  };
-
   const handlePopupClose = () => {
     setShowVisualizePopup(false);
   };
+
+  const handleDownload = async (fileId, fileName) => {
+    console.log("downloading file: " + fileId)
+    let response;
+    try {
+      response = await fetch(`/api/files/${fileId}`);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      if (error.name === "AbortError") {
+        alert("Downloading was cancelled. Please try again.");
+      } else if (error instanceof TypeError) {
+        alert("Network error occurred. Please check your internet connection and try again.");
+      } else {
+        // Fallback for unknown errors
+        alert("Failed to download file. Please try again.");
+      }
+      return;
+    }
+
+    if (!response.ok) {
+      console.error("Error downloading file:", response);
+      switch (response.status) {
+      case 400:
+        alert("Invalid file id");
+        break;
+      case 404:
+        alert("File not found");
+        break;
+      case 500:
+        alert("Server error occurred while downloading the file. Please try again later.");
+        break;
+      default:
+        alert(`Download failed: ${response.statusText}. Please try again.`);
+      }
+      return;
+    }
+
+    // Get the converted file from the response
+    let file;
+    try {
+      file = await response.blob();
+    } catch (error) {
+      if (error instanceof DOMException) {
+        console.log("Download was cancelled by the user.")
+      } else {
+        // Fallback for unknown errors
+        console.error("Error accessing or decoding response body:", error);
+        alert("Error accessing or decoding response body. Please try again.");
+      }
+      return;
+    }
+
+    // Create a download link for the modified file
+    const downloadUrl = window.URL.createObjectURL(file);
+
+    // Create a temporary link and trigger download
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(downloadUrl);
+  }
 
   return (
     <div className="admin-panel">
@@ -73,7 +120,6 @@ function AdminOverview({ onBack, t }) {
           <table className="files-table">
             <thead>
               <tr>
-                <th>{t.select}</th>
                 <th>{t.name}</th>
                 <th>{t.department}</th>
                 <th>{t.size}</th>
@@ -82,31 +128,20 @@ function AdminOverview({ onBack, t }) {
               </tr>
             </thead>
             <tbody>
-              {/* Example Row */}
-              <tr>
-                <td>
-                  <button className="square-button">☐</button>
-                </td>
-                <td>File 1</td>
-                <td>
-                  <span className="department-badge department-1">Department 1</span>
-                </td>
-                <td>2.1 MB</td>
-                <td>2025-05-04</td>
-                <td>
-                  <button className="btn-blue" onClick={handleVisualizeClick}>
-                    <img src={visualIcon} alt="visualize" className="icon" />
-                    {t.visualize}
-                  </button>
-                  <button className="btn-green">
-                    <img src={downloadIcon} alt="download" className="icon" />
-                    {t.download}
-                  </button>
-                  <button className="delete-button" onClick={() => handleDeleteClick('File 1')}>
-                    {t.delete}
-                  </button>
-                </td>
-              </tr>
+              {/* Map files to table rows*/}
+              {files.map((file) => (
+                <FileTableEntry
+                  key={file.id}
+                  filename={file.filename}
+                  size={file.size}
+                  department={file.department}
+                  time={file.time}
+                  onVisualize={() => handleVisualizeClick(file)}
+                  onExport={() => handleExportClick()}
+                  onDownload={() => handleDownload(file.id, file.filename)}
+                  t={{visualize: "visualize", download:"download"}}
+                />
+              ))}
             </tbody>
           </table>
         </div>
@@ -121,22 +156,6 @@ function AdminOverview({ onBack, t }) {
               <button className="popup-button">SVG</button>
               <button className="popup-button">PNG</button>
               <button className="popup-cancel" onClick={handlePopupClose}>
-                {t.cancel}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showDeletePopup && (
-        <div className="popup-overlay">
-          <div className="popup">
-            <h3 className="popup-heading">{t.confirmDelete(fileToDelete)}?</h3>
-            <div className="popup-buttons">
-              <button className="popup-button" onClick={handleDeleteConfirm}>
-                {t.yes}
-              </button>
-              <button className="popup-cancel" onClick={handleDeleteCancel}>
                 {t.cancel}
               </button>
             </div>
