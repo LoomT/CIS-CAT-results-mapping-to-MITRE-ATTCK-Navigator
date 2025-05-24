@@ -1,5 +1,6 @@
 import React from 'react';
 import './globalstyle.css';
+import { Link } from 'react-router-dom';
 
 /**
  * HomeScreen Component
@@ -7,25 +8,23 @@ import './globalstyle.css';
  * The entry screen of the application where users choose between Admin and User roles.
  *
  * Props:
- *  @param onAdminClick (function): Callback invoked when the "Admin" button is clicked.
- *  @param onUserClick (function): Callback invoked when the "User" button is clicked.
  *  @param t the translation mapping
  */
-function HomeScreen({ onAdminClick, onUserClick, t }) {
+function HomeScreen({ t }) {
   return (
     <div className="small-panel">
       <div className="card">
         <h2>{t.chooseScreen}</h2>
         {/* Buttons for role selection */}
         <div className="button-container">
-          <button className="btn-blue" onClick={onAdminClick}>Admin</button>
-          <button
+          <Link className="btn-blue" to="/admin">Admin</Link>
+          <Link
             className="btn-blue"
             data-testid="home-screen-user-button"
-            onClick={onUserClick}
+            to="/manual-conversion"
           >
             {t.user}
-          </button>
+          </Link>
         </div>
       </div>
     </div>

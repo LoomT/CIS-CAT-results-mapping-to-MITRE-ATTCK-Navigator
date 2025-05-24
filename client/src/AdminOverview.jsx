@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
@@ -14,12 +15,11 @@ import NavigatorAPI from './NavigatorAPI.js';
  * - A popup for choosing visualization formats (SVG or PNG).
  *
  * Props:
- * @param {function} onBack - Callback to navigate back to the home screen.
  * @param t the translation mapping
  * @return {React.JSX.Element} - The rendered AdminOverview component.
  */
 
-function AdminOverview({ onBack, t }) {
+function AdminOverview({ t }) {
   const [showExportPopup, setShowExportPopup] = useState(false);
   const [currentFile, setFile] = useState({});
   const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
@@ -157,9 +157,9 @@ function AdminOverview({ onBack, t }) {
       <div className="user-title">{t.adminOverview}</div>
 
       {/* Back button in the top left corner. TODO: add routing so this can be removed */}
-      <div className="back-button">
-        <img src={backIcon} alt="Back" className="back-icon" onClick={onBack} />
-      </div>
+      <Link className="back-button" to="/">
+        <img src={backIcon} alt="Back" className="back-icon" />
+      </Link>
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">

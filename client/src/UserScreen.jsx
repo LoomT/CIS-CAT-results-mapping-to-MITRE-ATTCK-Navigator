@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
@@ -14,12 +15,11 @@ import NavigatorAPI from './NavigatorAPI.js';
  * - A popup for choosing visualization formats (SVG or PNG).
  *
  * Props:
- * @param {function} onBack - Callback to navigate back to the previous screen (home).
  * @param t the translation mapping
  * @return {React.JSX.Element} - The rendered UserScreen component.
  */
 
-function UserScreen({ onBack, t }) {
+function UserScreen({ t }) {
   const [showPopup, setShowPopup] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -304,15 +304,14 @@ function UserScreen({ onBack, t }) {
         {t.userOverview}
       </div>
 
-      { /* Back button in the top left corner. TODO: add routing so this can be removed */}
-      <div className="back-button">
+      { /* Back button in the top left corner. TODO: add routing so this can be removed */ }
+      <Link className="back-button" to="/">
         <img
           src={backIcon}
           alt="Back"
           className="back-icon"
-          onClick={onBack}
         />
-      </div>
+      </Link>
 
       {/* Side-by-side Content Area */}
       <div className="content-area">
