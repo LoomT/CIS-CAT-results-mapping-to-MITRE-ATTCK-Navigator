@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
-import investigateIcon from './assets/investigate.png';
 import "./FileTableEntry.jsx";
 import FileTableEntry from "./FileTableEntry.jsx";
 
@@ -287,35 +286,39 @@ function UserScreen({ onBack, t }) {
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <input
-              type="file"
-              accept=".json"
-              onChange={handleFileInput}
-              style={{ display: 'none' }}
-              id="file-upload-input"
-            />
-            <label htmlFor="file-upload-input" className="upload-label">
-              Click here or drag a JSON file to upload
-            </label>
+            <div className="upload-content">
+              {uploading ? (
+                <p>Uploading...</p>
+              ) : (
+                <>
+                  <p>Drag and drop files here</p>
+                  <p>or</p>
+                  <input
+                    type="file"
+                    id="file-input"
+                    onChange={handleFileInput}
+                    accept=".json"
+                    style={{display: "none"}}
+                  />
+                  <button
+                    className="btn-blue"
+                    onClick={() => document.getElementById("file-input").click()}
+                  >
+                    Choose File
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-
-          {/* Run Benchmark Section */}
-          <div className="section-header" style={{ marginTop: '2rem' }}>
-            <h2>{t.runBenchmark}</h2>
-            <p>Run the benchmark and automatically convert the resulting CIS-CAT output to MITRE ATT&CK navigator.</p>
-          </div>
-          <button className="btn-purple">
-            <img src={investigateIcon} alt="benchmark" className="icon" />
-            {t.runBenchmark}
-          </button>
         </div>
 
         {/* File Table Section */}
         <div className="card file-table-section">
           <div className="section-header">
             <h2>{t.filesList}</h2>
-            {/*TODO: translate*/}
-            <p>View all uploaded files and available actions. Each file can be downloaded as its raw JSON, or visualised as a PNG or SVG.</p>
+            {/*TODO: translation*/}
+            <p>View all uploaded files and available actions. Each file can be downloaded as its raw JSON, or visualised
+              as a PNG or SVG.</p>
           </div>
           <table className="file-table">
             <thead>
@@ -328,7 +331,6 @@ function UserScreen({ onBack, t }) {
               </tr>
             </thead>
             <tbody>
-              {/* Map files to table rows*/}
               {files.map((file) => (
                 <FileTableEntry
                   key={file.id}
@@ -338,7 +340,7 @@ function UserScreen({ onBack, t }) {
                   time={file.time}
                   onVisualize={() => handleVisualizeClick()}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{visualize: "visualize", download:"download"}}
+                  t={{visualize: "visualize", download: "download"}}
                 />
               ))}
             </tbody>
@@ -351,11 +353,12 @@ function UserScreen({ onBack, t }) {
         <div className="popup-overlay">
           <div className="popup">
             <h3 className="popup-heading">{t.chooseFormat}</h3>
-            {/*Buttons in the popup*/}
             <div className="popup-buttons">
               <button className="popup-button">SVG</button>
               <button className="popup-button">PNG</button>
-              <button className="popup-cancel" onClick={handleClosePopup}>{t.cancel}</button>
+              <button className="popup-cancel" onClick={handleClosePopup}>
+                {t.cancel}
+              </button>
             </div>
           </div>
         </div>
@@ -363,5 +366,6 @@ function UserScreen({ onBack, t }) {
     </div>
   );
 }
+
 
 export default UserScreen;
