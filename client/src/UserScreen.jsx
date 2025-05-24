@@ -92,7 +92,7 @@ function UserScreen({ t }) {
       console.log('uploading file: ' + formData);
       let response;
       try {
-        response = await fetch('/api/files', {
+        response = await fetch('/api/files/', {
           method: 'POST',
           body: formData,
         });
