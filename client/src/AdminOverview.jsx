@@ -7,8 +7,14 @@ import FileTableEntry from "./FileTableEntry.jsx";
 function AdminOverview({ onBack, t }) {
   const [showVisualizePopup, setShowVisualizePopup] = useState(false);
   const [hostSearch, setHostSearch] = useState('');
+  const [files] = useState([]);
+
 
   const handleVisualizeClick = () => {
+    setShowVisualizePopup(true);
+  };
+
+  const handleExportClick = () => {
     setShowVisualizePopup(true);
   };
 
