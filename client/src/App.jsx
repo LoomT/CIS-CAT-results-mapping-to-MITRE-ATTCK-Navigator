@@ -7,7 +7,25 @@ import AdminOverview from './AdminOverview';
 import HomeScreen from './HomeScreen';
 import translations from './translation-map';
 
+/**
+ * App Component
+ * --------------
+ * The central component of the application that manages navigation between different
+ * screens using internal state.
+ *
+ * Screens:
+ * - 'home': Entry point where the user can choose between admin or user view.
+ * - 'user': The user interface for non-admin users.
+ * - 'admin-login': A secure entryway for admin token validation.
+ * - 'admin-overview': Administrative dashboard with file control actions.
+ *
+ * State:
+ * - currentScreen (string): Tracks the active screen being displayed.
+ */
 function App() {
+  /**
+   * Track the current screen
+   */
   const [currentScreen, setCurrentScreen] = useState('home');
   const [language, setLanguage] = useState('en');
   const t = translations[language];
@@ -34,6 +52,7 @@ function App() {
           t={t}
         />
       )}
+      {/* Render the Admin Login screen */}
       {currentScreen === 'admin-login' && (
         <AdminLogin
           onBack={handleBackClick}

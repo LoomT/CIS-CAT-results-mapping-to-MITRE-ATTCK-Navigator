@@ -27,8 +27,10 @@ function AdminLogin({ onBack, onSuccess, t }) {
   const handleSubmit = () => {
     const placeholderToken = 'correct-token'; // Placeholder token for validation
     if (token === placeholderToken) {
-      onSuccess();
-    } else {
+      // Navigate to admin overview when token is correct
+      onSuccess(); // Pass 'admin-overview' to navigate to the Admin Overview screen
+    }
+    else {
       setErrorMessage('Token Incorrect');
     }
   };

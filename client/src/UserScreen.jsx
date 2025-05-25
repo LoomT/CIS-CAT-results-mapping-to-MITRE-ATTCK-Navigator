@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
-import FileTableEntry from "./FileTableEntry.jsx";
+import FileTableEntry from "./components/FileTableEntry.jsx";
 
 /**
  * UserScreen Component
@@ -28,7 +28,7 @@ function UserScreen({ onBack, t }) {
    * Opens the visualization popup.
    */
   const handleVisualizeClick = () => {
-    console.log("Visualize clicked!");
+    console.log('Visualize clicked!');
     setShowPopup(true);
   };
 
@@ -49,9 +49,10 @@ function UserScreen({ onBack, t }) {
   const handleDrag = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    }
+    else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   }, []);
@@ -64,115 +65,125 @@ function UserScreen({ onBack, t }) {
    */
   async function uploadFile(file) {
     // Make sure that the file is a JSON file
-    if (!file.name.toLowerCase().endsWith(".json")) {
-      alert("Please upload a JSON file");
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      alert('Please upload a JSON file');
       return;
     }
 
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append('file', file);
 
-      console.log("uploading file: " + formData)
+      console.log('uploading file: ' + formData);
       let response;
       try {
-        response = await fetch("/api/files", {
-          method: "POST",
+        response = await fetch('/api/files', {
+          method: 'POST',
           body: formData,
         });
-      } catch (error) {
+      }
+      catch (error) {
         // TODO maybe try doing the fetch a few times before failing on some type of errors?
-        if (error instanceof DOMException && error.name === "AbortError") {
-          console.log("Upload was cancelled by the user.")
-        } else if (error instanceof TypeError) {
-          console.error("Error uploading file:", error);
-          alert("Network error occurred. Please check your internet connection and try again.");
-        } else {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.log('Upload was cancelled by the user.');
+        }
+        else if (error instanceof TypeError) {
+          console.error('Error uploading file:', error);
+          alert('Network error occurred. Please check your internet connection and try again.');
+        }
+        else {
           // Fallback for unknown errors
-          console.error("Error uploading file:", error);
-          alert("Failed to upload file. Please try again.");
+          console.error('Error uploading file:', error);
+          alert('Failed to upload file. Please try again.');
         }
         return;
       }
 
       if (!response.ok) {
-        console.error("Error uploading file:", response);
+        console.error('Error uploading file:', response);
         switch (response.status) {
-        case 400:
-          alert("Invalid file format or empty file. Please ensure you're uploading a valid JSON file.");
-          break;
-        case 500:
-          alert("Server error occurred while processing the file. Please try again later.");
-          break;
-        default:
-          alert(`Upload failed: ${response.statusText}. Please try again.`);
+          case 400:
+            alert('Invalid file format or empty file. Please ensure you\'re uploading a valid JSON file.');
+            break;
+          case 500:
+            alert('Server error occurred while processing the file. Please try again later.');
+            break;
+          default:
+            alert(`Upload failed: ${response.statusText}. Please try again.`);
         }
         return;
       }
       let data;
       try {
         data = await response.json();
-      } catch (error) {
+      }
+      catch (error) {
         if (error instanceof DOMException) {
-          console.log("Upload was cancelled by the user.")
-        } else if (error instanceof SyntaxError) {
-          console.error("Error parsing JSON:", error);
-          alert("Response from server is not valid JSON. Please try again.");
-        } else {
+          console.log('Upload was cancelled by the user.');
+        }
+        else if (error instanceof SyntaxError) {
+          console.error('Error parsing JSON:', error);
+          alert('Response from server is not valid JSON. Please try again.');
+        }
+        else {
           // Fallback for unknown errors
-          console.error("Error accessing or decoding response body:", error);
-          alert("Error accessing or decoding response body. Please try again.");
+          console.error('Error accessing or decoding response body:', error);
+          alert('Error accessing or decoding response body. Please try again.');
         }
         return;
       }
 
-      console.log("File uploaded successfully. File ID:", data.id);
+      console.log('File uploaded successfully. File ID:', data.id);
 
       // Append the new file to the files state
       setFiles(prevFiles => [{
         id: data.id,
         filename: data.filename,
-        department: "Default Department", // might want to make this dynamic
-        time: new Date().toISOString()
+        department: 'Default Department', // might want to make this dynamic
+        time: new Date().toISOString(),
       }, ...prevFiles]);
-    } finally {
+    }
+    finally {
       setUploading(false);
     }
   }
 
   const handleDownload = async (fileId, fileName) => {
-    console.log("downloading file: " + fileId)
+    console.log('downloading file: ' + fileId);
     let response;
     try {
       response = await fetch(`/api/files/${fileId}`);
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      if (error.name === "AbortError") {
-        alert("Downloading was cancelled. Please try again.");
-      } else if (error instanceof TypeError) {
-        alert("Network error occurred. Please check your internet connection and try again.");
-      } else {
+    }
+    catch (error) {
+      console.error('Error downloading file:', error);
+      if (error.name === 'AbortError') {
+        alert('Downloading was cancelled. Please try again.');
+      }
+      else if (error instanceof TypeError) {
+        alert('Network error occurred. Please check your internet connection and try again.');
+      }
+      else {
         // Fallback for unknown errors
-        alert("Failed to download file. Please try again.");
+        alert('Failed to download file. Please try again.');
       }
       return;
     }
 
     if (!response.ok) {
-      console.error("Error downloading file:", response);
+      console.error('Error downloading file:', response);
       switch (response.status) {
-      case 400:
-        alert("Invalid file id");
-        break;
-      case 404:
-        alert("File not found");
-        break;
-      case 500:
-        alert("Server error occurred while downloading the file. Please try again later.");
-        break;
-      default:
-        alert(`Download failed: ${response.statusText}. Please try again.`);
+        case 400:
+          alert('Invalid file id');
+          break;
+        case 404:
+          alert('File not found');
+          break;
+        case 500:
+          alert('Server error occurred while downloading the file. Please try again later.');
+          break;
+        default:
+          alert(`Download failed: ${response.statusText}. Please try again.`);
       }
       return;
     }
@@ -181,13 +192,15 @@ function UserScreen({ onBack, t }) {
     let file;
     try {
       file = await response.blob();
-    } catch (error) {
+    }
+    catch (error) {
       if (error instanceof DOMException) {
-        console.log("Download was cancelled by the user.")
-      } else {
+        console.log('Download was cancelled by the user.');
+      }
+      else {
         // Fallback for unknown errors
-        console.error("Error accessing or decoding response body:", error);
-        alert("Error accessing or decoding response body. Please try again.");
+        console.error('Error accessing or decoding response body:', error);
+        alert('Error accessing or decoding response body. Please try again.');
       }
       return;
     }
@@ -196,14 +209,14 @@ function UserScreen({ onBack, t }) {
     const downloadUrl = window.URL.createObjectURL(file);
 
     // Create a temporary link and trigger download
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = downloadUrl;
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(downloadUrl);
-  }
+  };
 
   /**
    * Handles file drop event.
@@ -215,15 +228,15 @@ function UserScreen({ onBack, t }) {
     e.preventDefault(); // Prevent default browser behavior (e.g., open file in new tab)
     e.stopPropagation(); // Prevent event bubbling up to parent elements
     setDragActive(false);
-    if (uploading) return // Don't allow dropping a file if already uploading
-    console.log("Drop event:", e);
+    if (uploading) return; // Don't allow dropping a file if already uploading
+    console.log('Drop event:', e);
     const files = e.dataTransfer.files;
     if (files.length > 1) alert(
-      "You can only upload one file at a time. Please try again."
-    ) // Limit to one file for now
+      'You can only upload one file at a time. Please try again.',
+    ); // Limit to one file for now
     if (files && files[0]) {
       // Handle the file upload here
-      console.log("File dropped:", files[0]);
+      console.log('File dropped:', files[0]);
       uploadFile(files[0]);
     }
   }, [uploading]);
@@ -237,11 +250,10 @@ function UserScreen({ onBack, t }) {
     const files = e.target.files;
     if (files && files[0]) {
       // Handle the file upload here
-      console.log("File selected:", files[0]);
+      console.log('File selected:', files[0]);
       uploadFile(files[0]);
     }
   };
-
 
   return (
     <div className="admin-panel" data-testid="user-screen">
@@ -271,13 +283,14 @@ function UserScreen({ onBack, t }) {
 
           {/* Drop zone area with drag and drop event handlers */}
           <div
-            className={`upload-area ${dragActive ? "drag-active" : ""}`}
+            className={`upload-area ${dragActive ? 'drag-active' : ''}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
             <div className="upload-content">
+              {/* eslint-disable-next-line @stylistic/multiline-ternary */}
               {uploading ? (
                 <p>{t.uploading}</p>
               ) : (
