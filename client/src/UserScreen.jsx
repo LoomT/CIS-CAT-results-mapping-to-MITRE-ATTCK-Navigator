@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
@@ -23,9 +23,9 @@ import FileTableEntry from "./FileTableEntry.jsx";
 function UserScreen({ onBack, t }) {
   const [showPopup, setShowPopup] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState('');
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState([]);
+
   /**
    * Opens the visualization popup.
    */
@@ -143,13 +143,6 @@ function UserScreen({ onBack, t }) {
     }
   }
 
-  useEffect(() => {
-    if (uploadMessage) {
-      const timer = setTimeout(() => setUploadMessage(''), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [uploadMessage]);
-
   const handleDownload = async (fileId, fileName) => {
     console.log("downloading file: " + fileId)
     let response;
@@ -259,6 +252,7 @@ function UserScreen({ onBack, t }) {
         {t.userOverview}
       </div>
 
+      {/*Back button in the top left corner. TODO: add routing so this can be removed*/}
       <div className="back-button">
         <img
           src={backIcon}
@@ -331,6 +325,7 @@ function UserScreen({ onBack, t }) {
                 <th>{t.actions}</th>
               </tr>
             </thead>
+            {/*Maps each file to be displayed with its name, department, time, and actions (visualise and download)*/}
             <tbody>
               {files.map((file) => (
                 <FileTableEntry
@@ -349,7 +344,7 @@ function UserScreen({ onBack, t }) {
         </div>
       </div>
 
-      {/* Visualization Popup */}
+      {/* Visualization Selection Popup */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup">
