@@ -136,7 +136,6 @@ function UserScreen({ onBack, t }) {
         id: data.id,
         filename: data.filename,
         department: "Default Department",
-        size: "~10KB", // TODO: placeholder
         time: new Date().toISOString()
       }, ...prevFiles]);
     } finally {
@@ -275,6 +274,7 @@ function UserScreen({ onBack, t }) {
         <div className="card upload-section" data-testid="user-screen-upload-section">
           <div className="section-header">
             <h2>{t.uploadFile}</h2>
+            {/*TODO: Translation*/}
             <p>Drag and drop a file or click the area below to upload your JSON file.</p>
           </div>
 
@@ -288,9 +288,10 @@ function UserScreen({ onBack, t }) {
           >
             <div className="upload-content">
               {uploading ? (
-                <p>Uploading...</p>
+                <p>Uploading...</p> //TODO: Translation
               ) : (
                 <>
+                  {/*TODO: Translation*/}
                   <p>Drag and drop files here</p>
                   <p>or</p>
                   <input
@@ -304,6 +305,7 @@ function UserScreen({ onBack, t }) {
                     className="btn-blue"
                     onClick={() => document.getElementById("file-input").click()}
                   >
+                    {/*TODO: Translation*/}
                     Choose File
                   </button>
                 </>
@@ -320,12 +322,11 @@ function UserScreen({ onBack, t }) {
             <p>View all uploaded files and available actions. Each file can be downloaded as its raw JSON, or visualised
               as a PNG or SVG.</p>
           </div>
-          <table className="file-table">
+          <table className="files-table">
             <thead>
               <tr>
                 <th>{t.name}</th>
                 <th>{t.department}</th>
-                <th>{t.size}</th>
                 <th>{t.date}</th>
                 <th>{t.actions}</th>
               </tr>
@@ -335,12 +336,12 @@ function UserScreen({ onBack, t }) {
                 <FileTableEntry
                   key={file.id}
                   filename={file.filename}
-                  size={file.size}
                   department={file.department}
                   time={file.time}
                   onVisualize={() => handleVisualizeClick()}
                   onDownload={() => handleDownload(file.id, file.filename)}
                   t={{visualize: "visualize", download: "download"}}
+                  showCheckbox={false}
                 />
               ))}
             </tbody>

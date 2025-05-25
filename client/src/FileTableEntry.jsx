@@ -14,12 +14,16 @@ import visualIcon from './assets/investigate.png';
  * @returns {JSX.Element} the rendered file table entry component
  * @constructor FileTableEntry
  */
-const FileTableEntry = ({ filename, department, size, time, onVisualize, onDownload, t }) => {
+const FileTableEntry = ({ filename, department, time, onVisualize, onDownload, t, showCheckbox }) => {
   return (
     <tr>
+      {showCheckbox && (
+        <td>
+          <input type="checkbox" />
+        </td>
+      )}
       <td>{filename}</td>
       <td>{department}</td>
-      <td>{size}</td>
       <td>{time}</td>
       <td>
         <button className="btn-blue" onClick={onVisualize}>

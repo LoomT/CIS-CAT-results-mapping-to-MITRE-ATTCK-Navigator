@@ -126,9 +126,9 @@ function AdminOverview({ onBack, t }) {
           <table className="files-table">
             <thead>
               <tr>
+                <th>Select</th>
                 <th>{t.name}</th>
                 <th>{t.department}</th>
-                <th>{t.size}</th>
                 <th>{t.date}</th>
                 <th>{t.actions}</th>
               </tr>
@@ -139,13 +139,13 @@ function AdminOverview({ onBack, t }) {
                 <FileTableEntry
                   key={file.id}
                   filename={file.filename}
-                  size={file.size}
                   department={file.department}
                   time={file.time}
                   onVisualize={() => handleVisualizeClick(file)}
                   onExport={() => handleExportClick()}
                   onDownload={() => handleDownload(file.id, file.filename)}
                   t={{visualize: "visualize", download:"download"}}
+                  showCheckbox={true}
                 />
               ))}
             </tbody>
