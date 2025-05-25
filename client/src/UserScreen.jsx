@@ -1,8 +1,8 @@
-import React, {useCallback, useState} from 'react';
+import React, { useCallback, useState } from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
-import FileTableEntry from "./components/FileTableEntry.jsx";
+import FileTableEntry from './components/FileTableEntry.jsx';
 
 /**
  * UserScreen Component
@@ -262,7 +262,7 @@ function UserScreen({ onBack, t }) {
         {t.userOverview}
       </div>
 
-      {/*Back button in the top left corner. TODO: add routing so this can be removed*/}
+      { /* Back button in the top left corner. TODO: add routing so this can be removed */ }
       <div className="back-button">
         <img
           src={backIcon}
@@ -302,11 +302,11 @@ function UserScreen({ onBack, t }) {
                     id="file-input"
                     onChange={handleFileInput}
                     accept=".json"
-                    style={{display: "none"}}
+                    style={{ display: 'none' }}
                   />
                   <button
                     className="btn-blue"
-                    onClick={() => document.getElementById("file-input").click()}
+                    onClick={() => document.getElementById('file-input').click()}
                   >
                     {t.chooseFile}
                   </button>
@@ -331,9 +331,9 @@ function UserScreen({ onBack, t }) {
                 <th>{t.actions}</th>
               </tr>
             </thead>
-            {/*Maps each file to be displayed with its name, department, time, and actions (visualise and download)*/}
+            { /* Maps each file to be displayed with its name, department, time, and actions (visualise and download) */ }
             <tbody>
-              {files.map((file) => (
+              {files.map(file => (
                 <FileTableEntry
                   key={file.id}
                   filename={file.filename}
@@ -341,7 +341,7 @@ function UserScreen({ onBack, t }) {
                   time={file.time}
                   onVisualize={() => handleVisualizeClick()}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{visualize: "Visualize", download: "Download"}}
+                  t={{ visualize: 'Visualize', download: 'Download' }}
                   showCheckbox={false}
                 />
               ))}

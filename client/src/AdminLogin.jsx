@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './globalstyle.css';
 import './popups.css';
 import visualIcon from './assets/visual.png';
-import backIcon from "./assets/back.png";
+import backIcon from './assets/back.png';
 
 /**
  * AdminLogin Component
@@ -63,7 +63,7 @@ function AdminLogin({ onBack, onSuccess, t }) {
 
       {/* Token Input Section */}
       <div className="card">
-        {/*TODO: translation*/}
+        {/* TODO: translation */}
         <h2>Enter Token</h2>
         <div className="password-field-container">
           <input
@@ -81,7 +81,7 @@ function AdminLogin({ onBack, onSuccess, t }) {
             onClick={togglePasswordVisibility}
           />
         </div>
-        {/*TODO: translation*/}
+        {/* TODO: translation */}
         <button className="btn-blue" onClick={handleSubmit}>Enter</button>
 
         {/* Error Message Display */}

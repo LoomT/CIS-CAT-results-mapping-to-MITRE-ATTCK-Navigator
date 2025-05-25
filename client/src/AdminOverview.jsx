@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
-import FileTableEntry from "./components/FileTableEntry.jsx";
+import FileTableEntry from './components/FileTableEntry.jsx';
 
 /**
  * AdminOverview Component
@@ -18,10 +18,9 @@ import FileTableEntry from "./components/FileTableEntry.jsx";
  * @return {React.JSX.Element} - The rendered AdminOverview component.
  */
 
-
 function AdminOverview({ onBack, t }) {
   const [showVisualizePopup, setShowVisualizePopup] = useState(false);
-  const [hostSearch, setHostSearch] = useState(''); //TODO: currently unused
+  const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
   const [files] = useState([]);
 
   /**
@@ -39,37 +38,40 @@ function AdminOverview({ onBack, t }) {
   };
 
   const handleDownload = async (fileId, fileName) => {
-    console.log("downloading file: " + fileId)
+    console.log('downloading file: ' + fileId);
     let response;
     try {
       response = await fetch(`/api/files/${fileId}`);
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      if (error.name === "AbortError") {
-        alert("Downloading was cancelled. Please try again.");
-      } else if (error instanceof TypeError) {
-        alert("Network error occurred. Please check your internet connection and try again.");
-      } else {
+    }
+    catch (error) {
+      console.error('Error downloading file:', error);
+      if (error.name === 'AbortError') {
+        alert('Downloading was cancelled. Please try again.');
+      }
+      else if (error instanceof TypeError) {
+        alert('Network error occurred. Please check your internet connection and try again.');
+      }
+      else {
         // Fallback for unknown errors
-        alert("Failed to download file. Please try again.");
+        alert('Failed to download file. Please try again.');
       }
       return;
     }
 
     if (!response.ok) {
-      console.error("Error downloading file:", response);
+      console.error('Error downloading file:', response);
       switch (response.status) {
-      case 400:
-        alert("Invalid file id");
-        break;
-      case 404:
-        alert("File not found");
-        break;
-      case 500:
-        alert("Server error occurred while downloading the file. Please try again later.");
-        break;
-      default:
-        alert(`Download failed: ${response.statusText}. Please try again.`);
+        case 400:
+          alert('Invalid file id');
+          break;
+        case 404:
+          alert('File not found');
+          break;
+        case 500:
+          alert('Server error occurred while downloading the file. Please try again later.');
+          break;
+        default:
+          alert(`Download failed: ${response.statusText}. Please try again.`);
       }
       return;
     }
@@ -78,13 +80,15 @@ function AdminOverview({ onBack, t }) {
     let file;
     try {
       file = await response.blob();
-    } catch (error) {
+    }
+    catch (error) {
       if (error instanceof DOMException) {
-        console.log("Download was cancelled by the user.")
-      } else {
+        console.log('Download was cancelled by the user.');
+      }
+      else {
         // Fallback for unknown errors
-        console.error("Error accessing or decoding response body:", error);
-        alert("Error accessing or decoding response body. Please try again.");
+        console.error('Error accessing or decoding response body:', error);
+        alert('Error accessing or decoding response body. Please try again.');
       }
       return;
     }
@@ -93,26 +97,26 @@ function AdminOverview({ onBack, t }) {
     const downloadUrl = window.URL.createObjectURL(file);
 
     // Create a temporary link and trigger download
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = downloadUrl;
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(downloadUrl);
-  }
+  };
 
   return (
     <div className="admin-panel">
       {/* Top Title */}
       <div className="user-title">{t.adminOverview}</div>
 
-      {/*Back button in the top left corner. TODO: add routing so this can be removed*/}
+      {/* Back button in the top left corner. TODO: add routing so this can be removed */}
       <div className="back-button">
         <img src={backIcon} alt="Back" className="back-icon" onClick={onBack} />
       </div>
 
-      {/*Section with selectors (department toggle and search bar)*/}
+      {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
         <div className="card">
           <div className="section-header">
@@ -130,21 +134,20 @@ function AdminOverview({ onBack, t }) {
               type="text"
               placeholder="Search hosts..."
               value={hostSearch}
-              onChange={(e) => setHostSearch(e.target.value)}
+              onChange={e => setHostSearch(e.target.value)}
             />
           </div>
         </div>
 
-
         {/* File Table Section */}
         <div className="card file-table-section">
           <h2>{t.filesList}</h2>
-          {/*TODO*/}
+          {/* TODO */}
           <p className="section-description">Description placeholder</p>
           <table className="files-table">
             <thead>
               <tr>
-                {/*TODO*/}
+                {/* TODO */}
                 <th>Select</th>
                 <th>{t.name}</th>
                 <th>{t.department}</th>
@@ -153,8 +156,8 @@ function AdminOverview({ onBack, t }) {
               </tr>
             </thead>
             <tbody>
-              {/* Map files to table rows*/}
-              {files.map((file) => (
+              {/* Map files to table rows */}
+              {files.map(file => (
                 <FileTableEntry
                   key={file.id}
                   filename={file.filename}
@@ -162,7 +165,7 @@ function AdminOverview({ onBack, t }) {
                   time={file.time}
                   onVisualize={() => handleVisualizeClick(file)}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{visualize: "Visualize", download:"Download"}}
+                  t={{ visualize: 'Visualize', download: 'Download' }}
                   showCheckbox={true}
                 />
               ))}
