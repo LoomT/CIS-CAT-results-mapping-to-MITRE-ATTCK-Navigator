@@ -244,7 +244,7 @@ function UserScreen({ onBack, t }) {
 
 
   return (
-    <div className="admin-panel">
+    <div className="admin-panel" data-testid="user-screen">
       {/* Top Center Title */}
       <div className="user-title" data-testid="user-screen-page-title">
         {t.userOverview}
