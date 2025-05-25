@@ -162,7 +162,7 @@ function AdminOverview({ onBack, t }) {
                   time={file.time}
                   onVisualize={() => handleVisualizeClick(file)}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{visualize: "visualize", download:"download"}}
+                  t={{visualize: "Visualize", download:"Download"}}
                   showCheckbox={true}
                 />
               ))}
