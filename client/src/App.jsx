@@ -3,7 +3,7 @@ import './App.css';
 import UserScreen from './UserScreen';
 import AdminLogin from './AdminLogin';
 import AdminOverview from './AdminOverview';
-import HomeScreen from './HomeScreen';  // Import HomeScreen component
+import HomeScreen from './HomeScreen';
 
 /**
  * App Component
