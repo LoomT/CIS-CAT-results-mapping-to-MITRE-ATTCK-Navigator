@@ -1,5 +1,5 @@
-import downloadIcon from './assets/download.png';
-import visualIcon from './assets/investigate.png';
+import downloadIcon from '../assets/download.png';
+import visualIcon from '../assets/investigate.png';
 
 /**
  * File table entry component for the user screen
