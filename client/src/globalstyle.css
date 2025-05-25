@@ -404,3 +404,15 @@ img[src$=".svg"] {
   height: 1.2rem;
   width: 1.2rem;
 }
+
+input[type="text"],
+input[type="password"],
+select {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
