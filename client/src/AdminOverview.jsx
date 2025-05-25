@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
-import FileTableEntry from "./FileTableEntry.jsx";
+import FileTableEntry from "./components/FileTableEntry.jsx";
 
 /**
  * AdminOverview Component
