@@ -19,7 +19,9 @@ function HomeScreen({ onAdminClick, onUserClick, t }) {
         {/* Buttons for role selection */}
         <div className="button-container">
           <button className="btn-blue" onClick={onAdminClick}>Admin</button>
-          <button className="btn-blue" onClick={onUserClick}>{t.user}</button>
+          <button className="btn-blue"
+            data-testid="home-screen-user-button"
+            onClick={onUserClick}>{t.user}</button>
         </div>
       </div>
     </div>
