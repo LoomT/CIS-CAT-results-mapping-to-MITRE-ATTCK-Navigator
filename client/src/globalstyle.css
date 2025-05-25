@@ -1,3 +1,10 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
 /* Overall Layout */
 .user-screen {
   display: flex;
@@ -296,7 +303,12 @@ h2, h3 {
   font-size: 1rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  background-colobutton {
+  background-color: #f9fafb;
+  color: #374151;
+  font-family: 'Roboto', sans-serif;
+}
+
+button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -308,10 +320,6 @@ button img, button svg {
   height: 1em;
   width: 1em;
   vertical-align: middle;
-}
-r: #f9fafb;
-  color: #374151;
-  font-family: 'Roboto', sans-serif;
 }
 
 .password-field::placeholder {

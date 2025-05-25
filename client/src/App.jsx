@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './App.css';
+import './globalstyle.css';
 
 import UserScreen from './UserScreen';
 import AdminLogin from './AdminLogin';
