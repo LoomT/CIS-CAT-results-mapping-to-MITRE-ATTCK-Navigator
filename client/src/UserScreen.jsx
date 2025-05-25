@@ -2,7 +2,6 @@ import React, {useCallback, useState} from 'react';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
-import "./FileTableEntry.jsx";
 import FileTableEntry from "./FileTableEntry.jsx";
 
 /**
@@ -134,7 +133,7 @@ function UserScreen({ onBack, t }) {
       setFiles(prevFiles => [{
         id: data.id,
         filename: data.filename,
-        department: "Default Department",
+        department: "Default Department", // might want to make this dynamic
         time: new Date().toISOString()
       }, ...prevFiles]);
     } finally {
@@ -356,6 +355,5 @@ function UserScreen({ onBack, t }) {
     </div>
   );
 }
-
 
 export default UserScreen;

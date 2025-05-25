@@ -3,17 +3,19 @@ import os
 
 import pytest
 
-
 # txt files should be removed and tests refactored
 # when proper file validation is added
-@pytest.mark.parametrize("file_name,file_content,expected_status", [
-    ("testfile.txt", b"Sample content", 201),
-    ("testfile.txt", b"", 201),
-    ("testfile.json", b"", 201),
-    ("testfile.json", b"{ \"id\": 2}", 201),
+
+
+@pytest.mark.parametrize("file_name,file_path,expected_status", [
+    ("testinputcis.json", 'tests/cisinput.json',  201)
 ])
-def test_convert_and_save_file_success(client, file_name, file_content,
+def test_convert_and_save_file_success(client, file_name, file_path,
                                        expected_status):
+
+    with open(file_path, "rb") as f:
+        file_content = f.read()
+
     response = client.post('/api/files',
                            data={
                                'file': (io.BytesIO(file_content), file_name)

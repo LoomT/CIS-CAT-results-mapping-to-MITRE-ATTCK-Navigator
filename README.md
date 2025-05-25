@@ -29,6 +29,17 @@ To run in detached mode `docker-compose up -d --build`
 
 To stop the application `docker-compose down`
 
+### Wrapper
+
+There are two ways to run the wrapper, the first is from any directory. In this case it expects as first argument the path to the actual CLI, (i.e `path/to/Assessor-CLI.sh` or `path\to\Assessor-CLI.bat`).  
+The second way is to make sure the respective `wrapper.sh` or `wrapper.ps1` is present in the same directory.  
+The remaining arguments are the same as for the normal `Assessor-CLI`.  
+On top of this a `.wrapper.env` must be present in the same directory as the wrapper. The format is as follows:
+```env
+POST_URL=http://localhost:5000/api/files
+POST_BEARER=TOKEN_sometoken_here
+```
+
 ## Development
 
 ### Backend Testing
@@ -92,6 +103,7 @@ Alternatively install `eslint` in vscode
   - When no file is provided: `"No file part"`
   - When filename is empty: `"No selected file"`
   - When filename is invalid: `"Invalid filename"`
+  - When file contents are invalid: `"Invalid file format"`
 
 - **Code**: `500 Internal Server Error`
   - When server encounters an unexpected error: `"Unexpected error while processing file"`
@@ -127,6 +139,7 @@ Alternatively install `eslint` in vscode
 - Filenames are sanitized for security
 - Original files are removed after processing
 - Error responses include cleanup of any partially created resources
+- Mappings are loaded from an Excel spreadsheed. Currently included file is from [CIS Security](https://www.cisecurity.org/insights/white-papers/cis-controls-v8-master-mapping-to-mitre-enterprise-attck-v82)
 
 ## Getting started
 

@@ -10,6 +10,7 @@
 *.sln
 *.sw?
 .git
+venv/*
 __pycache__
 
 # Generated
