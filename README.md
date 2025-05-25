@@ -70,9 +70,10 @@ Alternatively install `flake8` in vscode
 
 ### Frontend Style Checking
 
-Enter the client directory and make sure eslint is installed (i.e do a regular `npm install`)
+Enter the client directory and make sure eslint is installed (i.e. do a regular `npm install`)
 
-Then run `npx eslint . --ext .js,.jsx` to recursively check all `js` and `jsx`
+Then run `npm run lint` to recursively check all `js` and `jsx` in client
+or `npm run lint:fix` to fix all issues automatically
 
 Alternatively install `eslint` in vscode
 

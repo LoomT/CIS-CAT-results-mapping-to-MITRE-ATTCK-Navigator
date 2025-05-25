@@ -35,7 +35,8 @@ function AdminLogin({ onBack, onSuccess }) {
     if (token === placeholderToken) {
       // Navigate to admin overview when token is correct
       onSuccess(); // Pass 'admin-overview' to navigate to the Admin Overview screen
-    } else {
+    }
+    else {
       setErrorMessage('Token Incorrect');
     }
   };
