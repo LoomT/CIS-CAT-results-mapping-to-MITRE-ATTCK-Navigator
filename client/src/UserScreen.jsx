@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import './UserScreen.css';
 import './popups.css';
-import './FileTableEntry.jsx';
 import FileTableEntry from './components/FileTableEntry.jsx';
 
 /**
