@@ -1,8 +1,8 @@
-// src/translations.js
 const translations = {
   en: {
     adminToken: 'Enter Admin Token',
     delete: 'Delete',
+    user: 'User',
     visualize: 'Visualize',
     download: 'Download',
     uploadFile: 'Upload File',
@@ -11,17 +11,26 @@ const translations = {
     userOverview: 'User Overview',
     adminLogin: 'Admin Login',
     adminOverview: 'Admin Overview',
+    fileTableDesc: 'View all uploaded files and available actions. Each file can be downloaded as its raw JSON, or visualised\n' +
+      '              as a PNG or SVG.',
+    dragAndDrop: 'Drag and drop a file or click the area below to upload your JSON file.',
+    dragAndDropShort: 'Drag and drop files here',
     back: '← Back',
     cancel: 'Cancel',
-    confirmDelete: name => `Are you sure you want to delete ${name}?`,
+    uploading: 'Uploading...',
     chooseFormat: 'Choose a format to visualize',
+    departmentFilter: 'Filter by department',
     name: 'Name',
+    orr: 'or',
+    chooseFile: 'Choose file',
     department: 'Department',
     date: 'Date',
     actions: 'Actions',
     yes: 'Yes',
+    searchHosts: 'Search hosts',
     enterToken: 'Enter your token',
-    size: 'Filesize'
+    size: 'Filesize',
+    chooseScreen: 'Choose your screen'
   },
   nl: {
     adminToken: 'Voer admin token in',
@@ -33,18 +42,27 @@ const translations = {
     filesList: 'Bestandenlijst',
     userOverview: 'Gebruikersoverzicht',
     adminOverview: 'Beheerdersoverzicht',
+    fileTableDesc: 'Bekijk alle geuploade bestanden en beschikbare acties. Elk bestand kan gedownload worden als JSON, of gevisualiseerd als PNG of SVG',
+    dragAndDrop: 'Sleep uw bestand hier of klik op de onderstaande knop om uw JSON-bestand te uploaden.',
+    dragAndDropShort: 'Sleep uw bestand hier',
     adminLogin: 'Admin Login',
+    orr: 'of',
     back: '← Terug',
     cancel: 'Annuleer',
-    confirmDelete: name => `Weet je zeker dat je ${name} wilt verwijderen?`,
+    uploading: 'Aan het uploaden...',
     chooseFormat: 'Kies een formaat om te visualiseren',
     name: 'Naam',
     department: 'Afdeling',
+    chooseFile: 'Kies bestand',
     date: 'Datum',
     actions: 'Acties',
     yes: 'Ja',
+    departmentFilter: 'Filter op afdeling',
+    searchHosts: 'Doorzoek hosts',
     enterToken: 'Voer uw token in',
-    size: 'Bestandsgrootte'
+    size: 'Bestandsgrootte',
+    user: 'Gebruiker',
+    chooseScreen: 'Kies uw scherm'
   }
 };
 

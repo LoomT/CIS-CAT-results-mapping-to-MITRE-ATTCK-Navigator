@@ -9,13 +9,12 @@ import FileTableEntry from "./FileTableEntry.jsx";
  * UserScreen Component
  * ---------------------
  * Provides the main interface for regular users. Includes:
- * - File upload and benchmarking actions (currently placeholders).
+ * - File upload section
  * - A list of files with actions for visualization and download.
- * - A popup modal for choosing visualization formats.
+ * - A popup for choosing visualization formats (SVG or PNG).
  *
  * Props:
- * - onBack (function): Callback to navigate back to the previous screen (typically home).
- * @param {function} onBack - Callback to navigate back to the previous screen (typically home).
+ * @param {function} onBack - Callback to navigate back to the previous screen (home).
  * @param t the translation mapping
  * @return {React.JSX.Element} - The rendered UserScreen component.
  */
@@ -268,8 +267,7 @@ function UserScreen({ onBack, t }) {
         <div className="card upload-section" data-testid="user-screen-upload-section">
           <div className="section-header">
             <h2>{t.uploadFile}</h2>
-            {/*TODO: Translation*/}
-            <p>Drag and drop a file or click the area below to upload your JSON file.</p>
+            <p>{t.dragAndDrop}</p>
           </div>
 
           {/* Drop zone area with drag and drop event handlers */}
@@ -282,12 +280,11 @@ function UserScreen({ onBack, t }) {
           >
             <div className="upload-content">
               {uploading ? (
-                <p>Uploading...</p> //TODO: Translation
+                <p>{t.uploading}</p>
               ) : (
                 <>
-                  {/*TODO: Translation*/}
-                  <p>Drag and drop files here</p>
-                  <p>or</p>
+                  <p>{t.dragAndDropShort}</p>
+                  <p>{t.orr}</p>
                   <input
                     type="file"
                     id="file-input"
@@ -299,8 +296,7 @@ function UserScreen({ onBack, t }) {
                     className="btn-blue"
                     onClick={() => document.getElementById("file-input").click()}
                   >
-                    {/*TODO: Translation*/}
-                    Choose File
+                    {t.chooseFile}
                   </button>
                 </>
               )}
@@ -312,9 +308,7 @@ function UserScreen({ onBack, t }) {
         <div className="card file-table-section">
           <div className="section-header">
             <h2>{t.filesList}</h2>
-            {/*TODO: translation*/}
-            <p>View all uploaded files and available actions. Each file can be downloaded as its raw JSON, or visualised
-              as a PNG or SVG.</p>
+            <p>{t.fileTableDesc}</p>
           </div>
           <table className="files-table">
             <thead>

@@ -4,20 +4,36 @@ import './popups.css';
 import backIcon from './assets/back.png';
 import FileTableEntry from "./FileTableEntry.jsx";
 
+/**
+ * AdminOverview Component
+ * ---------------------
+ * Provides the main interface for admins. Includes:
+ * - A search section with (currently nonfunctional) toggle for the departments and a search bar
+ * - A list of files with actions for visualization and download, and a checkbox to select multiple rows (currently not functional)
+ * - A popup for choosing visualization formats (SVG or PNG).
+ *
+ * Props:
+ * @param {function} onBack - Callback to navigate back to the home screen.
+ * @param t the translation mapping
+ * @return {React.JSX.Element} - The rendered AdminOverview component.
+ */
+
+
 function AdminOverview({ onBack, t }) {
   const [showVisualizePopup, setShowVisualizePopup] = useState(false);
-  const [hostSearch, setHostSearch] = useState('');
+  const [hostSearch, setHostSearch] = useState(''); //TODO: currently unused
   const [files] = useState([]);
 
-
+  /**
+   * Opens the visualization popup.
+   */
   const handleVisualizeClick = () => {
     setShowVisualizePopup(true);
   };
 
-  const handleExportClick = () => {
-    setShowVisualizePopup(true);
-  };
-
+  /**
+   * Closes the visualization popup.
+   */
   const handlePopupClose = () => {
     setShowVisualizePopup(false);
   };
@@ -91,11 +107,12 @@ function AdminOverview({ onBack, t }) {
       {/* Top Title */}
       <div className="user-title">{t.adminOverview}</div>
 
+      {/*Back button in the top left corner. TODO: add routing so this can be removed*/}
       <div className="back-button">
         <img src={backIcon} alt="Back" className="back-icon" onClick={onBack} />
       </div>
 
-      {/* New Cards Section */}
+      {/*Section with selectors (department toggle and search bar)*/}
       <div className="content-area">
         <div className="card">
           <div className="section-header">
@@ -122,10 +139,12 @@ function AdminOverview({ onBack, t }) {
         {/* File Table Section */}
         <div className="card file-table-section">
           <h2>{t.filesList}</h2>
+          {/*TODO*/}
           <p className="section-description">Description placeholder</p>
           <table className="files-table">
             <thead>
               <tr>
+                {/*TODO*/}
                 <th>Select</th>
                 <th>{t.name}</th>
                 <th>{t.department}</th>
@@ -142,7 +161,6 @@ function AdminOverview({ onBack, t }) {
                   department={file.department}
                   time={file.time}
                   onVisualize={() => handleVisualizeClick(file)}
-                  onExport={() => handleExportClick()}
                   onDownload={() => handleDownload(file.id, file.filename)}
                   t={{visualize: "visualize", download:"download"}}
                   showCheckbox={true}
@@ -153,7 +171,7 @@ function AdminOverview({ onBack, t }) {
         </div>
       </div>
 
-      {/* Popups */}
+      {/* Visualisation popup */}
       {showVisualizePopup && (
         <div className="popup-overlay">
           <div className="popup">

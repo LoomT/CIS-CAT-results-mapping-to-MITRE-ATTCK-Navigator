@@ -11,8 +11,9 @@ import backIcon from "./assets/back.png";
  * to the Admin Overview. Includes basic validation and handles submission with the Enter key.
  *
  * Props:
- * - onBack (function): Callback to navigate back to the previous screen (e.g., home).
- * - onSuccess (function): Callback triggered when the token is successfully validated.
+ *  @param onBack (function): Callback to navigate back to the previous screen (e.g., home).
+ *  @param onSuccess (function): Callback triggered when the token is successfully validated.
+ *  @param t: the translation mapping
  */
 function AdminLogin({ onBack, onSuccess, t }) {
   const [token, setToken] = useState('');

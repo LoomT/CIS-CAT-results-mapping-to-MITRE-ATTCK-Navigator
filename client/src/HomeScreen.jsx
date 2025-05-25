@@ -7,18 +7,19 @@ import './globalstyle.css';
  * The entry screen of the application where users choose between Admin and User roles.
  *
  * Props:
- * - onAdminClick (function): Callback invoked when the "Admin" button is clicked.
- * - onUserClick (function): Callback invoked when the "User" button is clicked.
+ *  @param onAdminClick (function): Callback invoked when the "Admin" button is clicked.
+ *  @param onUserClick (function): Callback invoked when the "User" button is clicked.
+ *  @param t the translation mapping
  */
-function HomeScreen({ onAdminClick, onUserClick }) {
+function HomeScreen({ onAdminClick, onUserClick, t }) {
   return (
     <div className="home-screen">
       <div className="card">
-        <h2 className="screen-title">Choose your screen</h2>
+        <h2 className="screen-title">{t.chooseScreen}</h2>
         {/* Buttons for role selection */}
         <div className="button-container">
           <button className="btn-blue" onClick={onAdminClick}>Admin</button>
-          <button className="btn-blue" onClick={onUserClick}>User</button>
+          <button className="btn-blue" onClick={onUserClick}>{t.user}</button>
         </div>
       </div>
     </div>
