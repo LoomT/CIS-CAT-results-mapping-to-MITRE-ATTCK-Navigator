@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import './App.css';
+import './globalstyle.css';
+
 import UserScreen from './UserScreen';
 import AdminLogin from './AdminLogin';
 import AdminOverview from './AdminOverview';
 import HomeScreen from './HomeScreen';
+import translations from './translation-map';
 
 /**
  * App Component
@@ -25,35 +27,29 @@ function App() {
    * Track the current screen
    */
   const [currentScreen, setCurrentScreen] = useState('home');
+  const [language, setLanguage] = useState('en');
+  const t = translations[language];
 
-  /**
-   * Navigates to the User screen.
-   */
-  const handleUserClick = () => {
-    setCurrentScreen('user');
-  };
-
-  /**
-   * Navigates to the Admin Login screen.
-   */
-  const handleAdminClick = () => {
-    setCurrentScreen('admin-login');
-  };
-
-  /**
-   * Navigates back to the Home screen from any other screen.
-   */
-  const handleBackClick = () => {
-    setCurrentScreen('home'); // Navigate back to home screen
-  };
+  // Navigation handlers
+  const handleUserClick = () => setCurrentScreen('user');
+  const handleAdminClick = () => setCurrentScreen('admin-login');
+  const handleBackClick = () => setCurrentScreen('home');
 
   return (
     <div>
-      {/* Render the Home screen */}
+      {/* Language Toggle */}
+      <div style={{ position: 'absolute', top: 10, right: 120 }}>
+        <button onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}>
+          {language === 'en' ? 'Nederlands' : 'English'}
+        </button>
+      </div>
+
+      {/* Main Navigation Flow */}
       {currentScreen === 'home' && (
         <HomeScreen
           onAdminClick={handleAdminClick}
           onUserClick={handleUserClick}
+          t={t}
         />
       )}
       {/* Render the Admin Login screen */}
@@ -61,12 +57,21 @@ function App() {
         <AdminLogin
           onBack={handleBackClick}
           onSuccess={() => setCurrentScreen('admin-overview')}
+          t={t}
         />
       )}
-      {/* Render the User screen */}
-      {currentScreen === 'user' && <UserScreen onBack={handleBackClick} />}
-      {/* Render the Admin Overview screen */}
-      {currentScreen === 'admin-overview' && <AdminOverview onBack={handleBackClick} />}
+      {currentScreen === 'admin-overview' && (
+        <AdminOverview
+          onBack={handleBackClick}
+          t={t}
+        />
+      )}
+      {currentScreen === 'user' && (
+        <UserScreen
+          onBack={handleBackClick}
+          t={t}
+        />
+      )}
     </div>
   );
 }
