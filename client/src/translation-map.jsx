@@ -11,8 +11,8 @@ const translations = {
     userOverview: 'User Overview',
     adminLogin: 'Admin Login',
     adminOverview: 'Admin Overview',
-    fileTableDesc: 'View all uploaded files and available actions. Each file can be downloaded as its raw JSON, or visualised\n' +
-      '              as a PNG or SVG.',
+    fileTableDesc: 'View all uploaded files and available actions. Each file can be downloaded as its raw JSON, or visualised\n'
+      + '              as a PNG or SVG.',
     dragAndDrop: 'Drag and drop a file or click the area below to upload your JSON file.',
     dragAndDropShort: 'Drag and drop files here',
     back: '← Back',
@@ -30,7 +30,7 @@ const translations = {
     searchHosts: 'Search hosts',
     enterToken: 'Enter your token',
     size: 'Filesize',
-    chooseScreen: 'Choose your screen'
+    chooseScreen: 'Choose your screen',
   },
   nl: {
     adminToken: 'Voer admin token in',
@@ -62,8 +62,8 @@ const translations = {
     enterToken: 'Voer uw token in',
     size: 'Bestandsgrootte',
     user: 'Gebruiker',
-    chooseScreen: 'Kies uw scherm'
-  }
+    chooseScreen: 'Kies uw scherm',
+  },
 };
 
 export default translations;
