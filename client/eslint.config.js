@@ -1,34 +1,46 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import stylistic from '@stylistic/eslint-plugin';
+import reactPlugin from 'eslint-plugin-react';
 
 export default [
-  { ignores: ['dist'] },
+  // Define which files to include/exclude
+  {
+    ignores: ['dist', 'node_modules'],
+  },
+
+  // Apply to all JS/JSX files
   {
     files: ['**/*.{js,jsx}'],
+    plugins: {
+      react: reactPlugin,
+    },
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      ecmaVersion: 2022,
+      sourceType: 'module',
       parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+    // React specific settings
+    settings: {
+      react: {
+        version: 'detect',
+      },
     },
     rules: {
-      ...js.configs.recommended.rules,
-      "indent": ["error", 2],
-      ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      // React rules
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
+      'react/react-in-jsx-scope': 'off', // For React 17+ (not needed)
     },
   },
-]
+
+  // Apply recommended stylistic rules
+  stylistic.configs.recommended,
+
+  // Customize stylistic rules
+  stylistic.configs.customize({
+    semi: true, // Semicolons are required
+  }),
+];
