@@ -128,7 +128,11 @@ function AdminOverview({ onBack }) {
       {showDeletePopup && (
         <div className="popup-overlay">
           <div className="popup">
-            <h3 className="popup-heading">Are you sure you want to delete {fileToDelete}?</h3>
+            <h3 className="popup-heading">
+              Are you sure you want to delete
+              {fileToDelete}
+              ?
+            </h3>
             <div className="popup-buttons">
               <button className="popup-button" onClick={handleDeleteConfirm}>Yes</button>
               <button className="popup-cancel" onClick={handleDeleteCancel}>Cancel</button>

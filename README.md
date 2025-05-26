@@ -77,9 +77,10 @@ Alternatively install `flake8` in vscode
 
 ### Frontend Style Checking
 
-Enter the client directory and make sure eslint is installed (i.e do a regular `npm install`)
+Enter the client directory and make sure eslint is installed (i.e. do a regular `npm install`)
 
-Then run `npx eslint` to recursively check all `js` and `jsx`
+Then run `npm run lint` to recursively check all `js` and `jsx` in client
+or `npm run lint:fix` to fix all issues automatically
 
 Alternatively install `eslint` in vscode
 
@@ -110,6 +111,7 @@ Alternatively install `eslint` in vscode
   - When no file is provided: `"No file part"`
   - When filename is empty: `"No selected file"`
   - When filename is invalid: `"Invalid filename"`
+  - When file contents are invalid: `"Invalid file format"`
 
 - **Code**: `500 Internal Server Error`
   - When server encounters an unexpected error: `"Unexpected error while processing file"`
@@ -145,6 +147,7 @@ Alternatively install `eslint` in vscode
 - Filenames are sanitized for security
 - Original files are removed after processing
 - Error responses include cleanup of any partially created resources
+- Mappings are loaded from an Excel spreadsheed. Currently included file is from [CIS Security](https://www.cisecurity.org/insights/white-papers/cis-controls-v8-master-mapping-to-mitre-enterprise-attck-v82)
 
 ## Getting started
 

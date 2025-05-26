@@ -37,8 +37,6 @@ RUN pip install -r requirements.txt
 # Copy the rest of the application
 COPY api .
 
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
 ENV FLASK_STATIC_FOLDER=static
 
 # Copy the built React files after building the backend.

@@ -26,7 +26,7 @@ python_lint:
       - flake8-report.txt
   allow_failure: false
 
-# LINT REACT – ESLint on everything in tests/e2e/
+# LINT REACT – ESLint on everything in client/
 js_lint:
   stage: lint
   image: node:22
@@ -45,9 +45,10 @@ js_lint:
   script:
     - cd client
     - npx eslint . --ext .js,.jsx
+
   allow_failure: false
 
-# LINT REACT – ESLint on everything in client/
+# LINT REACT – ESLint on everything in tests/e2e/
 cypress_js_lint:
   stage: lint
   image: node:22
@@ -63,7 +64,7 @@ cypress_js_lint:
     - cd tests/e2e
     - npm ci --cache .npm --prefer-offline
   script:
-    - npx eslint . --ext .js,.jsx
+    - npx eslint . --ext .js,.jsx --ignore-pattern 'cypress_cache/*'
   allow_failure: false
 
 # PYTHON TESTS – pytest against the api/ package

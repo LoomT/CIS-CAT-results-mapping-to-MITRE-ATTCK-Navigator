@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
-import serveStatic from 'serve-static'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import serveStatic from 'serve-static';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,21 +14,21 @@ export default defineConfig({
           '/attack-navigator',
           serveStatic(path.resolve('../attack-navigator/nav-app/dist'), {
             index: ['index.html'],
-          })
+          }),
         );
-      }
-    }
+      },
+    },
   ],
   build: {
     outDir: './dist',
-    emptyOutDir: true
+    emptyOutDir: true,
   },
   server: {
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
-        changeOrigin: true
-      }
-    }
-  }
-})
+        changeOrigin: true,
+      },
+    },
+  },
+});
