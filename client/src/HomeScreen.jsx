@@ -1,25 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import './globalstyle.css';
 import { Link } from 'react-router-dom';
+import { LanguageContext } from './main.jsx';
 
 /**
  * HomeScreen Component
  * ---------------------
  * The entry screen of the application where users choose between Admin and User roles.
- *
- * Props:
- *  @param t the translation mapping
  */
-function HomeScreen({ t }) {
+function HomeScreen() {
+  const t = useContext(LanguageContext);
   return (
     <div className="small-panel">
       <div className="card">
         <h2>{t.chooseScreen}</h2>
         {/* Buttons for role selection */}
         <div className="button-container">
-          <Link className="btn-blue" to="/admin">Admin</Link>
+          <Link className="button btn-blue" to="/admin">Admin</Link>
           <Link
-            className="btn-blue"
+            className="button btn-blue"
             data-testid="home-screen-user-button"
             to="/manual-conversion"
           >

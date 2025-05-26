@@ -1,25 +1,24 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './globalstyle.css';
 import './popups.css';
 import visualIcon from './assets/visual.png';
 import backIcon from './assets/back.png';
 import { Link, useNavigate } from 'react-router-dom';
+import { LanguageContext } from './main.jsx';
 
 /**
  * AdminLogin Component
  * ---------------------
  * Renders the admin login interface where a user can input a token to gain access
  * to the Admin Overview. Includes basic validation and handles submission with the Enter key.
- *
- * Props:
- * @param t: the translation mapping
  */
-function AdminLogin({ t }) {
+function AdminLogin() {
   // State for storing the entered token
   const [token, setToken] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const navigate = useNavigate();
+  const t = useContext(LanguageContext);
 
   /**
    * Updates the token state as the user types.
@@ -67,12 +66,11 @@ function AdminLogin({ t }) {
         {t.adminLogin}
       </div>
 
-      <Link className="back-button">
+      <Link className="back-button" to="/">
         <img
           src={backIcon}
           alt="Back"
           className="back-icon"
-          onClick={onBack}
         />
       </Link>
 

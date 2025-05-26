@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
@@ -6,9 +6,9 @@ import UserScreen from './UserScreen.jsx';
 import HomeScreen from './HomeScreen.jsx';
 import AdminLogin from './AdminLogin.jsx';
 import AdminOverview from './AdminOverview.jsx';
+import translations from './translation-map';
 
-const [language, setLanguage] = useState('en');
-const t = translations[language];
+export const LanguageContext = createContext(translations['en']);
 
 /**
  * Main Component
@@ -17,12 +17,28 @@ const t = translations[language];
  * screens using internal state.
  */
 createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <Routes>
-      <Route index element={<HomeScreen />} />
-      <Route path="/manual-conversion" element={<UserScreen />} />
-      <Route path="/admin" element={<AdminLogin />} />
-      <Route path="/admin/overview" element={<AdminOverview />} />
-    </Routes>
-  </BrowserRouter>,
+  <LanguageProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route index element={<HomeScreen />} />
+        <Route path="/manual-conversion" element={<UserScreen />} />
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/overview" element={<AdminOverview />} />
+      </Routes>
+    </BrowserRouter>
+  </LanguageProvider>,
 );
+
+function LanguageProvider({ children }) {
+  const [language, setLanguage] = useState('en');
+  return (
+    <LanguageContext.Provider value={translations[language]}>
+      <div style={{ position: 'absolute', top: 10, right: 120 }}>
+        <button onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}>
+          {language === 'en' ? 'Nederlands' : 'English'}
+        </button>
+      </div>
+      {children}
+    </LanguageContext.Provider>
+  );
+}

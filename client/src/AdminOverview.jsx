@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import NavigatorAPI from './NavigatorAPI.js';
+import { LanguageContext } from './main.jsx';
 
 /**
  * AdminOverview Component
@@ -13,17 +14,14 @@ import NavigatorAPI from './NavigatorAPI.js';
  * - A search section with (currently nonfunctional) toggle for the departments and a search bar
  * - A list of files with actions for visualization and download, and a checkbox to select multiple rows (currently not functional)
  * - A popup for choosing visualization formats (SVG or PNG).
- *
- * Props:
- * @param t the translation mapping
- * @return {React.JSX.Element} - The rendered AdminOverview component.
  */
 
-function AdminOverview({ t }) {
+function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
   const [currentFile, setFile] = useState({});
   const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
   const [files] = useState([]);
+  const t = useContext(LanguageContext);
 
   /**
    * Opens the visualization popup.
@@ -212,7 +210,6 @@ function AdminOverview({ t }) {
                   onExport={() => handleExportClick(file)}
                   onVisualize={() => handleVisualizeClick(file)}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{ export: 'Export', visualize: 'Visualize', download: 'Download' }}
                   showCheckbox={true}
                 />
               ))}
