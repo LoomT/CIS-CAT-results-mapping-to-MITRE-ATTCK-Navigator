@@ -46,7 +46,7 @@ function AdminLogin({ onBack, onSuccess, t }) {
   };
 
   return (
-    <div className="admin-panel">
+    <div className="small-panel">
       {/* Top Center Title */}
       <div className="user-title">
         {t.adminLogin}

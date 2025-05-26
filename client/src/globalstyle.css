@@ -1,16 +1,40 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  min-width: 100%;
+  min-height: 100vh;
   text-align: center;
 }
 
-/* Overall Layout */
-.user-screen {
+/* Parent container for the navbar and main content */
+#main-content {
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  font-family: 'Roboto', cursive, sans-serif;
+  align-items: center;
+  gap: 20px;
+  height: 100vh;
+}
+
+/* Navigation bar */
+nav {
+  /*position: sticky;*/
+  width: calc(100% - 2em); /* subtract padding */
+  display: flex;
+  flex-direction: row-reverse;
+  padding: 1em;
+  top: 0;
+  /*z-index: 1000;*/
+  background-color: #ffffff;
+}
+
+/* Full panel for admin overview and manual conversion screens */
+.full-panel {
+  width: 100%;
+  flex: auto;
+}
+
+/* Small centered panel for home and admin login screens */
+.small-panel {
+  width: fit-content;
+  margin: auto 0;
 }
 
 /* Top Bar */
@@ -53,8 +77,10 @@
 
 /* Upload Section */
 .upload-section {
-  width: 260px;
-  text-align: center;
+  max-width: 20%;
+  min-width: 10%;
+  height: max-content;
+  flex: initial;
 }
 
 /* File Table Section */
@@ -92,14 +118,17 @@
 
 .files-table td:first-child, .files-table th:first-child {
   text-align: center;
-  width: 60px;
+  white-space: wrap;
+  width: auto;
 }
 
 .files-table td:last-child {
+  width: fit-content;
   display: flex;
   flex-wrap: nowrap;
   gap: 0.5rem;
   align-items: center;
+  justify-content: center;
 }
 
 .files-table tbody tr {
@@ -189,6 +218,12 @@ button img, button svg {
   border-color: #999;
 }
 
+.button-container {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
 /* Group and file cards */
 .card {
   background-color: #ffffff;
@@ -208,13 +243,6 @@ button img, button svg {
 .btn-blue { background-color: #dbeafe; color: #1e40af; } /* blue-100 / blue-800 */
 .btn-green { background-color: #d1fae5; color: #065f46; } /* green-100 / green-800 */
 .btn-purple { background-color: #ede9fe; color: #5b21b6; } /* purple-100 / purple-800 */
-
-/* Base text color & background */
-body, .admin-panel {
-  background-color: #f9fafb;
-  color: #374151; /* slate-700 */
-  font-family: 'Roboto', sans-serif;
-}
 
 /* Headings */
 h2, h3 {

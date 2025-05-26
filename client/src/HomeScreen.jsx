@@ -13,9 +13,9 @@ import './globalstyle.css';
  */
 function HomeScreen({ onAdminClick, onUserClick, t }) {
   return (
-    <div className="home-screen">
+    <div className="small-panel">
       <div className="card">
-        <h2 className="screen-title">{t.chooseScreen}</h2>
+        <h2>{t.chooseScreen}</h2>
         {/* Buttons for role selection */}
         <div className="button-container">
           <button className="btn-blue" onClick={onAdminClick}>Admin</button>

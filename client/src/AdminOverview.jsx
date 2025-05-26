@@ -107,7 +107,7 @@ function AdminOverview({ onBack, t }) {
   };
 
   return (
-    <div className="admin-panel">
+    <div className="full-panel">
       {/* Top Title */}
       <div className="user-title">{t.adminOverview}</div>
 
