@@ -36,13 +36,13 @@ function App() {
   const handleBackClick = () => setCurrentScreen('home');
 
   return (
-    <div>
+    <div id="main-content" className="full-panel">
       {/* Language Toggle */}
-      <div style={{ position: 'absolute', top: 10, right: 120 }}>
+      <nav>
         <button onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}>
           {language === 'en' ? 'Nederlands' : 'English'}
         </button>
-      </div>
+      </nav>
 
       {/* Main Navigation Flow */}
       {currentScreen === 'home' && (
