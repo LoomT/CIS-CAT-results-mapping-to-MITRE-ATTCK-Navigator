@@ -33,12 +33,15 @@ function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
   return (
     <LanguageContext.Provider value={translations[language]}>
-      <div style={{ position: 'absolute', top: 10, right: 120 }}>
-        <button onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}>
-          {language === 'en' ? 'Nederlands' : 'English'}
-        </button>
+      <div id="main-content" className="full-panel">
+        {/* Language Toggle */}
+        <nav>
+          <button onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}>
+            {language === 'en' ? 'Nederlands' : 'English'}
+          </button>
+        </nav>
+        {children}
       </div>
-      {children}
     </LanguageContext.Provider>
   );
 }
