@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './globalstyle.css';
-import './popups.css';
 import visualIcon from './assets/visual.png';
 import backIcon from './assets/back.png';
 
