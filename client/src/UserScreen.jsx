@@ -1,21 +1,24 @@
 import React, { useCallback, useState } from 'react';
-import './UserScreen.css';
+import './globalstyle.css';
 import './popups.css';
+import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
 
 /**
  * UserScreen Component
  * ---------------------
  * Provides the main interface for regular users. Includes:
- * - File upload and benchmarking actions (currently placeholders).
+ * - File upload section
  * - A list of files with actions for visualization and download.
- * - A popup modal for choosing visualization formats.
+ * - A popup for choosing visualization formats (SVG or PNG).
  *
- * @param {function} onBack - Callback to navigate back to the previous screen (typically home).
+ * Props:
+ * @param {function} onBack - Callback to navigate back to the previous screen (home).
+ * @param t the translation mapping
  * @return {React.JSX.Element} - The rendered UserScreen component.
  */
 
-function UserScreen({ onBack }) {
+function UserScreen({ onBack, t }) {
   const [showPopup, setShowPopup] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -253,19 +256,31 @@ function UserScreen({ onBack }) {
   };
 
   return (
-    <div data-testid="user-screen" className="user-screen">
-
-      {/* Top Navigation Bar */}
-      <div className="top-bar">
-        <div className="back-text" onClick={onBack}>← Back</div>
-        <div data-testid="user-screen-page-title" className="title-text">User Overview</div>
+    <div className="admin-panel" data-testid="user-screen">
+      {/* Top Center Title */}
+      <div className="user-title" data-testid="user-screen-page-title">
+        {t.userOverview}
       </div>
 
-      {/* Side-by-side Content Area container */}
+      { /* Back button in the top left corner. TODO: add routing so this can be removed */ }
+      <div className="back-button">
+        <img
+          src={backIcon}
+          alt="Back"
+          className="back-icon"
+          onClick={onBack}
+        />
+      </div>
+
+      {/* Side-by-side Content Area */}
       <div className="content-area">
-        {/* Left section for file upload functionality */}
-        <div data-testid="user-screen-upload-section" className="upload-section">
-          <h2>Upload a File</h2>
+        {/* Upload Section */}
+        <div className="card upload-section" data-testid="user-screen-upload-section">
+          <div className="section-header">
+            <h2>{t.uploadFile}</h2>
+            <p>{t.dragAndDrop}</p>
+          </div>
+
           {/* Drop zone area with drag and drop event handlers */}
           <div
             className={`upload-area ${dragActive ? 'drag-active' : ''}`}
@@ -274,17 +289,14 @@ function UserScreen({ onBack }) {
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            {/* Upload status and instructions */}
             <div className="upload-content">
               {/* eslint-disable-next-line @stylistic/multiline-ternary */}
               {uploading ? (
-                <p>Uploading...</p>
+                <p>{t.uploading}</p>
               ) : (
                 <>
-                  {/* Instructions shown when not uploading */}
-                  <p>Drag and drop files here</p>
-                  <p>or</p>
-                  {/* Hidden file input element triggered by button */}
+                  <p>{t.dragAndDropShort}</p>
+                  <p>{t.orr}</p>
                   <input
                     type="file"
                     id="file-input"
@@ -293,38 +305,34 @@ function UserScreen({ onBack }) {
                     style={{ display: 'none' }}
                   />
                   <button
-                    className="upload-button"
-                    onClick={
-                      () => document.getElementById('file-input').click()
-                    }
+                    className="btn-blue"
+                    onClick={() => document.getElementById('file-input').click()}
                   >
-                    Choose File
+                    {t.chooseFile}
                   </button>
                 </>
               )}
             </div>
           </div>
-
-          {/* Run Benchmark Section */}
-          <h2>Run Benchmark</h2>
-          {/* Same styling as Upload File */}
-          <button className="upload-button">Run Benchmark</button>
         </div>
 
         {/* File Table Section */}
-        <div data-testid="user-screen-file-table-section" className="file-table-section">
-          <h2>Files List</h2>
-          <table className="file-table">
+        <div className="card file-table-section" data-testid="user-screen-file-table-section">
+          <div className="section-header">
+            <h2>{t.filesList}</h2>
+            <p>{t.fileTableDesc}</p>
+          </div>
+          <table className="files-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Time</th>
-                <th>Actions</th>
+                <th>{t.name}</th>
+                <th>{t.department}</th>
+                <th>{t.date}</th>
+                <th>{t.actions}</th>
               </tr>
             </thead>
+            { /* Maps each file to be displayed with its name, department, time, and actions (visualise and download) */ }
             <tbody>
-              {/* Map files to table rows */}
               {files.map(file => (
                 <FileTableEntry
                   key={file.id}
@@ -333,6 +341,8 @@ function UserScreen({ onBack }) {
                   time={file.time}
                   onVisualize={() => handleVisualizeClick()}
                   onDownload={() => handleDownload(file.id, file.filename)}
+                  t={{ visualize: 'Visualize', download: 'Download' }}
+                  showCheckbox={false}
                 />
               ))}
             </tbody>
@@ -340,16 +350,17 @@ function UserScreen({ onBack }) {
         </div>
       </div>
 
-      {/* Visualization Popup */}
+      {/* Visualization Selection Popup */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup">
-            <h3 className="popup-heading">Choose a format to visualize</h3>
-            {/* Buttons in the popup */}
+            <h3 className="popup-heading">{t.chooseFormat}</h3>
             <div className="popup-buttons">
               <button className="popup-button">SVG</button>
               <button className="popup-button">PNG</button>
-              <button className="popup-cancel" onClick={handleClosePopup}>Cancel</button>
+              <button className="popup-cancel" onClick={handleClosePopup}>
+                {t.cancel}
+              </button>
             </div>
           </div>
         </div>

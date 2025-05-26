@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import './AdminLogin.css';
+import './globalstyle.css';
 import './popups.css';
+import visualIcon from './assets/visual.png';
+import backIcon from './assets/back.png';
 
 /**
  * AdminLogin Component
@@ -9,29 +11,21 @@ import './popups.css';
  * to the Admin Overview. Includes basic validation and handles submission with the Enter key.
  *
  * Props:
- * - onBack (function): Callback to navigate back to the previous screen (e.g., home).
- * - onSuccess (function): Callback triggered when the token is successfully validated.
+ *  @param onBack (function): Callback to navigate back to the previous screen (e.g., home).
+ *  @param onSuccess (function): Callback triggered when the token is successfully validated.
+ *  @param t: the translation mapping
  */
-function AdminLogin({ onBack, onSuccess }) {
-  // State for storing the entered token
+function AdminLogin({ onBack, onSuccess, t }) {
   const [token, setToken] = useState('');
-  // State for showing error messages
   const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
-  /**
-   * Updates the token state as the user types.
-   * @param {object} e - The input change event.
-   */
   const handleTokenChange = (e) => {
     setToken(e.target.value);
   };
 
-  /**
-   * Handles token validation. If correct, triggers the onSuccess callback.
-   * Otherwise, displays an error message.
-   */
   const handleSubmit = () => {
-    const placeholderToken = 'correct-token'; // Placeholder token
+    const placeholderToken = 'correct-token'; // Placeholder token for validation
     if (token === placeholderToken) {
       // Navigate to admin overview when token is correct
       onSuccess(); // Pass 'admin-overview' to navigate to the Admin Overview screen
@@ -41,35 +35,54 @@ function AdminLogin({ onBack, onSuccess }) {
     }
   };
 
-  /**
-   * Enables form submission when the Enter key is pressed.
-   * @param {object} e - The keydown event.
-   */
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      handleSubmit(); // Submit when Enter is pressed
+      handleSubmit();
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="admin-login">
-      {/* Top Navigation Bar */}
-      <div className="top-bar">
-        <div className="back-text" onClick={() => onBack('home')}>← Back</div>
-        <div className="title-text">Admin Login</div>
+    <div className="admin-panel">
+      {/* Top Center Title */}
+      <div className="user-title">
+        {t.adminLogin}
+      </div>
+
+      <div className="back-button">
+        <img
+          src={backIcon}
+          alt="Back"
+          className="back-icon"
+          onClick={onBack}
+        />
       </div>
 
       {/* Token Input Section */}
-      <div className="login-section">
+      <div className="card">
+        {/* TODO: translation */}
         <h2>Enter Token</h2>
-        <input
-          type="text"
-          value={token}
-          onChange={handleTokenChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Enter your token"
-        />
-        <button className="submit-button" onClick={handleSubmit}>Submit</button>
+        <div className="password-field-container">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={token}
+            onChange={handleTokenChange}
+            onKeyDown={handleKeyDown}
+            placeholder={t.enterToken}
+            className="password-field"
+          />
+          <img
+            src={visualIcon}
+            alt="Toggle Password Visibility"
+            className="toggle-visibility-icon"
+            onClick={togglePasswordVisibility}
+          />
+        </div>
+        {/* TODO: translation */}
+        <button className="btn-blue" onClick={handleSubmit}>Enter</button>
 
         {/* Error Message Display */}
         {errorMessage && <div className="error-message">{errorMessage}</div>}
