@@ -3,6 +3,7 @@ import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
+import NavigatorAPI from './NavigatorAPI.js';
 
 /**
  * UserScreen Component
@@ -23,12 +24,25 @@ function UserScreen({ onBack, t }) {
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState([]);
+  const [currentFile, setFile] = useState({});
 
   /**
    * Opens the visualization popup.
    */
-  const handleVisualizeClick = () => {
-    console.log('Visualize clicked!');
+  const handleVisualizeClick = (file) => {
+    let uri = new URL(location.href);
+
+    uri.pathname = `/api/files/${file.id}`;
+    let targetWindow = window.open('/attack-navigator/index.html');
+
+    let client = new NavigatorAPI(targetWindow, uri.toString(), false);
+  };
+
+  /**
+   * Opens the export popup.
+   */
+  const handleExportClick = (file) => {
+    setFile(file);
     setShowPopup(true);
   };
 
@@ -255,6 +269,34 @@ function UserScreen({ onBack, t }) {
     }
   };
 
+  /**
+   * Handle SVG export & download
+   */
+  const handleSVGExportClick = () => {
+    let uri = new URL(location.href);
+
+    /**
+     * Dirty workaround to get a fresh handle to the iframe window
+     * There are a couple of issues with reusing the old one
+     * Specifically that navigation takes time. A lot of time
+     * So when we modify the src the window will still point to the
+     * old window object. Theres definitely a better solution than this
+     * But let's mark this as TODO */
+
+    const newIframe = document.createElement('iframe');
+    newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
+    newIframe.src = '/attack-navigator/index.html';
+    newIframe.id = currentFile.id;
+
+    let frame = document.getElementById(currentFile.id);
+    frame.parentNode.replaceChild(newIframe, frame);
+
+    uri.pathname = `/api/files/${currentFile.id}`;
+    let targetWindow = newIframe.contentWindow;
+
+    let client = new NavigatorAPI(targetWindow, uri.toString(), true);
+  };
+
   return (
     <div className="full-panel" data-testid="user-screen">
       {/* Top Center Title */}
@@ -262,7 +304,7 @@ function UserScreen({ onBack, t }) {
         {t.userOverview}
       </div>
 
-      { /* Back button in the top left corner. TODO: add routing so this can be removed */ }
+      { /* Back button in the top left corner. TODO: add routing so this can be removed */}
       <div className="back-button">
         <img
           src={backIcon}
@@ -331,17 +373,19 @@ function UserScreen({ onBack, t }) {
                 <th>{t.actions}</th>
               </tr>
             </thead>
-            { /* Maps each file to be displayed with its name, department, time, and actions (visualise and download) */ }
+            { /* Maps each file to be displayed with its name, department, time, and actions (visualise and download) */}
             <tbody>
               {files.map(file => (
                 <FileTableEntry
                   key={file.id}
+                  id={file.id}
                   filename={file.filename}
                   department={file.department}
                   time={file.time}
-                  onVisualize={() => handleVisualizeClick()}
+                  onExport={() => handleExportClick(file)}
+                  onVisualize={() => handleVisualizeClick(file)}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{ visualize: 'Visualize', download: 'Download' }}
+                  t={{ export: 'Export', visualize: 'Visualize', download: 'Download' }}
                   showCheckbox={false}
                 />
               ))}
@@ -356,7 +400,7 @@ function UserScreen({ onBack, t }) {
           <div className="popup">
             <h3 className="popup-heading">{t.chooseFormat}</h3>
             <div className="popup-buttons">
-              <button className="popup-button">SVG</button>
+              <button className="popup-button" onClick={handleSVGExportClick}>SVG</button>
               <button className="popup-button">PNG</button>
               <button className="popup-cancel" onClick={handleClosePopup}>
                 {t.cancel}

@@ -3,6 +3,7 @@ import './globalstyle.css';
 import './popups.css';
 import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
+import NavigatorAPI from './NavigatorAPI.js';
 
 /**
  * AdminOverview Component
@@ -19,7 +20,8 @@ import FileTableEntry from './components/FileTableEntry.jsx';
  */
 
 function AdminOverview({ onBack, t }) {
-  const [showVisualizePopup, setShowVisualizePopup] = useState(false);
+  const [showExportPopup, setShowExportPopup] = useState(false);
+  const [currentFile, setFile] = useState({});
   const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
   const [files] = useState([]);
 
@@ -27,14 +29,29 @@ function AdminOverview({ onBack, t }) {
    * Opens the visualization popup.
    */
   const handleVisualizeClick = () => {
-    setShowVisualizePopup(true);
+    let uri = new URL(location.href);
+
+    uri.pathname = `/api/files/${file.id}`;
+    let targetWindow = window.open('/attack-navigator/index.html');
+
+    let client = new NavigatorAPI(targetWindow, uri.toString(), false);
+
+    setShowPopup(true);
   };
 
   /**
-   * Closes the visualization popup.
+   * Opens the export popup.
+   */
+  const handleExportClick = (file) => {
+    setFile(file);
+    setShowExportPopup(true);
+  };
+
+  /**
+   * Closes the export popup.
    */
   const handlePopupClose = () => {
-    setShowVisualizePopup(false);
+    setShowExportPopup(false);
   };
 
   const handleDownload = async (fileId, fileName) => {
@@ -106,6 +123,34 @@ function AdminOverview({ onBack, t }) {
     window.URL.revokeObjectURL(downloadUrl);
   };
 
+  /**
+   * Handle SVG export & download
+   */
+  const handleSVGExportClick = () => {
+    let uri = new URL(location.href);
+
+    /**
+     * Dirty workaround to get a fresh handle to the iframe window
+     * There are a couple of issues with reusing the old one
+     * Specifically that navigation takes time. A lot of time
+     * So when we modify the src the window will still point to the
+     * old window object. Theres definitely a better solution than this
+     * But let's mark this as TODO */
+
+    const newIframe = document.createElement('iframe');
+    newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
+    newIframe.src = '/attack-navigator/index.html';
+    newIframe.id = currentFile.id;
+
+    let frame = document.getElementById(currentFile.id);
+    frame.parentNode.replaceChild(newIframe, frame);
+
+    uri.pathname = `/api/files/${currentFile.id}`;
+    let targetWindow = newIframe.contentWindow;
+
+    let client = new NavigatorAPI(targetWindow, uri.toString(), true);
+  };
+
   return (
     <div className="full-panel">
       {/* Top Title */}
@@ -160,12 +205,14 @@ function AdminOverview({ onBack, t }) {
               {files.map(file => (
                 <FileTableEntry
                   key={file.id}
+                  id={file.id}
                   filename={file.filename}
                   department={file.department}
                   time={file.time}
+                  onExport={() => handleExportClick(file)}
                   onVisualize={() => handleVisualizeClick(file)}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{ visualize: 'Visualize', download: 'Download' }}
+                  t={{ export: 'Export', visualize: 'Visualize', download: 'Download' }}
                   showCheckbox={true}
                 />
               ))}
@@ -175,12 +222,12 @@ function AdminOverview({ onBack, t }) {
       </div>
 
       {/* Visualisation popup */}
-      {showVisualizePopup && (
+      {showExportPopup && (
         <div className="popup-overlay">
           <div className="popup">
             <h3 className="popup-heading">{t.chooseFormat}</h3>
             <div className="popup-buttons">
-              <button className="popup-button">SVG</button>
+              <button className="popup-button" onClick={handleSVGExportClick()}>SVG</button>
               <button className="popup-button">PNG</button>
               <button className="popup-cancel" onClick={handlePopupClose}>
                 {t.cancel}
