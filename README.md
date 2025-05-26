@@ -4,9 +4,10 @@
 
 ### Build attack navigator
 
-In the cloned submodule directory, `attack-navigator`, run `npm ci` to install dependencies
 
-Then run `npm run build -- --deploy-url /attack-navigator/ --base-href /attack-navigator/ --configuration production --aot=false --build-optimizer=false` to build the navigator
+First make sure all the submodules are cloned as well `git submodule update --init`, then in the cloned submodule directory enter the `nav-app` folder and run `npm ci` to install dependencies  
+
+Then run `npm run build '--' --deploy-url /attack-navigator/ --base-href /attack-navigator/ --configuration production --aot=false --build-optimizer=false` to build the navigator
 
 ### Client
 
