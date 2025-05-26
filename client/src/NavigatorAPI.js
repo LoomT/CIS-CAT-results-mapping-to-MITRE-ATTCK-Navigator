@@ -61,7 +61,6 @@ export default class NavigatorAPI {
             args[0].returnValue = '';
           }
           catch {
-            // This might happen when debouncing, in that case buildSVG will be called again and we should be good
           }
         },
       );
