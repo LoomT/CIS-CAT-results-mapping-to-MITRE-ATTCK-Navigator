@@ -129,10 +129,24 @@ function AdminOverview({ onBack, t }) {
   const handleSVGExportClick = () => {
     let uri = new URL(location.href);
 
-    uri.pathname = `/api/files/${currentFile.id}`;
+    /**
+     * Dirty workaround to get a fresh handle to the iframe window
+     * There are a couple of issues with reusing the old one
+     * Specifically that navigation takes time. A lot of time
+     * So when we modify the src the window will still point to the
+     * old window object. Theres definitely a better solution than this
+     * But let's mark this as TODO */
+
+    const newIframe = document.createElement('iframe');
+    newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
+    newIframe.src = '/attack-navigator/index.html';
+    newIframe.id = currentFile.id;
+
     let frame = document.getElementById(currentFile.id);
-    frame.src = '/attack-navigator/';
-    let targetWindow = frame.contentWindow;
+    frame.parentNode.replaceChild(newIframe, frame);
+
+    uri.pathname = `/api/files/${currentFile.id}`;
+    let targetWindow = newIframe.contentWindow;
 
     let client = new NavigatorAPI(targetWindow, uri.toString(), true);
   };

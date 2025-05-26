@@ -284,7 +284,8 @@ function UserScreen({ onBack, t }) {
      * But let's mark this as TODO */
 
     const newIframe = document.createElement('iframe');
-    newIframe.src = '/attack-navigator/';
+    newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
+    newIframe.src = '/attack-navigator/index.html';
     newIframe.id = currentFile.id;
 
     let frame = document.getElementById(currentFile.id);

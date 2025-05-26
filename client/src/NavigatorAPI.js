@@ -50,6 +50,21 @@ export default class NavigatorAPI {
           }
         },
       );
+
+      this.hooker.hook(
+        ['promptNavAway'],
+        'promptNavAway',
+        (instance, args) => {
+          try {
+            instance.configService.setFeature('leave_site_dialog');
+            /* This is required to get rid of the unsaved changes popup */
+            args[0].returnValue = '';
+          }
+          catch {
+            // This might happen when debouncing, in that case buildSVG will be called again and we should be good
+          }
+        },
+      );
     }
   }
 }
