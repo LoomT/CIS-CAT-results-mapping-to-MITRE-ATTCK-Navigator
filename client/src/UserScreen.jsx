@@ -256,7 +256,7 @@ function UserScreen({ onBack, t }) {
   };
 
   return (
-    <div className="admin-panel" data-testid="user-screen">
+    <div className="full-panel" data-testid="user-screen">
       {/* Top Center Title */}
       <div className="user-title" data-testid="user-screen-page-title">
         {t.userOverview}
@@ -317,7 +317,7 @@ function UserScreen({ onBack, t }) {
         </div>
 
         {/* File Table Section */}
-        <div className="card file-table-section" data-testid="user-screen-file-table-section">
+        <div className="card file-table-section full-panel" data-testid="user-screen-file-table-section">
           <div className="section-header">
             <h2>{t.filesList}</h2>
             <p>{t.fileTableDesc}</p>
