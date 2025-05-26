@@ -167,7 +167,7 @@ iframe {
   background-color: #74b9ff;
 }
 
-button {
+button, .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -175,7 +175,7 @@ button {
   vertical-align: middle;
 }
 
-button img, button svg {
+button img, button svg, .button img, .button svg {
   height: 1em;
   width: 1em;
   vertical-align: middle;
@@ -338,20 +338,6 @@ h2, h3 {
   background-color: #f9fafb;
   color: #374151;
   font-family: 'Roboto', sans-serif;
-}
-
-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem; /* Space between icon and text */
-  vertical-align: middle;
-}
-
-button img, button svg {
-  height: 1em;
-  width: 1em;
-  vertical-align: middle;
 }
 
 .password-field::placeholder {
