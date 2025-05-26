@@ -73,6 +73,7 @@ export default class AngularHook {
     /* In case */
     const originalDecorate = this.targetWindow.Reflect.decorate;
 
+    /* Implementation from https://github.com/microsoft/reflect-metadata/blob/main/Reflect.ts */
     this.targetWindow.Reflect.decorate = function decorate(
       decorators,
       target,
