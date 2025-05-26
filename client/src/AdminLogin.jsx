@@ -45,9 +45,9 @@ function AdminLogin({ onBack, onSuccess, t }) {
   };
 
   return (
-    <div className="admin-panel">
+    <div className="admin-panel" data-testid="login-screen">
       {/* Top Center Title */}
-      <div className="user-title">
+      <div className="user-title" data-testid="admin-login-page-title">
         {t.adminLogin}
       </div>
 
@@ -64,7 +64,7 @@ function AdminLogin({ onBack, onSuccess, t }) {
       <div className="card">
         {/* TODO: translation */}
         <h2>Enter Token</h2>
-        <div className="password-field-container">
+        <div className="password-field-container" data-testid="password-field-container">
           <input
             type={showPassword ? 'text' : 'password'}
             value={token}
@@ -72,6 +72,7 @@ function AdminLogin({ onBack, onSuccess, t }) {
             onKeyDown={handleKeyDown}
             placeholder={t.enterToken}
             className="password-field"
+            data-testid="password-field"
           />
           <img
             src={visualIcon}

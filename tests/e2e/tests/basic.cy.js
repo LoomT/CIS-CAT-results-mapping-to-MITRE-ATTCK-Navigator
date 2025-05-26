@@ -1,4 +1,4 @@
-describe('Basic application tests', () => {
+describe('HomeScreen tests', () => {
   it('should navigate to User Overview when User button is clicked', () => {
     // Visit the home page
     cy.visit('/');
@@ -18,12 +18,22 @@ describe('Basic application tests', () => {
     cy.get('[data-testid="user-screen-file-table-section"]').should('be.visible');
   });
 
-  //
-  // it('can upload a file', () => {
-  //   cy.visit('/')
-  //   // Test file upload functionality
-  //   cy.get('input[type=file]').selectFile('cypress/fixtures/example.json', { force: true })
-  //   cy.get('button[type=submit]').click()
-  //   // Add assertions for successful upload
-  // })
+  it('should navigate to Admin Overview when Admin button is clicked', () => {
+    // Visit the home page
+    cy.visit('/');
+
+    // Find and click the Admin button using its id
+    cy.get('[data-testid="home-screen-admin-button"]').should('be.visible')
+    cy.get('[data-testid="home-screen-admin-button"]').click();
+
+    // Verify that we navigated to the Admin Login screen
+    cy.get('[data-testid="admin-login-page-title"]')
+      .should('be.visible')
+      .should('have.text', 'Admin Login');
+
+    // Additional verification that we're on the Login screen
+    cy.get('[data-testid="login-screen"]').should('exist');
+    cy.get('[data-testid="password-field-container"]').should('be.visible');
+    cy.get('[data-testid="password-field"]').should('be.visible');
+  });
 })

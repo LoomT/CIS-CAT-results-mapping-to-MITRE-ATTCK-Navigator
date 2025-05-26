@@ -18,7 +18,13 @@ function HomeScreen({ onAdminClick, onUserClick, t }) {
         <h2 className="screen-title">{t.chooseScreen}</h2>
         {/* Buttons for role selection */}
         <div className="button-container">
-          <button className="btn-blue" onClick={onAdminClick}>Admin</button>
+          <button
+            className="btn-blue"
+            data-testid="home-screen-admin-button"
+            onClick={onAdminClick}
+          >
+            Admin
+          </button>
           <button
             className="btn-blue"
             data-testid="home-screen-user-button"
