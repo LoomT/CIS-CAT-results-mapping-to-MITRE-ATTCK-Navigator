@@ -2,8 +2,7 @@ import React, { useContext, useState } from 'react';
 import './globalstyle.css';
 import './popups.css';
 import visualIcon from './assets/visual.png';
-import backIcon from './assets/back.png';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { LanguageContext } from './main.jsx';
 
 /**
@@ -65,14 +64,6 @@ function AdminLogin() {
       <div className="user-title">
         {t.adminLogin}
       </div>
-
-      <Link className="back-button" to="/">
-        <img
-          src={backIcon}
-          alt="Back"
-          className="back-icon"
-        />
-      </Link>
 
       {/* Token Input Section */}
       <div className="card">

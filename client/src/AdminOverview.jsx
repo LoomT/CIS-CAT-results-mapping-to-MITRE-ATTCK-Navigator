@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
-import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import NavigatorAPI from './NavigatorAPI.js';
 import { LanguageContext } from './main.jsx';
@@ -153,11 +152,6 @@ function AdminOverview() {
     <div className="full-panel">
       {/* Top Title */}
       <div className="user-title">{t.adminOverview}</div>
-
-      {/* Back button in the top left corner. TODO: add routing so this can be removed */}
-      <Link className="back-button" to="/">
-        <img src={backIcon} alt="Back" className="back-icon" />
-      </Link>
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">

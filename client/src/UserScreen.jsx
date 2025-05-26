@@ -2,7 +2,6 @@ import React, { useCallback, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
-import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import NavigatorAPI from './NavigatorAPI.js';
 import { LanguageContext } from './main.jsx';
@@ -301,15 +300,6 @@ function UserScreen() {
       <div className="user-title" data-testid="user-screen-page-title">
         {t.userOverview}
       </div>
-
-      { /* Back button in the top left corner. TODO: add routing so this can be removed */ }
-      <Link className="back-button" to="/">
-        <img
-          src={backIcon}
-          alt="Back"
-          className="back-icon"
-        />
-      </Link>
 
       {/* Side-by-side Content Area */}
       <div className="content-area">
