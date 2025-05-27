@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
-import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import NavigatorAPI from './NavigatorAPI.js';
+import { LanguageContext } from './main.jsx';
 
 /**
  * UserScreen Component
@@ -12,19 +13,15 @@ import NavigatorAPI from './NavigatorAPI.js';
  * - File upload section
  * - A list of files with actions for visualization and download.
  * - A popup for choosing visualization formats (SVG or PNG).
- *
- * Props:
- * @param {function} onBack - Callback to navigate back to the previous screen (home).
- * @param t the translation mapping
- * @return {React.JSX.Element} - The rendered UserScreen component.
  */
 
-function UserScreen({ onBack, t }) {
+function UserScreen() {
   const [showPopup, setShowPopup] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState([]);
   const [currentFile, setFile] = useState({});
+  const t = useContext(LanguageContext);
 
   /**
    * Opens the visualization popup.
@@ -92,7 +89,7 @@ function UserScreen({ onBack, t }) {
       console.log('uploading file: ' + formData);
       let response;
       try {
-        response = await fetch('/api/files', {
+        response = await fetch('/api/files/', {
           method: 'POST',
           body: formData,
         });
@@ -304,16 +301,6 @@ function UserScreen({ onBack, t }) {
         {t.userOverview}
       </div>
 
-      { /* Back button in the top left corner. TODO: add routing so this can be removed */}
-      <div className="back-button">
-        <img
-          src={backIcon}
-          alt="Back"
-          className="back-icon"
-          onClick={onBack}
-        />
-      </div>
-
       {/* Side-by-side Content Area */}
       <div className="content-area">
         {/* Upload Section */}
@@ -385,7 +372,6 @@ function UserScreen({ onBack, t }) {
                   onExport={() => handleExportClick(file)}
                   onVisualize={() => handleVisualizeClick(file)}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{ export: 'Export', visualize: 'Visualize', download: 'Download' }}
                   showCheckbox={false}
                 />
               ))}

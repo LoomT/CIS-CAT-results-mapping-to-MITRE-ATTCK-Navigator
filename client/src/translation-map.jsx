@@ -3,6 +3,7 @@ const translations = {
     adminToken: 'Enter Admin Token',
     delete: 'Delete',
     user: 'User',
+    export: 'Export',
     visualize: 'Visualize',
     download: 'Download',
     uploadFile: 'Upload File',
@@ -35,6 +36,7 @@ const translations = {
   nl: {
     adminToken: 'Voer admin token in',
     delete: 'Verwijder',
+    export: 'Exporteren',
     visualize: 'Visualiseer',
     download: 'Downloaden',
     uploadFile: 'Bestand Uploaden',

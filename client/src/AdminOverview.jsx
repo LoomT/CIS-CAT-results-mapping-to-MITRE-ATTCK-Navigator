@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
-import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import NavigatorAPI from './NavigatorAPI.js';
+import { LanguageContext } from './main.jsx';
 
 /**
  * AdminOverview Component
@@ -12,18 +13,14 @@ import NavigatorAPI from './NavigatorAPI.js';
  * - A search section with (currently nonfunctional) toggle for the departments and a search bar
  * - A list of files with actions for visualization and download, and a checkbox to select multiple rows (currently not functional)
  * - A popup for choosing visualization formats (SVG or PNG).
- *
- * Props:
- * @param {function} onBack - Callback to navigate back to the home screen.
- * @param t the translation mapping
- * @return {React.JSX.Element} - The rendered AdminOverview component.
  */
 
-function AdminOverview({ onBack, t }) {
+function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
   const [currentFile, setFile] = useState({});
   const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
   const [files] = useState([]);
+  const t = useContext(LanguageContext);
 
   /**
    * Opens the visualization popup.
@@ -156,11 +153,6 @@ function AdminOverview({ onBack, t }) {
       {/* Top Title */}
       <div className="user-title">{t.adminOverview}</div>
 
-      {/* Back button in the top left corner. TODO: add routing so this can be removed */}
-      <div className="back-button">
-        <img src={backIcon} alt="Back" className="back-icon" onClick={onBack} />
-      </div>
-
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
         <div className="card">
@@ -212,7 +204,6 @@ function AdminOverview({ onBack, t }) {
                   onExport={() => handleExportClick(file)}
                   onVisualize={() => handleVisualizeClick(file)}
                   onDownload={() => handleDownload(file.id, file.filename)}
-                  t={{ export: 'Export', visualize: 'Visualize', download: 'Download' }}
                   showCheckbox={true}
                 />
               ))}
