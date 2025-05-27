@@ -144,6 +144,10 @@ nav {
   background-color: #f9fafb;
 }
 
+iframe {
+  display: none
+}
+
 /* Button Styles */
 .view-button {
   background-color: #00b894;
