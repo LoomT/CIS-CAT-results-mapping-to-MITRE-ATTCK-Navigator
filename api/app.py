@@ -8,8 +8,15 @@ try:
 except ImportError:
     from .convert import convert_cis_to_attack
 
-from .database import init_db, db_save_file, db_get_all_files
-from .helpers import extract_metadata
+try:
+    from database import init_db, db_save_file, db_get_all_files
+except ImportError:
+    from .database import init_db, db_save_file, db_get_all_files
+
+try:
+    from helpers import extract_metadata
+except ImportError:
+    from .helpers import extract_metadata
 
 from flask import (Flask, request, send_file, Response, jsonify)
 

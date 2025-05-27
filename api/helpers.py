@@ -1,6 +1,8 @@
 # Helpers for db functionality
-
-from .database import FileMetadata
+try:
+    from database import FileMetadata
+except ImportError:
+    from .database import FileMetadata
 
 
 def extract_metadata(file) -> FileMetadata:

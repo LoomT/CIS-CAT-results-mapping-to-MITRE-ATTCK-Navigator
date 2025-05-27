@@ -1,8 +1,13 @@
 import sqlite3
 
 from flask import Flask, g
-from .sql_querries import (ADD_FILE, GET_FILE_BY_ID, GET_ALL_FILES,
-                           ADD_TAG_TO_FILE)
+
+try:
+    from sql_querries import (ADD_FILE, GET_FILE_BY_ID, GET_ALL_FILES,
+                              ADD_TAG_TO_FILE)
+except ImportError:
+    from .sql_querries import (ADD_FILE, GET_FILE_BY_ID, GET_ALL_FILES,
+                               ADD_TAG_TO_FILE)
 
 
 class FileMetadata:
