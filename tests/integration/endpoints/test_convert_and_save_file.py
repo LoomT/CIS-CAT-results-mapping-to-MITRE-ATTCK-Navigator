@@ -8,7 +8,7 @@ import pytest
 
 
 @pytest.mark.parametrize("file_name,file_path,expected_status", [
-    ("testinputcis.json", 'tests/cisinput.json',  201)
+    ("testinputcis.json", 'tests/data/cisinput.json',  201)
 ])
 def test_convert_and_save_file_success(client, file_name, file_path,
                                        expected_status):
