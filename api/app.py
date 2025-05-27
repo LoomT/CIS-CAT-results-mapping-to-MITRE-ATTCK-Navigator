@@ -9,9 +9,11 @@ except ImportError:
     from .convert import convert_cis_to_attack
 
 try:
-    from database import init_db, db_save_file, db_get_all_files
+    from database import (init_db, db_save_file, db_get_all_files,
+                          db_get_file_by_id)
 except ImportError:
-    from .database import init_db, db_save_file, db_get_all_files
+    from .database import (init_db, db_save_file, db_get_all_files,
+                           db_get_file_by_id)
 
 try:
     from helpers import extract_metadata
@@ -34,6 +36,13 @@ if not os.path.exists(UPLOAD_FOLDER):
 # initialize the database
 print("Initializing database")
 init_db(app)
+
+
+@app.get('/api/files/')
+def get_all_files() -> Response:
+    """Returns all files in the database."""
+    all_files = db_get_all_files()
+    return jsonify([vars(f) for f in all_files]), 200
 
 
 @app.get("/api/files/<file_id>")
@@ -69,13 +78,6 @@ def get_file(file_id: str) -> tuple[str, int] | Response:
         # TODO configure logging in the future
         print(f"Unexpected error while getting file: {e}")
         return "Unexpected error while getting file", 500
-
-
-@app.get('/api/files/')
-def get_all_files() -> Response:
-    """Returns all files in the database."""
-    all_files = db_get_all_files()
-    return jsonify([vars(f) for f in all_files]), 200
 
 
 @app.post('/api/files/')
@@ -138,12 +140,11 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
             json.dump(attck_data, F, ensure_ascii=False, indent=2)
 
         # Send the id of the modified file back to the client
-        return {
-            'id': unique_id,
-            'filename': modified_filename,
-        }, 201
+        # TODO: Update readme on enpoint changes
+        return jsonify(vars(db_get_file_by_id(unique_id))), 201
 
     except Exception as e:
+        # TODO: Add db cleanup if file upload fails
         # Clean up on error, remove the directory with all its files
         if os.path.exists(os.path.join(UPLOAD_FOLDER, unique_id)):
             shutil.rmtree(os.path.join(UPLOAD_FOLDER, unique_id))
