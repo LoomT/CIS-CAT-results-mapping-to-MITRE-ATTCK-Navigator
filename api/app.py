@@ -8,8 +8,11 @@ try:
 except ImportError:
     from .convert import convert_cis_to_attack
 
+from .database import init_db, db_save_file, db_get_all_files
+from .helpers import extract_metadata
 
-from flask import (Flask, request, send_file, Response)
+from flask import (Flask, request, send_file, Response, jsonify)
+
 from flask.cli import load_dotenv
 from werkzeug.utils import secure_filename
 
@@ -20,6 +23,10 @@ app = Flask(__name__, static_folder=os.getenv('FLASK_STATIC_FOLDER'),
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
+# initialize the database
+print("Initializing database")
+init_db(app)
 
 
 @app.get("/api/files/<file_id>")
@@ -57,10 +64,18 @@ def get_file(file_id: str) -> tuple[str, int] | Response:
         return "Unexpected error while getting file", 500
 
 
+@app.get('/api/files/')
+def get_all_files() -> Response:
+    """Returns all files in the database."""
+    all_files = db_get_all_files()
+    return jsonify([vars(f) for f in all_files]), 200
+
+
 @app.post('/api/files/')
 def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
     """Endpoint for uploading, converting and storing the converted file.
     Returns a response with the unique id of the converted file."""
+    # TODO: Note to self: why are we generating uuid twice?
     unique_id = str(uuid.uuid4())
     try:
         if 'file' not in request.files:
@@ -89,6 +104,22 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         modified_file_path = os.path.join(
             UPLOAD_FOLDER, unique_id, modified_filename
         )
+
+        # DATABASE PART #
+        try:
+            metaData = extract_metadata(file)
+            # Set remaining metadata fields
+            metaData.id = unique_id
+            metaData.ip_address = request.remote_addr
+            metaData.file_name = modified_filename
+
+            db_save_file(metaData)
+        except ValueError as ve:
+            print(f"Error extracting metadata: {ve}")
+            return "Invalid file format", 500
+
+        print(db_get_all_files())
+        # END OF DATABASE PART #
 
         try:
             cis_data = json.load(file.stream)
