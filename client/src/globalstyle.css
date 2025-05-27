@@ -83,6 +83,17 @@ nav {
   flex: initial;
 }
 
+/* Admin side Section */
+.admin-side-section {
+  max-width: 20%;
+  min-width: 10%;
+  height: max-content;
+  flex: initial;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 /* File Table Section */
 .file-table-section {
   flex: 1;
@@ -111,16 +122,16 @@ nav {
 .files-table th, .files-table td {
   padding: 0.75rem 1rem;
   border: none; /* Ensure no borders for cells */
-  white-space: nowrap; /* Prevents wrapping */
+  white-space: wrap; /* Wrap text to prevent overflow */
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.files-table td:first-child, .files-table th:first-child {
-  text-align: center;
-  white-space: wrap;
-  width: auto;
-}
+/*.files-table td:first-child, .files-table th:first-child {*/
+/*  text-align: center;*/
+/*  white-space: wrap;*/
+/*  width: auto;*/
+/*}*/
 
 .files-table td:last-child {
   width: fit-content;
@@ -249,6 +260,44 @@ button img, button svg, .button img, .button svg {
 .btn-green { background-color: #d1fae5; color: #065f46; } /* green-100 / green-800 */
 .btn-purple { background-color: #ede9fe; color: #5b21b6; } /* purple-100 / purple-800 */
 
+/* Disabled button styles */
+.btn-blue:disabled {
+  background-color: #eff6ff; /* lighter blue-50 */
+  color: #93c5fd; /* blue-300 */
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-green:disabled {
+  background-color: #ecfdf5; /* lighter green-50 */
+  color: #6ee7b7; /* green-300 */
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-purple:disabled {
+  background-color: #f5f3ff; /* lighter purple-50 */
+  color: #c4b5fd; /* purple-300 */
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Common styles for all disabled buttons */
+button:disabled {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* Hover effects should be neutralized for disabled buttons */
+.btn-blue:disabled:hover,
+.btn-green:disabled:hover,
+.btn-purple:disabled:hover {
+  background-color: inherit;
+  box-shadow: none;
+}
+
+
 /* Headings */
 h2, h3 {
   color: #2d3436;
@@ -290,7 +339,7 @@ h2, h3 {
 
 .section-header {
   text-align: left;
-  margin-bottom: 1rem;
+  flex: auto;
 }
 
 .section-header h2 {

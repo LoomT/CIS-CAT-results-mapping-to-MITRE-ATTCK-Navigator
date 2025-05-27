@@ -1,7 +1,7 @@
 import downloadIcon from '../assets/download.png';
 import visualIcon from '../assets/investigate.png';
 import { LanguageContext } from '../main.jsx';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 /**
  * File table entry component for the user screen
@@ -17,21 +17,39 @@ import { useContext } from 'react';
  * @returns {JSX.Element} the rendered file table entry component
  * @constructor FileTableEntry
  */
-const FileTableEntry = ({ id, filename, department, time, onExport, onVisualize, onDownload, showCheckbox }) => {
+const FileTableEntry = ({
+  id,
+  filename,
+  department,
+  time,
+  onExport,
+  onVisualize,
+  onDownload,
+  showCheckbox,
+  onCheckboxChange,
+}) => {
   const t = useContext(LanguageContext);
+  const [isChecked, setIsChecked] = useState(false);
 
   return (
     <tr>
       {showCheckbox && (
         <td>
-          <input type="checkbox" />
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={() => {
+              setIsChecked(!isChecked);
+              onCheckboxChange(isChecked, id);
+            }}
+          />
         </td>
       )}
       <td>{filename}</td>
       <td>{department}</td>
       <td>{time}</td>
       <td>
-        <button className="btn-blue" onClick={onExport}>
+        <button className="btn-purple" onClick={onExport}>
           <img src={visualIcon} alt="export" className="icon" />
           {t.export}
         </button>

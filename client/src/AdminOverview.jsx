@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
@@ -19,7 +19,8 @@ function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
   const [currentFile, setFile] = useState({});
   const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
-  const [files] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const t = useContext(LanguageContext);
 
   /**
@@ -148,6 +149,122 @@ function AdminOverview() {
     let client = new NavigatorAPI(targetWindow, uri.toString(), true);
   };
 
+  useEffect(() => {
+    // Call the handleRefresh function when the component mounts
+    handleRefresh();
+  }, []);
+
+  const handleRefresh = async () => {
+    const response = await fetch('/api/files/');
+    if (!response.ok) {
+      console.error('Error fetching files:', response);
+      return;
+    }
+    const files = (await response.json()).files;
+
+    console.log(files);
+
+    setFiles(files.map(file => ({
+      id: file.id,
+      filename: file.filename,
+      department: 'Default Department',
+      time: new Date().toISOString(),
+    })));
+  };
+
+  const handleCheckboxChange = (isChecked, fileId) => {
+    isChecked = !isChecked;
+    setSelectedFiles((prevSelected) => {
+      // If the ID is already in the array, remove it; otherwise, add it
+      if (!isChecked) {
+        return prevSelected.filter(id => id !== fileId);
+      }
+      else {
+        return [...prevSelected, fileId];
+      }
+    });
+  };
+
+  const handleDownloadOnSelectedFiles = async () => {
+    if (selectedFiles.length === 0) {
+      alert('No files selected!');
+      return;
+    }
+
+    console.log('Downloading aggregated selected files:', selectedFiles);
+    try {
+      // Build the URL with all file IDs as query parameters
+      const queryParams = new URLSearchParams();
+      selectedFiles.forEach(id => queryParams.append('ids', id));
+      const url = `/api/files/combine?${queryParams.toString()}`;
+
+      // Fetch the combined file
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.error('Error downloading combined files:', response);
+
+        let errorMessage;
+        switch (response.status) {
+          case 400:
+            errorMessage = 'Invalid file ids';
+            break;
+          case 404:
+            errorMessage = 'One or more files not found';
+            break;
+          case 500:
+            errorMessage = 'Server error occurred while combining files';
+            break;
+          default:
+            errorMessage = `Download failed: ${response.statusText}`;
+        }
+
+        alert(errorMessage);
+        return;
+      }
+
+      // Get the combined file blob
+      const file = await response.blob();
+
+      // Create a download link and trigger download
+      const downloadUrl = window.URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+
+      // Get filename from Content-Disposition header if available
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = 'combined_results.json';
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      console.log('Combined files downloaded successfully');
+    }
+    catch (error) {
+      console.error('Error downloading combined files:', error);
+
+      let errorMessage = 'Failed to download combined files';
+      if (error.name === 'AbortError') {
+        errorMessage = 'Download was cancelled';
+      }
+      else if (error instanceof TypeError) {
+        errorMessage = 'Network error occurred. Please check your internet connection and try again.';
+      }
+
+      alert(errorMessage);
+    }
+  };
+
   return (
     <div className="full-panel">
       {/* Top Title */}
@@ -155,7 +272,7 @@ function AdminOverview() {
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
-        <div className="card">
+        <div className="card admin-side-section">
           <div className="section-header">
             <h2>{t.departmentFilter}</h2>
             <select id="departmentFilter">
@@ -174,10 +291,27 @@ function AdminOverview() {
               onChange={e => setHostSearch(e.target.value)}
             />
           </div>
+          <button className="btn-blue" onClick={() => handleRefresh()}>Refresh</button>
+          <div>
+            <h2>Aggregation</h2>
+            {selectedFiles.length === 0
+              ? (
+                  <>
+                    <p>No files selected</p>
+                    <button className="btn-green" disabled={true}>Download</button>
+                  </>
+                )
+              : (
+                  <>
+                    <p>{'Selected files: ' + selectedFiles.length}</p>
+                    <button className="btn-green" onClick={() => handleDownloadOnSelectedFiles()}>Download</button>
+                  </>
+                )}
+          </div>
         </div>
 
         {/* File Table Section */}
-        <div className="card file-table-section">
+        <div className="card file-table-section full-panel">
           <h2>{t.filesList}</h2>
           {/* TODO */}
           <p className="section-description">Description placeholder</p>
@@ -205,6 +339,7 @@ function AdminOverview() {
                   onVisualize={() => handleVisualizeClick(file)}
                   onDownload={() => handleDownload(file.id, file.filename)}
                   showCheckbox={true}
+                  onCheckboxChange={handleCheckboxChange}
                 />
               ))}
             </tbody>
