@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, StrictMode, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
@@ -17,16 +17,18 @@ export const LanguageContext = createContext(translations['en']);
  * screens using internal state.
  */
 createRoot(document.getElementById('root')).render(
-  <LanguageProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route index element={<HomeScreen />} />
-        <Route path="/manual-conversion" element={<UserScreen />} />
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/admin/overview" element={<AdminOverview />} />
-      </Routes>
-    </BrowserRouter>
-  </LanguageProvider>,
+  <StrictMode>
+    <LanguageProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<HomeScreen />} />
+          <Route path="/manual-conversion" element={<UserScreen />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/overview" element={<AdminOverview />} />
+        </Routes>
+      </BrowserRouter>
+    </LanguageProvider>
+  </StrictMode>,
 );
 
 function LanguageProvider({ children }) {
