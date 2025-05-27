@@ -15,6 +15,7 @@ __pycache__
 
 # Generated
 uploads
+*.db
 
 # Tests
 tests/e2e/node_modules
