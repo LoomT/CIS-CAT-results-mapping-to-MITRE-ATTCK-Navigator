@@ -1,5 +1,7 @@
 import downloadIcon from '../assets/download.png';
 import visualIcon from '../assets/investigate.png';
+import { LanguageContext } from '../main.jsx';
+import { useContext } from 'react';
 
 /**
  * File table entry component for the user screen
@@ -12,11 +14,12 @@ import visualIcon from '../assets/investigate.png';
  * @param onExport callback to trigger the export popup
  * @param onVisualize callback to trigger the visualization popup
  * @param onDownload callback to trigger the download
- * @param t the translation mapping
  * @returns {JSX.Element} the rendered file table entry component
  * @constructor FileTableEntry
  */
-const FileTableEntry = ({ id, filename, department, time, onExport, onVisualize, onDownload, t, showCheckbox }) => {
+const FileTableEntry = ({ id, filename, department, time, onExport, onVisualize, onDownload, showCheckbox }) => {
+  const t = useContext(LanguageContext);
+
   return (
     <tr>
       {showCheckbox && (

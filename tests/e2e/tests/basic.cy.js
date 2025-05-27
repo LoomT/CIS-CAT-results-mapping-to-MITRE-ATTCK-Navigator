@@ -18,6 +18,15 @@ describe('Basic application tests', () => {
     cy.get('[data-testid="user-screen-file-table-section"]').should('be.visible');
   });
 
+  it("can't access admin overview directly", () => {
+    cy.request({
+      url: '/admin/overview',
+      failOnStatusCode: false
+    }).then((response) => {
+      expect(response.status).to.eq(404);
+    });
+  });
+
   //
   // it('can upload a file', () => {
   //   cy.visit('/')
