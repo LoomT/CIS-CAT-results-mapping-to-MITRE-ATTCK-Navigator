@@ -224,7 +224,8 @@ button img, button svg, .button img, .button svg {
 
 .button-container {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  gap: 1rem;
   align-items: center;
 }
 
