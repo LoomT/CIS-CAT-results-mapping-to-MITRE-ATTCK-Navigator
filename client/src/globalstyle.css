@@ -78,7 +78,7 @@ nav {
 /* Upload Section */
 .upload-section {
   max-width: 20%;
-  min-width: 10%;
+  min-width: 15%;
   height: max-content;
   flex: initial;
 }
@@ -86,13 +86,22 @@ nav {
 /* Admin side Section */
 .admin-side-section {
   max-width: 20%;
-  min-width: 10%;
+  min-width: 15%;
   height: max-content;
   flex: initial;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
+
+.admin-side-section input {
+  width: calc(100% - 16px);
+}
+
+.admin-side-section select {
+  width: calc(100% - 16px);
+}
+
 
 /* File Table Section */
 .file-table-section {
@@ -428,7 +437,7 @@ img[src$=".svg"] {
   margin-top: 0.5rem;
 }
 
-/*Host Search*/
+/*Host Search TODO REMOVE*/
 .search-section {
   display: flex;
   align-items: center;
