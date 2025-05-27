@@ -26,15 +26,13 @@ function AdminOverview() {
   /**
    * Opens the visualization popup.
    */
-  const handleVisualizeClick = () => {
+  const handleVisualizeClick = (file) => {
     let uri = new URL(location.href);
 
     uri.pathname = `/api/files/${file.id}`;
     let targetWindow = window.open('/attack-navigator/index.html');
 
     let client = new NavigatorAPI(targetWindow, uri.toString(), false);
-
-    setShowPopup(true);
   };
 
   /**
