@@ -1,14 +1,15 @@
+import io
 import json
 import os
 import shutil
-import tempfile
 import uuid
 
 try:
     from convert import convert_cis_to_attack, combine_results
+    from utils import find_file, ClientException
 except ImportError:
     from .convert import convert_cis_to_attack, combine_results
-
+    from .utils import find_file, ClientException
 
 from flask import (Flask, request, send_file, Response)
 from flask.cli import load_dotenv
@@ -48,48 +49,28 @@ def get_all_file_ids():
 
 
 @app.get("/api/files/<file_id>")
-def get_file(file_id: str) -> tuple[str, int] | Response:
+def convert_file(file_id: str) -> tuple[str, int] | Response:
     """Endpoint for retrieving a file by its unique id."""
     try:
-        # Ensure file_id is safe to use as a filename
-        secure_file_id = secure_filename(file_id)
-        if secure_file_id != file_id:
-            return "Invalid file id", 400
-
-        file_dir = os.path.join(UPLOAD_FOLDER, file_id)
-        # Check if a folder with the id exists
-        if not os.path.isdir(file_dir):
-            return "No file by this id found", 404
-
-        # The folder should contain exactly one file
-        files = os.listdir(file_dir)
-
-        # Should not happen
-        if len(files) > 1:
-            return "Multiple files found", 500
-        elif len(files) == 0:
-            return "No file found", 500
-
-        file_path = os.path.join(file_dir, files[0])
+        file_name, file_path = find_file(UPLOAD_FOLDER, file_id)
 
         with open(file_path, 'r', encoding='utf-8') as F:
             cis_data = json.load(F)
 
         attack_data = convert_cis_to_attack(cis_data)
 
-        tmp = tempfile.TemporaryFile('w+')
-        json.dump(attack_data, tmp, ensure_ascii=False, indent=2)
-        tmp.seek(0)
-        tmp2 = tempfile.TemporaryFile()
-        tmp2.write(tmp.read().encode('utf-8'))
-        tmp2.seek(0)
+        mem = io.BytesIO()
+        mem.write(json.dumps(attack_data).encode('utf-8'))
+        mem.seek(0)
 
         return send_file(
-            tmp2,
+            mem,
             as_attachment=True,
-            download_name=f'converted_{files[0]}'
+            download_name=f'converted_{file_name}'
         )
 
+    except ClientException as e:
+        return e.to_response()
     except Exception as e:
         # TODO configure logging in the future
         print(f"Unexpected error while getting file: {e}")
@@ -97,7 +78,7 @@ def get_file(file_id: str) -> tuple[str, int] | Response:
 
 
 @app.get("/api/files/combine")
-def get_aggregated_files() -> tuple[str, int] | Response:
+def aggregate_and_convert_files() -> tuple[str, int] | Response:
     """Endpoint for combining and retrieving multiple files
      by their unique ids."""
     file_ids = request.args.getlist('ids')
@@ -109,45 +90,25 @@ def get_aggregated_files() -> tuple[str, int] | Response:
         cis_data_list = []
 
         for file_id in file_ids:
-            # Ensure file_id is safe to use as a filename
-            secure_file_id = secure_filename(file_id)
-            if secure_file_id != file_id:
-                return "Invalid file id", 400
-
-            file_dir = os.path.join(UPLOAD_FOLDER, file_id)
-            # Check if a folder with the id exists
-            if not os.path.isdir(file_dir):
-                return "No file by this id found", 404
-
-            # The folder should contain exactly one file
-            files = os.listdir(file_dir)
-
-            # Should not happen
-            if len(files) > 1:
-                return "Multiple files found", 500
-            elif len(files) == 0:
-                return "No file found", 500
-
-            file_path = os.path.join(file_dir, files[0])
+            _, file_path = find_file(UPLOAD_FOLDER, file_id)
 
             with open(file_path, 'r', encoding='utf-8') as F:
                 cis_data_list.append(json.load(F))
 
         attack_data = combine_results(cis_data_list)
 
-        tmp = tempfile.TemporaryFile('w+')
-        json.dump(attack_data, tmp, ensure_ascii=False, indent=2)
-        tmp.seek(0)
-        tmp2 = tempfile.TemporaryFile()
-        tmp2.write(tmp.read().encode('utf-8'))
-        tmp2.seek(0)
+        mem = io.BytesIO()
+        mem.write(json.dumps(attack_data).encode('utf-8'))
+        mem.seek(0)
 
         return send_file(
-            tmp2,
+            mem,
             as_attachment=True,
-            download_name=f'converted_aggregated_results.json'
+            download_name='converted_aggregated_results.json'
         )
 
+    except ClientException as e:
+        return e.to_response()
     except Exception as e:
         # TODO configure logging in the future
         print(f"Unexpected error while getting file: {e}")
@@ -155,7 +116,7 @@ def get_aggregated_files() -> tuple[str, int] | Response:
 
 
 @app.post('/api/files/')
-def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
+def save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
     """Endpoint for uploading, converting and storing the converted file.
     Returns a response with the unique id of the converted file."""
     unique_id = str(uuid.uuid4())
