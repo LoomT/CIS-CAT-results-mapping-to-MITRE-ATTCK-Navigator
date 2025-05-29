@@ -85,6 +85,7 @@ python_tests:
     - source .venv/bin/activate
     - pip install -r api/requirements.txt
     - pip install pytest
+    - pip install pytest-mock
   script:
     - python -m pytest -q
 
