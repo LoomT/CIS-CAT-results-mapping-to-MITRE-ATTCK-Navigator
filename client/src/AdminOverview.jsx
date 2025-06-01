@@ -193,7 +193,7 @@ function AdminOverview() {
     try {
       // Build the URL with all file IDs as query parameters
       const queryParams = new URLSearchParams();
-      selectedFiles.forEach(id => queryParams.append('ids', id));
+      selectedFiles.forEach(id => queryParams.append('id', id));
       const url = `/api/files/combine?${queryParams.toString()}`;
 
       // Fetch the combined file

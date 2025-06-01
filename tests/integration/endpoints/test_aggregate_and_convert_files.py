@@ -23,7 +23,7 @@ def test_aggregate_true_valid_ids(
     mock_combine.return_value = {'aggregated': 'data'}
 
     response = client.get(
-        '/api/files?aggregate=true&ids=file_id1&ids=file_id2'
+        '/api/files?aggregate=true&id=file_id1&id=file_id2'
     )
 
     assert response.status_code == 200
@@ -52,7 +52,7 @@ def test_aggregate_true_invalid_id(
 ):
     """Test aggregating files with an invalid id"""
     response = client.get(
-        '/api/files?aggregate=true&ids=file_id1&ids=nonexistent_id'
+        '/api/files?aggregate=true&id=file_id1&id=nonexistent_id'
     )
 
     assert response.status_code == 404
@@ -72,7 +72,7 @@ def test_aggregate_true_error_handling(
     )
 
     response = client.get(
-        '/api/files?aggregate=true&ids=file_id1&ids=file_id2')
+        '/api/files?aggregate=true&id=file_id1&id=file_id2')
 
     assert response.status_code == 500
     assert "Internal Server Error" in response.data.decode('utf-8')

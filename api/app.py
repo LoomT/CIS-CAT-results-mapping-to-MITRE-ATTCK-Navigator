@@ -76,7 +76,7 @@ def get_files_metadata() -> tuple[dict[str, list[dict]], int]:
 def aggregate_and_convert_files() -> tuple[str, int] | Response:
     """Endpoint for combining and retrieving multiple files
      by their unique ids."""
-    file_ids = request.args.getlist('ids')
+    file_ids = request.args.getlist('id')
 
     if not file_ids:
         return "No file ids provided", 400
