@@ -27,57 +27,44 @@ if not os.path.exists(UPLOAD_FOLDER):
 @app.get('/api/files/')
 def get_all_file_ids():
     """Endpoint for retrieving a list of all stored files' IDs."""
-    try:
-        files_list = []
-        # List all directories (file IDs) in the uploads folder
-        for file_id in os.listdir(UPLOAD_FOLDER):
-            file_path = os.path.join(UPLOAD_FOLDER, file_id)
-            if os.path.isdir(file_path):
-                # Get the filename from the directory
-                dir_files = os.listdir(file_path)
-                if len(dir_files) == 1:
-                    files_list.append({
-                        'id': file_id,
-                        'filename': dir_files[0]
-                    })
+    files_list = []
+    # List all directories (file IDs) in the uploads folder
+    for file_id in os.listdir(UPLOAD_FOLDER):
+        file_path = os.path.join(UPLOAD_FOLDER, file_id)
+        if os.path.isdir(file_path):
+            # Get the filename from the directory
+            dir_files = os.listdir(file_path)
+            if len(dir_files) == 1:
+                files_list.append({
+                    'id': file_id,
+                    'filename': dir_files[0]
+                })
 
-        return {'files': files_list}, 200
-    except Exception as e:
-        # TODO configure logging in the future
-        print(f"Unexpected error while listing files: {e}")
-        return "Unexpected error while listing files", 500
+    return {'files': files_list}, 200
 
 
 @app.get("/api/files/<file_id>")
 def convert_file(file_id: str) -> tuple[str, int] | Response:
     """Endpoint for retrieving a file by its unique id."""
-    try:
-        file_name, file_path = find_file(UPLOAD_FOLDER, file_id)
+    file_name, file_path = find_file(UPLOAD_FOLDER, file_id)
 
-        with open(file_path, 'r', encoding='utf-8') as F:
-            cis_data = json.load(F)
+    with open(file_path, 'r', encoding='utf-8') as F:
+        cis_data = json.load(F)
 
-        attack_data = convert_cis_to_attack(cis_data)
+    attack_data = convert_cis_to_attack(cis_data)
 
-        mem = io.BytesIO()
-        mem.write(json.dumps(attack_data).encode('utf-8'))
-        mem.seek(0)
+    mem = io.BytesIO()
+    mem.write(json.dumps(attack_data).encode('utf-8'))
+    mem.seek(0)
 
-        return send_file(
-            mem,
-            as_attachment=True,
-            download_name=f'converted_{file_name}'
-        )
-
-    except ClientException as e:
-        return e.to_response()
-    except Exception as e:
-        # TODO configure logging in the future
-        print(f"Unexpected error while getting file: {e}")
-        return "Unexpected error while getting file", 500
+    return send_file(
+        mem,
+        as_attachment=True,
+        download_name=f'converted_{file_name}'
+    )
 
 
-@app.get("/api/files/combine")
+@app.get("/api/files/")
 def aggregate_and_convert_files() -> tuple[str, int] | Response:
     """Endpoint for combining and retrieving multiple files
      by their unique ids."""
@@ -86,33 +73,25 @@ def aggregate_and_convert_files() -> tuple[str, int] | Response:
     if not file_ids:
         return "No file ids provided", 400
 
-    try:
-        cis_data_list = []
+    cis_data_list = []
 
-        for file_id in file_ids:
-            _, file_path = find_file(UPLOAD_FOLDER, file_id)
+    for file_id in file_ids:
+        _, file_path = find_file(UPLOAD_FOLDER, file_id)
 
-            with open(file_path, 'r', encoding='utf-8') as F:
-                cis_data_list.append(json.load(F))
+        with open(file_path, 'r', encoding='utf-8') as F:
+            cis_data_list.append(json.load(F))
 
-        attack_data = combine_results(cis_data_list)
+    attack_data = combine_results(cis_data_list)
 
-        mem = io.BytesIO()
-        mem.write(json.dumps(attack_data).encode('utf-8'))
-        mem.seek(0)
+    mem = io.BytesIO()
+    mem.write(json.dumps(attack_data).encode('utf-8'))
+    mem.seek(0)
 
-        return send_file(
-            mem,
-            as_attachment=True,
-            download_name='converted_aggregated_results.json'
-        )
-
-    except ClientException as e:
-        return e.to_response()
-    except Exception as e:
-        # TODO configure logging in the future
-        print(f"Unexpected error while getting file: {e}")
-        return "Unexpected error while getting file", 500
+    return send_file(
+        mem,
+        as_attachment=True,
+        download_name='converted_aggregated_results.json'
+    )
 
 
 @app.post('/api/files/')
@@ -164,9 +143,7 @@ def save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         # Clean up on error, remove the directory with all its files
         if os.path.exists(os.path.join(UPLOAD_FOLDER, unique_id)):
             shutil.rmtree(os.path.join(UPLOAD_FOLDER, unique_id))
-        # TODO configure logging in the future
-        print(f"Unexpected error while processing file: {e}")
-        return "Unexpected error while processing file", 500
+        raise e  # rethrow for the error handler to handle it
 
 
 # Have to specify each page manually since static_url_path at line 17
@@ -177,6 +154,19 @@ def save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
 def serve() -> Response:
     """Serve pages that don't need authentication"""
     return app.send_static_file('index.html')
+
+
+# Handle endpoint errors
+@app.errorhandler(ClientException)
+def handle_client_error(error):
+    # TODO LOG error
+    return error.to_response()
+
+
+@app.errorhandler(Exception)
+def handle_server_error(error):
+    # TODO LOG error
+    return "Internal Server Error", 500
 
 
 if __name__ == '__main__':

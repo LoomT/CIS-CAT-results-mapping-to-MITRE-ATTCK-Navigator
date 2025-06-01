@@ -61,5 +61,5 @@ def test_convert_file_unexpected_error(client, mocker):
     response = client.get('/api/files/unexpected-error-id')
 
     assert response.status_code == 500
-    assert "Unexpected error while getting file" in response.data.decode(
+    assert "Internal Server Error" in response.data.decode(
         'utf-8')

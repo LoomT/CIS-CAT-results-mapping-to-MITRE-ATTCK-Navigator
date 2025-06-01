@@ -67,4 +67,4 @@ def test_unexpected_error_on_save(client, monkeypatch):
                            content_type='multipart/form-data')
     assert response.status_code == 500
     assert response.get_data(
-        as_text=True) == "Unexpected error while processing file"
+        as_text=True) == "Internal Server Error"
