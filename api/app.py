@@ -24,25 +24,6 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 
-@app.get('/api/files/')
-def get_all_file_ids():
-    """Endpoint for retrieving a list of all stored files' IDs."""
-    files_list = []
-    # List all directories (file IDs) in the uploads folder
-    for file_id in os.listdir(UPLOAD_FOLDER):
-        file_path = os.path.join(UPLOAD_FOLDER, file_id)
-        if os.path.isdir(file_path):
-            # Get the filename from the directory
-            dir_files = os.listdir(file_path)
-            if len(dir_files) == 1:
-                files_list.append({
-                    'id': file_id,
-                    'filename': dir_files[0]
-                })
-
-    return {'files': files_list}, 200
-
-
 @app.get("/api/files/<file_id>")
 def convert_file(file_id: str) -> tuple[str, int] | Response:
     """Endpoint for retrieving a file by its unique id."""
@@ -64,7 +45,34 @@ def convert_file(file_id: str) -> tuple[str, int] | Response:
     )
 
 
-@app.get("/api/files/")
+@app.get('/api/files')
+def get_files():
+    """Middleware for determining whether to return queried files' metadata
+    or to aggregate and convert multiple files."""
+    if request.args.get('aggregate', 'false').lower() == 'true':
+        return aggregate_and_convert_files()
+    else:
+        return get_files_metadata()
+
+
+def get_files_metadata() -> tuple[dict[str, list[dict]], int]:
+    """Endpoint for retrieving a list of all stored files' IDs."""
+    files_list = []
+    # List all directories (file IDs) in the uploads folder
+    for file_id in os.listdir(UPLOAD_FOLDER):
+        file_path = os.path.join(UPLOAD_FOLDER, file_id)
+        if os.path.isdir(file_path):
+            # Get the filename from the directory
+            dir_files = os.listdir(file_path)
+            if len(dir_files) == 1:
+                files_list.append({
+                    'id': file_id,
+                    'filename': dir_files[0]
+                })
+
+    return {'files': files_list}, 200
+
+
 def aggregate_and_convert_files() -> tuple[str, int] | Response:
     """Endpoint for combining and retrieving multiple files
      by their unique ids."""
