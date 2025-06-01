@@ -174,6 +174,11 @@ def handle_client_error(error):
     return error.to_response()
 
 
+@app.errorhandler(404)
+def handle_not_found(error):
+    return "404 Not Found :(", 404
+
+
 @app.errorhandler(Exception)
 def handle_server_error(error):
     # TODO LOG error
