@@ -296,24 +296,32 @@ function AdminOverview() {
               ? (
                   <>
                     <p>No files selected</p>
-                    <button className="btn-green" disabled={true}>Download</button>
+                    <div className="button-container">
+                      <button className="btn-purple" disabled={true}>Export</button>
+                      <button className="btn-blue" disabled={true}>Visualize</button>
+                      <button className="btn-green" disabled={true}>Download</button>
+                    </div>
                   </>
                 )
               : (
                   <>
                     <p>{'Selected files: ' + selectedFiles.length}</p>
-                    <button className="btn-green" onClick={() => handleDownloadOnSelectedFiles()}>Download</button>
+                    <div className="button-container">
+                      <button className="btn-purple" onClick={() => handleDownloadOnSelectedFiles()}>Export</button>
+                      <button className="btn-blue" onClick={() => handleDownloadOnSelectedFiles()}>Visualize</button>
+                      <button className="btn-green" onClick={() => handleDownloadOnSelectedFiles()}>Download</button>
+                    </div>
                   </>
                 )}
           </div>
         </div>
 
         {/* File Table Section */}
-        <div className="card file-table-section full-panel">
+        <div className="card file-table-section">
           <h2>{t.filesList}</h2>
           {/* TODO */}
           <p className="section-description">Description placeholder</p>
-          <table className="files-table">
+          <table>
             <thead>
               <tr>
                 {/* TODO */}
@@ -351,7 +359,7 @@ function AdminOverview() {
           <div className="popup">
             <h3 className="popup-heading">{t.chooseFormat}</h3>
             <div className="popup-buttons">
-              <button className="popup-button" onClick={handleSVGExportClick()}>SVG</button>
+              <button className="popup-button" onClick={handleSVGExportClick}>SVG</button>
               <button className="popup-button">PNG</button>
               <button className="popup-cancel" onClick={handlePopupClose}>
                 {t.cancel}

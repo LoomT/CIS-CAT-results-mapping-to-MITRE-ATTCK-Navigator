@@ -346,12 +346,12 @@ function UserScreen() {
         </div>
 
         {/* File Table Section */}
-        <div className="card file-table-section full-panel" data-testid="user-screen-file-table-section">
+        <div className="card file-table-section" data-testid="user-screen-file-table-section">
           <div className="section-header">
             <h2>{t.filesList}</h2>
             <p>{t.fileTableDesc}</p>
           </div>
-          <table className="files-table">
+          <table>
             <thead>
               <tr>
                 <th>{t.name}</th>

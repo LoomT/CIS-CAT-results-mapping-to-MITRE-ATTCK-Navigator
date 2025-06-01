@@ -45,23 +45,25 @@ const FileTableEntry = ({
           />
         </td>
       )}
-      <td>{filename}</td>
-      <td>{department}</td>
-      <td>{time}</td>
+      <td className="long-word">{filename}</td>
+      <td><div className="department-badge">{department}</div></td>
+      <td className="long-word">{time}</td>
       <td>
-        <button className="btn-purple" onClick={onExport}>
-          <img src={visualIcon} alt="export" className="icon" />
-          {t.export}
-        </button>
-        <button className="btn-blue" onClick={onVisualize}>
-          <img src={visualIcon} alt="visualize" className="icon" />
-          {t.visualize}
-        </button>
-        <button className="btn-green" onClick={onDownload}>
-          <img src={downloadIcon} alt="download" className="icon" />
-          {t.download}
-        </button>
-        <iframe id={id}></iframe>
+        <div className="button-container">
+          <button className="btn-purple" onClick={onExport}>
+            <img src={visualIcon} alt="export" className="icon" />
+            {t.export}
+          </button>
+          <button className="btn-blue" onClick={onVisualize}>
+            <img src={visualIcon} alt="visualize" className="icon" />
+            {t.visualize}
+          </button>
+          <button className="btn-green" onClick={onDownload}>
+            <img src={downloadIcon} alt="download" className="icon" />
+            {t.download}
+          </button>
+          <iframe id={id}></iframe>
+        </div>
       </td>
     </tr>
   );
