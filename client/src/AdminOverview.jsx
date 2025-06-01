@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
@@ -17,7 +16,8 @@ import { LanguageContext } from './main.jsx';
 
 function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
-  const [currentFile, setFile] = useState({});
+  const [exportFile, setExportFile] = useState({});
+  const [exportAggregate, setExportAggregate] = useState(false);
   const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
   const [files, setFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -26,10 +26,21 @@ function AdminOverview() {
   /**
    * Opens the visualization popup.
    */
-  const handleVisualizeClick = (file) => {
+  const handleVisualizeClick = (file, aggregate) => {
     let uri = new URL(location.href);
 
-    uri.pathname = `/api/files/${file.id}`;
+    if (aggregate) {
+      if (selectedFiles.length === 0) {
+        alert('No files selected!');
+        return;
+      }
+      uri.searchParams.append('aggregate', 'true');
+      selectedFiles.forEach(id => uri.searchParams.append('id', id));
+      uri.pathname = `/api/files`;
+    }
+    else {
+      uri.pathname = `/api/files/${file.id}`;
+    }
     let targetWindow = window.open('/attack-navigator/index.html');
 
     let client = new NavigatorAPI(targetWindow, uri.toString(), false);
@@ -38,8 +49,9 @@ function AdminOverview() {
   /**
    * Opens the export popup.
    */
-  const handleExportClick = (file) => {
-    setFile(file);
+  const handleExportClick = (file, aggregate) => {
+    setExportFile(file);
+    setExportAggregate(aggregate);
     setShowExportPopup(true);
   };
 
@@ -136,12 +148,23 @@ function AdminOverview() {
     const newIframe = document.createElement('iframe');
     newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
     newIframe.src = '/attack-navigator/index.html';
-    newIframe.id = currentFile.id;
+    newIframe.id = exportFile.id; // TODO @Qyn what IFrame to use when aggregating?
 
-    let frame = document.getElementById(currentFile.id);
+    let frame = document.getElementById(exportFile.id);
     frame.parentNode.replaceChild(newIframe, frame);
 
-    uri.pathname = `/api/files/${currentFile.id}`;
+    if (exportAggregate) {
+      if (selectedFiles.length === 0) {
+        alert('No files selected!');
+        return;
+      }
+      uri.searchParams.append('aggregate', 'true');
+      selectedFiles.forEach(id => uri.searchParams.append('id', id));
+      uri.pathname = `/api/files`;
+    }
+    else {
+      uri.pathname = `/api/files/${exportFile.id}`;
+    }
     let targetWindow = newIframe.contentWindow;
 
     let client = new NavigatorAPI(targetWindow, uri.toString(), true);
@@ -193,8 +216,9 @@ function AdminOverview() {
     try {
       // Build the URL with all file IDs as query parameters
       const queryParams = new URLSearchParams();
+      queryParams.append('aggregate', 'true');
       selectedFiles.forEach(id => queryParams.append('id', id));
-      const url = `/api/files/combine?${queryParams.toString()}`;
+      const url = `/api/files?${queryParams.toString()}`;
 
       // Fetch the combined file
       const response = await fetch(url);
@@ -307,8 +331,8 @@ function AdminOverview() {
                   <>
                     <p>{'Selected files: ' + selectedFiles.length}</p>
                     <div className="button-container">
-                      <button className="btn-purple" onClick={() => handleDownloadOnSelectedFiles()}>Export</button>
-                      <button className="btn-blue" onClick={() => handleDownloadOnSelectedFiles()}>Visualize</button>
+                      <button className="btn-purple" onClick={() => handleExportClick(null, true)}>Export</button>
+                      <button className="btn-blue" onClick={() => handleVisualizeClick(null, true)}>Visualize</button>
                       <button className="btn-green" onClick={() => handleDownloadOnSelectedFiles()}>Download</button>
                     </div>
                   </>
@@ -341,8 +365,8 @@ function AdminOverview() {
                   filename={file.filename}
                   department={file.department}
                   time={file.time}
-                  onExport={() => handleExportClick(file)}
-                  onVisualize={() => handleVisualizeClick(file)}
+                  onExport={() => handleExportClick(file, false)}
+                  onVisualize={() => handleVisualizeClick(file, false)}
                   onDownload={() => handleDownload(file.id, file.filename)}
                   showCheckbox={true}
                   onCheckboxChange={handleCheckboxChange}
