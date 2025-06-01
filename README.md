@@ -89,7 +89,7 @@ Alternatively install `eslint` in vscode
 ## Endpoints
 
 ### Upload File
-- **URL**: `/api/files`
+- **URL**: `/api/files/`
 - **Method**: `POST`
 - **Content-Type**: `multipart/form-data`
 - **Request Body**:
@@ -114,7 +114,7 @@ Alternatively install `eslint` in vscode
   - When file contents are invalid: `"Invalid file format"`
 
 - **Code**: `500 Internal Server Error`
-  - When server encounters an unexpected error: `"Unexpected error while processing file"`
+  - When server encounters an unexpected error: `"Internal Server Error"`
 
 ### Download File
 - **URL**: `/api/files/<file_id>`
@@ -139,7 +139,51 @@ Alternatively install `eslint` in vscode
 - **Code**: `500 Internal Server Error`
   - When multiple files found: `"Multiple files found"`
   - When no files found in directory (dangling directory): `"No file found"`
-  - When server encounters an unexpected error: `"Unexpected error while getting file"`
+  - When server encounters an unexpected error: `"Internal Server Error"`
+
+### List or Aggregate Files
+- **URL**: `/api/files`
+- **Method**: `GET`
+- **Query Parameters**:
+    - `aggregate`: Boolean flag to determine operation mode (optional)
+        - `false` (default): Returns metadata for all stored files
+        - `true`: Aggregates and converts multiple files
+
+    - `id`: List of file IDs to aggregate (required when `aggregate=true`, can be provided multiple times)
+
+#### Successful Response (When `aggregate=false` or not provided)
+- **Code**: `200 OK`
+- **Content-Type**: `application/json`
+- **Response Body**:
+``` json
+  {
+    "files": [
+      {
+        "id": "string",       // Unique identifier for the file
+        "filename": "string"  // Name of the file
+      },
+      ...
+    ]
+  }
+```
+#### Successful Response (When `aggregate=true`)
+- **Code**: `200 OK`
+- **Content-Type**: `application/json`
+- **Headers**:
+    - `Content-Disposition`: `attachment; filename=converted_aggregated_results.json`
+
+- **Response Body**: Aggregated and converted file content as JSON
+
+#### Error Responses
+- **Code**: `400 Bad Request`
+    - When `aggregate=true` but no file IDs provided: `"No file ids provided"`
+
+- **Code**: `404 Not Found`
+    - When a specified file ID doesn't exist: `"No file by this id found"`
+
+- **Code**: `500 Internal Server Error`
+    - When server encounters an unexpected error: `"Internal Server Error"`
+
 
 ### Notes
 - All files are stored in a dedicated uploads directory
