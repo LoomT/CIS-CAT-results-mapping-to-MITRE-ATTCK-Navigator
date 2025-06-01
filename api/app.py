@@ -45,8 +45,10 @@ def convert_file(file_id: str) -> tuple[str, int] | Response:
     )
 
 
-@app.get('/api/files')
-def get_files():
+@app.get('/api/files', strict_slashes=False)
+def get_files() -> (
+        tuple[dict[str, list[dict]], int] | tuple[str, int] | Response
+):
     """Middleware for determining whether to return queried files' metadata
     or to aggregate and convert multiple files."""
     if request.args.get('aggregate', 'false').lower() == 'true':
@@ -168,12 +170,14 @@ def serve() -> Response:
 @app.errorhandler(ClientException)
 def handle_client_error(error):
     # TODO LOG error
+    print(error)
     return error.to_response()
 
 
 @app.errorhandler(Exception)
 def handle_server_error(error):
     # TODO LOG error
+    print(error)
     return "Internal Server Error", 500
 
 
