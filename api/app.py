@@ -35,9 +35,7 @@ def convert_file(file_id: str) -> tuple[str, int] | Response:
 
     attack_data = convert_cis_to_attack(cis_data)
 
-    mem = io.BytesIO()
-    mem.write(json.dumps(attack_data).encode('utf-8'))
-    mem.seek(0)
+    mem = io.BytesIO(json.dumps(attack_data).encode('utf-8'))
 
     return send_file(
         mem,
@@ -95,9 +93,7 @@ def aggregate_and_convert_files() -> tuple[str, int] | Response:
 
     attack_data = combine_results(cis_data_list)
 
-    mem = io.BytesIO()
-    mem.write(json.dumps(attack_data).encode('utf-8'))
-    mem.seek(0)
+    mem = io.BytesIO(json.dumps(attack_data).encode('utf-8'))
 
     return send_file(
         mem,
