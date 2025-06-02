@@ -18,6 +18,8 @@ class ClientException(Exception):
 
 
 def find_file(upload_folder: str, file_id: str) -> tuple[str, str]:
+    """Find a file by its unique id in the Uploads folder.
+    :returns: Filename and path to the file tuple."""
     # Ensure file_id is safe to use as a filename
     secure_file_id = secure_filename(file_id)
     if secure_file_id != file_id:

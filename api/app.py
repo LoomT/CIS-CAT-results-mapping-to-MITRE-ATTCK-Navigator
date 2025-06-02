@@ -14,6 +14,7 @@ except ImportError:
 from flask import (Flask, request, send_file, Response)
 from flask.cli import load_dotenv
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException
 
 load_dotenv()
 app = Flask(__name__, static_folder=os.getenv('FLASK_STATIC_FOLDER'),
@@ -71,6 +72,7 @@ def get_files_metadata() -> tuple[dict[str, list[dict]], int]:
                     'id': file_id,
                     'filename': dir_files[0]
                 })
+            # TODO else fail?
 
     return {'files': files_list}, 200
 
@@ -168,20 +170,20 @@ def serve() -> Response:
 
 # Handle endpoint errors
 @app.errorhandler(ClientException)
-def handle_client_error(error):
-    # TODO LOG error
+def handle_client_error(error) -> tuple[str, int]:
+    """Handle errors caused by the client, like invalid file ids."""
+    # TODO LOG client caused errors
     print(error)
     return error.to_response()
 
 
-@app.errorhandler(404)
-def handle_not_found(error):
-    return "404 Not Found :(", 404
-
-
 @app.errorhandler(Exception)
-def handle_server_error(error):
-    # TODO LOG error
+def handle_server_error(error) -> tuple[str, int] | HTTPException:
+    """Handle all other errors."""
+    if isinstance(error, HTTPException):
+        # Return HTTP errors as is like 404 Not Found
+        return error
+    # TODO LOG server caused errors
     print(error)
     return "Internal Server Error", 500
 
