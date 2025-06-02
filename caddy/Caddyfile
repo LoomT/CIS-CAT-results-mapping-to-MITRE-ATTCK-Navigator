@@ -30,6 +30,6 @@ localhost:443, cis-cat.local:443 {
 }
 
 # Redirect HTTP to HTTPS
-localhost:80, cis-cat.local:443 {
+localhost:80, cis-cat.local:80 {
     redir https://{host}{uri} permanent
 }
