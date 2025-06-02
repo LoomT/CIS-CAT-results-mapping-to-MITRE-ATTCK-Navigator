@@ -23,6 +23,11 @@ function AdminOverview() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const t = useContext(LanguageContext);
 
+  useEffect(() => {
+    // Call the handleRefresh function when the component mounts
+    handleRefresh();
+  }, []);
+
   /**
    * Opens the visualization popup.
    */
@@ -170,18 +175,60 @@ function AdminOverview() {
     let client = new NavigatorAPI(targetWindow, uri.toString(), true);
   };
 
-  useEffect(() => {
-    // Call the handleRefresh function when the component mounts
-    handleRefresh();
-  }, []);
-
+  /**
+   * Asynchronous function to refresh files by fetching data from the designated API endpoint.
+   * Handles various error scenarios such as network issues, server errors, and user-initiated cancellations.
+   * The function processes the response, maps the data, and updates the list of files in the application state.
+   *
+   * Key error handling:
+   * - Displays alerts for network issues, aborted requests, server errors, and decoding problems.
+   * - Logs detailed error information to the console for debugging purposes.
+   *
+   * Behavior:
+   * - Makes an HTTP GET request to fetch files metadata from the `/api/files` endpoint.
+   * - Maps the response data to a standardized format before updating the state.
+   */
   const handleRefresh = async () => {
-    const response = await fetch('/api/files/');
-    if (!response.ok) {
-      console.error('Error fetching files:', response);
+    let response;
+    try {
+      response = await fetch('/api/files/');
+    }
+    catch (error) {
+      console.error('Error refreshing files:', error);
+      if (error.name === 'AbortError') {
+        alert('Refresh was cancelled. Please try again.');
+      }
+      else if (error instanceof TypeError) {
+        alert('Network error occurred. Please check your internet connection and try again.');
+      }
+      else {
+        // Fallback for unknown errors
+        alert('Failed to refresh files. Please try again.');
+      }
       return;
     }
-    const files = (await response.json()).files;
+    if (!response.ok) {
+      // Only 500 is possible for this endpoint at the moment
+      console.error('Error fetching files:', response);
+      alert('Server error occurred while refreshing the files. Please try again later.');
+      return;
+    }
+    let files;
+    try {
+      files = (await response.json()).files;
+    }
+    catch (error) {
+      console.error('Error downloading file:', error);
+      if (error instanceof DOMException) {
+        console.log('Refresh was cancelled by the user.');
+      }
+      else {
+        // Fallback for unknown errors
+        console.error('Error accessing or decoding response body:', error);
+        alert('Error accessing or decoding response body. Please try again.');
+      }
+      return;
+    }
 
     console.log(files);
 
@@ -193,6 +240,13 @@ function AdminOverview() {
     })));
   };
 
+  /**
+   * Handles the change event for a checkbox by toggling its checked state
+   * and updating the selected files list accordingly.
+   *
+   * @param {boolean} isChecked - The current checked state of the checkbox.
+   * @param {string|number} fileId - The unique identifier of the file associated with the checkbox.
+   */
   const handleCheckboxChange = (isChecked, fileId) => {
     isChecked = !isChecked;
     setSelectedFiles((prevSelected) => {
@@ -206,6 +260,32 @@ function AdminOverview() {
     });
   };
 
+  /**
+   * Handles the download of selected files by aggregating them into a single file.
+   *
+   * This function checks if any files are selected, and if so, constructs a request
+   * to download the aggregated file. The aggregated file is then automatically downloaded.
+   * If no files are selected or an error occurs during the process,
+   * appropriate messages are logged and/or alerted to the user.
+   *
+   * Error Handling:
+   * - Alerts the user if no files are selected.
+   * - Handles HTTP response errors (e.g., 400, 404, 500) and displays an appropriate message.
+   * - Catches network errors or cancellation of the download.
+   *
+   * Filename:
+   * - The function attempts to retrieve the filename from the `Content-Disposition` header.
+   * - If no filename is provided in the header, a default filename (`combined_results.json`) is used.
+   *
+   * Additional Notes:
+   * - The combined file is fetched from the `/api/files` endpoint with query parameters specifying
+   *   the selected file IDs and an aggregate flag.
+   * - A temporary hyperlink element is created to trigger the download and is removed afterward.
+   *
+   * Preconditions:
+   * - `selectedFiles` is an array containing the IDs of the files to be downloaded. It should be declared
+   *   and populated elsewhere in the scope.
+   */
   const handleDownloadOnSelectedFiles = async () => {
     if (selectedFiles.length === 0) {
       alert('No files selected!');
@@ -282,7 +362,14 @@ function AdminOverview() {
       else if (error instanceof TypeError) {
         errorMessage = 'Network error occurred. Please check your internet connection and try again.';
       }
-
+      else if (error instanceof DOMException) {
+        console.log('Download was cancelled by the user.');
+      }
+      else {
+        // Fallback for unknown errors
+        console.error('Error accessing or decoding response body:', error);
+        alert('Error accessing or decoding response body. Please try again.');
+      }
       alert(errorMessage);
     }
   };
