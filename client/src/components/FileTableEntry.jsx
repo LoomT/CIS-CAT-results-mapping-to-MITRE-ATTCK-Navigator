@@ -1,19 +1,24 @@
 import downloadIcon from '../assets/download.png';
 import visualIcon from '../assets/investigate.png';
+import { LanguageContext } from '../main.jsx';
+import { useContext } from 'react';
 
 /**
  * File table entry component for the user screen
  *
+ * @param id the id of the file
  * @param filename name of the file
  * @param department department of the user
  * @param time time of conversion
+ * @param onExport callback to trigger the export popup
  * @param onVisualize callback to trigger the visualization popup
  * @param onDownload callback to trigger the download
- * @param t the translation mapping
- * @param showCheckbox whether or not the checkbox must be displayed -- only for admins
  * @returns {JSX.Element} the rendered file table entry component
  * @constructor FileTableEntry
  */
+const FileTableEntry = ({ id, filename, department, time, onExport, onVisualize, onDownload, showCheckbox }) => {
+  const t = useContext(LanguageContext);
+
 const FileTableEntry = ({ fileId, filename, department, time, onVisualize, t, showCheckbox }) => {
   const handleDownload = async () => {
     console.log('downloading file: ' + fileId);
@@ -116,6 +121,10 @@ const FileTableEntry = ({ fileId, filename, department, time, onVisualize, t, sh
       <td>{department}</td>
       <td>{time}</td>
       <td>
+        <button className="btn-blue" onClick={onExport}>
+          <img src={visualIcon} alt="export" className="icon" />
+          {t.export}
+        </button>
         <button className="btn-blue" onClick={onVisualize}>
           <img src={visualIcon} alt="visualize" className="icon" />
           {t.visualize}
@@ -124,6 +133,7 @@ const FileTableEntry = ({ fileId, filename, department, time, onVisualize, t, sh
           <img src={downloadIcon} alt="download" className="icon" />
           {t.download}
         </button>
+        <iframe id={id}></iframe>
       </td>
     </tr>
   );

@@ -18,7 +18,7 @@ describe('HomeScreen tests', () => {
     cy.get('[data-testid="user-screen-file-table-section"]').should('be.visible');
   });
 
-  it('should navigate to Admin Overview when Admin button is clicked', () => {
+    it('should navigate to Admin Overview when Admin button is clicked', () => {
     // Visit the home page
     cy.visit('/');
 
@@ -35,5 +35,14 @@ describe('HomeScreen tests', () => {
     cy.get('[data-testid="login-screen"]').should('exist');
     cy.get('[data-testid="password-field-container"]').should('be.visible');
     cy.get('[data-testid="password-field"]').should('be.visible');
+  });
+
+  it("can't access admin overview directly", () => {
+    cy.request({
+      url: '/admin/overview',
+      failOnStatusCode: false
+    }).then((response) => {
+      expect(response.status).to.eq(404);
+    });
   });
 })

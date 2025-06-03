@@ -1,14 +1,15 @@
+import json
 import os
 import shutil
 import uuid
-import json
+
 try:
     from convert import convert_cis_to_attack
 except ImportError:
     from .convert import convert_cis_to_attack
 
 
-from flask import (Flask, send_from_directory, request, send_file, Response)
+from flask import (Flask, request, send_file, Response)
 from flask.cli import load_dotenv
 from werkzeug.utils import secure_filename
 
@@ -56,7 +57,7 @@ def get_file(file_id: str) -> tuple[str, int] | Response:
         return "Unexpected error while getting file", 500
 
 
-@app.post('/api/files')
+@app.post('/api/files/')
 def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
     """Endpoint for uploading, converting and storing the converted file.
     Returns a response with the unique id of the converted file."""
@@ -113,11 +114,14 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         return "Unexpected error while processing file", 500
 
 
-# Serve React App
+# Have to specify each page manually since static_url_path at line 17
+# intercepts the requests if @app.route('/<path:path>') is used.
 @app.route('/')
+@app.route('/admin', strict_slashes=False)  # trailing dash is optional
+@app.route('/manual-conversion', strict_slashes=False)
 def serve() -> Response:
-    print('connecting')
-    return send_from_directory(app.static_folder, 'index.html')
+    """Serve pages that don't need authentication"""
+    return app.send_static_file('index.html')
 
 
 if __name__ == '__main__':

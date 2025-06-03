@@ -1,9 +1,70 @@
 /** || ROOT CONTAINER || */
 #root {
-    max-width: 1280px; /* Maximum width for the root container */
-    margin: 0 auto; /* Center horizontally */
-    padding: 2rem; /* Inner spacing */
-    text-align: center; /* Center align content */
+  min-width: 100%;
+  min-height: 100vh;
+  text-align: center;
+}
+
+/* Parent container for the navbar and main content */
+#main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  height: 100vh;
+}
+
+/* Navigation bar */
+nav {
+  /*position: sticky;*/
+  width: calc(100% - 2em); /* subtract padding */
+  display: flex;
+  flex-direction: row-reverse;
+  padding: 1em;
+  top: 0;
+  /*z-index: 1000;*/
+  background-color: #ffffff;
+}
+
+/* Full panel for admin overview and manual conversion screens */
+.full-panel {
+  width: 100%;
+  flex: auto;
+}
+
+/* Small centered panel for home and admin login screens */
+.small-panel {
+  width: fit-content;
+  margin: auto 0;
+}
+
+/* Top Bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f3f3f3;
+  padding: 10px 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-weight: bold;
+  width: 100%;
+}
+
+.back-text {
+  cursor: pointer;
+  color: #6c5ce7;
+  font-size: 16px;
+}
+
+.title-text {
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+  color: #2d3436;
 }
 
 /** || CONTENT AREA LAYOUT || */
@@ -17,8 +78,10 @@
 
 /** || UPLOAD SECTION || */
 .upload-section {
-    width: 260px; /* Fixed width for upload */
-    text-align: center; /* Center align content */
+  max-width: 20%;
+  min-width: 10%;
+  height: max-content;
+  flex: initial;
 }
 
 /** || FILE TABLE SECTION || */
@@ -55,15 +118,18 @@
 }
 
 .files-table td:first-child, .files-table th:first-child {
-    text-align: center; /* Center align first column */
-    width: 60px; /* Narrow width for icon/status */
+  text-align: center;
+  white-space: wrap;
+  width: auto;
 }
 
 .files-table td:last-child {
-    display: flex; /* Flex for buttons/icons */
-    flex-wrap: nowrap; /* Prevent wrapping */
-    gap: 0.5rem; /* Space between actions */
-    align-items: center; /* Center align vertically */
+  width: fit-content;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
 }
 
 .files-table tbody tr {
@@ -79,8 +145,32 @@
     background-color: #f9fafb; /* Highlight on hover */
 }
 
+iframe {
+  display: none
+}
+
+/* Button Styles */
+.view-button {
+  background-color: #00b894;
+  color: white;
+}
+
+.download-button {
+  background-color: #0984e3;
+  color: white;
+}
+
+.view-button:hover {
+  background-color: #55efc4;
+}
+
+.download-button:hover {
+  background-color: #74b9ff;
+}
+
+
 /** || BUTTON STYLES || */
-button {
+button, .button {
     display: inline-flex; /* Inline-flex container */
     align-items: center; /* Align content vertically */
     justify-content: center; /* Center content horizontally */
@@ -88,11 +178,27 @@ button {
     vertical-align: middle; /* Align button with surrounding text */
 }
 
-button img, button svg {
-    height: 1em; /* Icon height */
-    width: 1em; /* Icon width */
-    vertical-align: middle; /* Align with text */
+button img, button svg, .button img, .button svg {
+  height: 1em;
+  width: 1em;
+  vertical-align: middle;
 }
+
+/* Upload Button Styling */
+.upload-button {
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  margin-top: 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.upload-button:hover {
+  background-color: #a29bfe;
 
 /** || UPLOAD AREA BOX || */
 .upload-area {
@@ -135,6 +241,13 @@ button img, button svg {
 }
 
 /** || BUTTON COLOR VARIANTS || */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+}
+
 .btn-blue {
     background-color: #dbeafe; /* Light blue background */
     color: #1e40af; /* Deep blue text */
@@ -159,7 +272,16 @@ body, .admin-panel {
 
 /** || HEADINGS || */
 h2, h3 {
-    color: #2d3436; /* Heading text color */
+  color: #2d3436;
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 /** || BACK BUTTON || */

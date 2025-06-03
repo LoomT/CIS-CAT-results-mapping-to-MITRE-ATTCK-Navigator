@@ -2,6 +2,13 @@
 
 ## Running the app
 
+### Build attack navigator
+
+
+First make sure all the submodules are cloned as well `git submodule update --init`, then in the cloned submodule directory enter the `nav-app` folder and run `npm ci` to install dependencies  
+
+Then run `npm run build '--' --deploy-url /attack-navigator/ --base-href /attack-navigator/ --configuration production --aot=false --build-optimizer=false` to build the navigator
+
 ### Client
 
 In the client directory
@@ -22,6 +29,8 @@ Execute `python -m flask run` to start Flask server for development
 ### Deployment
 
 Docker should be installed
+
+In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain and ensure that local SSL certificates are properly configured for secure access.
 
 Build and start the application `docker-compose up --build`
 

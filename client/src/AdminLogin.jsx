@@ -1,39 +1,52 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './globalstyle.css';
 import visualIcon from './assets/visual.png';
-import backIcon from './assets/back.png';
+import { useNavigate } from 'react-router-dom';
+import { LanguageContext } from './main.jsx';
 
 /**
  * AdminLogin Component
  * ---------------------
  * Renders the admin login interface where a user can input a token to gain access
  * to the Admin Overview. Includes basic validation and handles submission with the Enter key.
- *
- * Props:
- *  @param onBack (function): Callback to navigate back to the previous screen (e.g., home).
- *  @param onSuccess (function): Callback triggered when the token is successfully validated.
- *  @param t: the translation mapping
  */
-function AdminLogin({ onBack, onSuccess, t }) {
+function AdminLogin() {
+  // State for storing the entered token
   const [token, setToken] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const navigate = useNavigate();
+  const t = useContext(LanguageContext);
 
+  /**
+   * Updates the token state as the user types.
+   * @param {object} e - The input change event.
+   */
   const handleTokenChange = (e) => {
     setToken(e.target.value);
   };
 
+  /**
+   * Handles token validation. If correct triggers the onSuccess callback.
+   * Otherwise, it displays an error message.
+   *
+   * TODO server-side authentication
+   */
   const handleSubmit = () => {
     const placeholderToken = 'correct-token'; // Placeholder token for validation
     if (token === placeholderToken) {
       // Navigate to admin overview when token is correct
-      onSuccess(); // Pass 'admin-overview' to navigate to the Admin Overview screen
+      navigate('/admin/overview');
     }
     else {
       setErrorMessage('Token Incorrect');
     }
   };
 
+  /**
+   * Enables form submission when the Enter key is pressed.
+   * @param {object} e - The keydown event.
+   */
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleSubmit();
@@ -45,19 +58,10 @@ function AdminLogin({ onBack, onSuccess, t }) {
   };
 
   return (
-    <div className="admin-panel" data-testid="login-screen">
+    <div className="small-panel" data-testid="login-screen">
       {/* Top Center Title */}
       <div className="user-title" data-testid="admin-login-page-title">
         {t.adminLogin}
-      </div>
-
-      <div className="back-button">
-        <img
-          src={backIcon}
-          alt="Back"
-          className="back-icon"
-          onClick={onBack}
-        />
       </div>
 
       {/* Token Input Section */}
