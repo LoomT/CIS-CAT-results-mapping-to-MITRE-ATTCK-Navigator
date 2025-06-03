@@ -11,6 +11,14 @@ export default defineConfig({
       // Add custom middleware to serve /attack-navigator
       configureServer(server) {
         server.middlewares.use(
+          '/attack-navigator/assets/config.json',
+          serveStatic(path.resolve('../navigator-config/mitre_attack_local/config/config_local.json')),
+        );
+        server.middlewares.use(
+          '/attack-navigator/mitre_attack_local',
+          serveStatic(path.resolve('../navigator-config/mitre_attack_local/')),
+        );
+        server.middlewares.use(
           '/attack-navigator',
           serveStatic(path.resolve('../attack-navigator/nav-app/dist'), {
             index: ['index.html'],
