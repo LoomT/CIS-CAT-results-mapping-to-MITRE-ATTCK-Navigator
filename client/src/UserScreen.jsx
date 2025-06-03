@@ -1,10 +1,9 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import './popups.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
-import NavigatorAPI from './NavigatorAPI.js';
 import { LanguageContext } from './main.jsx';
+import { constructDownloadURL, handleDownload, handleFileUpload, handleSVGExport, handleVisualize } from './FileAPI.js';
 
 /**
  * UserScreen Component
@@ -22,18 +21,6 @@ function UserScreen() {
   const [files, setFiles] = useState([]);
   const [currentFile, setFile] = useState({});
   const t = useContext(LanguageContext);
-
-  /**
-   * Opens the visualization popup.
-   */
-  const handleVisualizeClick = (file) => {
-    let uri = new URL(location.href);
-
-    uri.pathname = `/api/files/${file.id}`;
-    let targetWindow = window.open('/attack-navigator/index.html');
-
-    let client = new NavigatorAPI(targetWindow, uri.toString(), false);
-  };
 
   /**
    * Opens the export popup.
@@ -69,12 +56,12 @@ function UserScreen() {
   }, []);
 
   /**
-   * Handles file upload to the server and downloads the modified file from the response.
+   * Handles file upload to the server.
    *
-   * @param file {File} - The file to be uploaded.
-   * @returns {Promise<void>} - A promise that resolves when the file is uploaded and downloaded.
+   * @param file {Object} - The file to be uploaded.
+   * @returns {Promise<void>} - A promise that resolves when the file is uploaded.
    */
-  async function uploadFile(file) {
+  async function handleFileUploadAction(file) {
     // Make sure that the file is a JSON file
     if (!file.name.toLowerCase().endsWith('.json')) {
       alert('Please upload a JSON file');
@@ -82,152 +69,19 @@ function UserScreen() {
     }
 
     setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      console.log('uploading file: ' + formData);
-      let response;
-      try {
-        response = await fetch('/api/files/', {
-          method: 'POST',
-          body: formData,
-        });
-      }
-      catch (error) {
-        // TODO maybe try doing the fetch a few times before failing on some type of errors?
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          console.log('Upload was cancelled by the user.');
-        }
-        else if (error instanceof TypeError) {
-          console.error('Error uploading file:', error);
-          alert('Network error occurred. Please check your internet connection and try again.');
-        }
-        else {
-          // Fallback for unknown errors
-          console.error('Error uploading file:', error);
-          alert('Failed to upload file. Please try again.');
-        }
-        return;
-      }
-
-      if (!response.ok) {
-        console.error('Error uploading file:', response);
-        switch (response.status) {
-          case 400:
-            alert('Invalid file format or empty file. Please ensure you\'re uploading a valid JSON file.');
-            break;
-          case 500:
-            alert('Server error occurred while processing the file. Please try again later.');
-            break;
-          default:
-            alert(`Upload failed: ${response.statusText}. Please try again.`);
-        }
-        return;
-      }
-      let data;
-      try {
-        data = await response.json();
-      }
-      catch (error) {
-        if (error instanceof DOMException) {
-          console.log('Upload was cancelled by the user.');
-        }
-        else if (error instanceof SyntaxError) {
-          console.error('Error parsing JSON:', error);
-          alert('Response from server is not valid JSON. Please try again.');
-        }
-        else {
-          // Fallback for unknown errors
-          console.error('Error accessing or decoding response body:', error);
-          alert('Error accessing or decoding response body. Please try again.');
-        }
-        return;
-      }
-
-      console.log('File uploaded successfully. File ID:', data.id);
-
-      // Append the new file to the files state
-      setFiles(prevFiles => [{
-        id: data.id,
-        filename: data.filename,
-        department: 'Default Department', // might want to make this dynamic
-        time: new Date().toISOString(),
-      }, ...prevFiles]);
-    }
-    finally {
-      setUploading(false);
-    }
+    handleFileUpload(file)
+      .then((data) => {
+        if (!data) return;
+        // Append the new file to the files state
+        setFiles(prevFiles => [{
+          id: data.id,
+          filename: data.filename,
+          department: 'Default Department', // might want to make this dynamic
+          time: new Date().toISOString(),
+        }, ...prevFiles]);
+      })
+      .then(() => setUploading(false));
   }
-
-  const handleDownload = async (fileId, fileName) => {
-    console.log('downloading file: ' + fileId);
-    let response;
-    try {
-      response = await fetch(`/api/files/${fileId}`);
-    }
-    catch (error) {
-      console.error('Error downloading file:', error);
-      if (error.name === 'AbortError') {
-        alert('Downloading was cancelled. Please try again.');
-      }
-      else if (error instanceof TypeError) {
-        alert('Network error occurred. Please check your internet connection and try again.');
-      }
-      else {
-        // Fallback for unknown errors
-        alert('Failed to download file. Please try again.');
-      }
-      return;
-    }
-
-    if (!response.ok) {
-      console.error('Error downloading file:', response);
-      switch (response.status) {
-        case 400:
-          alert('Invalid file id');
-          break;
-        case 404:
-          alert('File not found');
-          break;
-        case 500:
-          alert('Server error occurred while downloading the file. Please try again later.');
-          break;
-        default:
-          alert(`Download failed: ${response.statusText}. Please try again.`);
-      }
-      return;
-    }
-
-    // Get the converted file from the response
-    let file;
-    try {
-      file = await response.blob();
-    }
-    catch (error) {
-      if (error instanceof DOMException) {
-        console.log('Download was cancelled by the user.');
-      }
-      else {
-        // Fallback for unknown errors
-        console.error('Error accessing or decoding response body:', error);
-        alert('Error accessing or decoding response body. Please try again.');
-      }
-      return;
-    }
-
-    // Create a download link for the modified file
-    const downloadUrl = window.URL.createObjectURL(file);
-
-    // Create a temporary link and trigger download
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(downloadUrl);
-  };
 
   /**
    * Handles file drop event.
@@ -248,7 +102,7 @@ function UserScreen() {
     if (files && files[0]) {
       // Handle the file upload here
       console.log('File dropped:', files[0]);
-      uploadFile(files[0]);
+      handleFileUploadAction(files[0]);
     }
   }, [uploading]);
 
@@ -262,36 +116,8 @@ function UserScreen() {
     if (files && files[0]) {
       // Handle the file upload here
       console.log('File selected:', files[0]);
-      uploadFile(files[0]);
+      handleFileUploadAction(files[0]);
     }
-  };
-
-  /**
-   * Handle SVG export & download
-   */
-  const handleSVGExportClick = () => {
-    let uri = new URL(location.href);
-
-    /**
-     * Dirty workaround to get a fresh handle to the iframe window
-     * There are a couple of issues with reusing the old one
-     * Specifically that navigation takes time. A lot of time
-     * So when we modify the src the window will still point to the
-     * old window object. Theres definitely a better solution than this
-     * But let's mark this as TODO */
-
-    const newIframe = document.createElement('iframe');
-    newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
-    newIframe.src = '/attack-navigator/index.html';
-    newIframe.id = currentFile.id;
-
-    let frame = document.getElementById(currentFile.id);
-    frame.parentNode.replaceChild(newIframe, frame);
-
-    uri.pathname = `/api/files/${currentFile.id}`;
-    let targetWindow = newIframe.contentWindow;
-
-    let client = new NavigatorAPI(targetWindow, uri.toString(), true);
   };
 
   return (
@@ -369,9 +195,23 @@ function UserScreen() {
                   filename={file.filename}
                   department={file.department}
                   time={file.time}
-                  onExport={() => handleExportClick(file)}
-                  onVisualize={() => handleVisualizeClick(file)}
-                  onDownload={() => handleDownload(file.id, file.filename)}
+                  onExport={
+                    () => handleExportClick(file)
+                  }
+                  onVisualize={
+                    () => constructDownloadURL([file.id])
+                      .then(
+                        uri => handleVisualize(uri),
+                        (_) => {}, // Ignore errors
+                      )
+                  }
+                  onDownload={
+                    () => constructDownloadURL([file.id])
+                      .then(
+                        uri => handleDownload(uri, file.filename),
+                        (_) => {}, // Ignore errors
+                      )
+                  }
                   showCheckbox={false}
                 />
               ))}
@@ -386,7 +226,18 @@ function UserScreen() {
           <div className="popup">
             <h3 className="popup-heading">{t.chooseFormat}</h3>
             <div className="popup-buttons">
-              <button className="popup-button" onClick={handleSVGExportClick}>SVG</button>
+              <button
+                className="popup-button"
+                onClick={
+                  () => constructDownloadURL([currentFile.id])
+                    .then(
+                      uri => handleSVGExport(uri, currentFile.id),
+                      (_) => {}, // Ignore errors
+                    )
+                }
+              >
+                SVG
+              </button>
               <button className="popup-button">PNG</button>
               <button className="popup-cancel" onClick={handleClosePopup}>
                 {t.cancel}
