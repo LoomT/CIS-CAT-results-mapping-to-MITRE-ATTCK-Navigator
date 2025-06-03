@@ -41,7 +41,7 @@ class MitreAttackDownloader:
                 with open(local_path, 'w', encoding='utf-8') as f:
                     if url.endswith('.json'):
                         # Pretty print JSON for readability
-                        json.dump(response.json(), f, indent=2, ensure_ascii=False)
+                        json.dump(response.json(), f, ensure_ascii=False)
                     else:
                         f.write(response.text)
                 
