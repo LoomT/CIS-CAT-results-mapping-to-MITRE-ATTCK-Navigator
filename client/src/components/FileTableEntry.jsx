@@ -6,20 +6,19 @@ import { useContext } from 'react';
 /**
  * File table entry component for the user screen
  *
- * @param id the id of the file
+ * @param fileId the id of the file
  * @param filename name of the file
  * @param department department of the user
  * @param time time of conversion
  * @param onExport callback to trigger the export popup
  * @param onVisualize callback to trigger the visualization popup
- * @param onDownload callback to trigger the download
+ * @param showCheckbox whether the textbox should be shown or not (true for admin, false for user)
  * @returns {JSX.Element} the rendered file table entry component
  * @constructor FileTableEntry
  */
-const FileTableEntry = ({ id, filename, department, time, onExport, onVisualize, onDownload, showCheckbox }) => {
+const FileTableEntry = ({ fileId, filename, department, time, onExport, onVisualize, showCheckbox }) => {
   const t = useContext(LanguageContext);
 
-const FileTableEntry = ({ fileId, filename, department, time, onVisualize, t, showCheckbox }) => {
   const handleDownload = async () => {
     console.log('downloading file: ' + fileId);
     let response;
@@ -54,12 +53,7 @@ const FileTableEntry = ({ fileId, filename, department, time, onVisualize, t, sh
     document.body.removeChild(a);
     window.URL.revokeObjectURL(downloadUrl);
   };
-  /**
-   * Handles a server error if it presents itself during the download process.
-   *
-   * @param response - the response provided by the server
-   * @param context - the context for the error, in this case 'file download'
-   */
+
   function handleServerError(response, context = 'operation') {
     console.error(`Error during ${context}:`, response);
     switch (response.status) {
@@ -76,12 +70,7 @@ const FileTableEntry = ({ fileId, filename, department, time, onVisualize, t, sh
         alert(`Download failed: ${response.statusText}. Please try again.`);
     }
   }
-  /**
-   * Handles a fetch error if it presents itself during the download process.
-   *
-   * @param error - the error provided by the server
-   * @param context - the context for the error, in this case 'file download'
-   */
+
   function handleFetchError(error, context = 'operation') {
     console.error(`Error during ${context}:`, error);
     if (error.name === 'AbortError') {
@@ -94,12 +83,7 @@ const FileTableEntry = ({ fileId, filename, department, time, onVisualize, t, sh
       alert(`Failed to complete ${context}. Please try again.`);
     }
   }
-  /**
-   * Handles a blob error if it presents itself during the download process.
-   *
-   * @param error - the error provided by the server
-   * @param context - the context for the error, in this case 'file download'
-   */
+
   function handleBlobError(error, context = 'operation') {
     if (error instanceof DOMException) {
       console.log(`${context} was cancelled by the user.`);
@@ -133,7 +117,7 @@ const FileTableEntry = ({ fileId, filename, department, time, onVisualize, t, sh
           <img src={downloadIcon} alt="download" className="icon" />
           {t.download}
         </button>
-        <iframe id={id}></iframe>
+        <iframe id={fileId}></iframe>
       </td>
     </tr>
   );
