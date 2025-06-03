@@ -9,11 +9,12 @@ import { useContext, useState } from 'react';
  * @param id the id of the file
  * @param filename name of the file
  * @param department department of the user
- * @param size the size of the file
  * @param time time of conversion
  * @param onExport callback to trigger the export popup
  * @param onVisualize callback to trigger the visualization popup
  * @param onDownload callback to trigger the download
+ * @param showCheckbox whether to show the checkbox
+ * @param onCheckboxChange callback to trigger when the checkbox is changed
  * @returns {JSX.Element} the rendered file table entry component
  * @constructor FileTableEntry
  */
