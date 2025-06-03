@@ -18,7 +18,7 @@ describe('HomeScreen tests', () => {
     cy.get('[data-testid="user-screen-file-table-section"]').should('be.visible');
   });
 
-    it('should navigate to Admin Overview when Admin button is clicked', () => {
+    it('should navigate to Admin Login when Admin button is clicked', () => {
     // Visit the home page
     cy.visit('/');
 
