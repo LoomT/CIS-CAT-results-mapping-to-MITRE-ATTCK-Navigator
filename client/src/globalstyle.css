@@ -145,7 +145,10 @@ nav {
 }
 
 iframe {
-  display: none
+  position: absolute;
+  width:0;
+  height:0;
+  border:0;
 }
 
 /* Button Styles */
