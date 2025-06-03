@@ -302,7 +302,6 @@ function UserScreen() {
                   time={file.time}
                   onExport={() => handleExportClick(file)}
                   onVisualize={() => handleVisualizeClick(file)}
-                  onDownload={() => handleDownload(file.id, file.filename)}
                   showCheckbox={false}
                 />
               ))}
