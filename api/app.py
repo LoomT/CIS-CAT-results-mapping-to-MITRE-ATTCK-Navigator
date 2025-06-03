@@ -45,17 +45,6 @@ def convert_file(file_id: str) -> tuple[str, int] | Response:
 
 
 @app.get('/api/files', strict_slashes=False)
-def get_files() -> (
-        tuple[dict[str, list[dict]], int] | tuple[str, int] | Response
-):
-    """Middleware for determining whether to return queried files' metadata
-    or to aggregate and convert multiple files."""
-    if request.args.get('aggregate', 'false').lower() == 'true':
-        return aggregate_and_convert_files()
-    else:
-        return get_files_metadata()
-
-
 def get_files_metadata() -> tuple[dict[str, list[dict]], int]:
     """Endpoint for retrieving a list of all stored files' IDs."""
     files_list = []
@@ -75,6 +64,7 @@ def get_files_metadata() -> tuple[dict[str, list[dict]], int]:
     return {'files': files_list}, 200
 
 
+@app.get('/api/files/aggregate')
 def aggregate_and_convert_files() -> tuple[str, int] | Response:
     """Endpoint for combining and retrieving multiple files
      by their unique ids."""

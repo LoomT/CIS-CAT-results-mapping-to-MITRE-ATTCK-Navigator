@@ -39,9 +39,8 @@ function AdminOverview() {
         alert('No files selected!');
         return;
       }
-      uri.searchParams.append('aggregate', 'true');
       selectedFiles.forEach(id => uri.searchParams.append('id', id));
-      uri.pathname = `/api/files`;
+      uri.pathname = `/api/files/aggregate`;
     }
     else {
       uri.pathname = `/api/files/${file.id}`;
@@ -163,9 +162,8 @@ function AdminOverview() {
         alert('No files selected!');
         return;
       }
-      uri.searchParams.append('aggregate', 'true');
       selectedFiles.forEach(id => uri.searchParams.append('id', id));
-      uri.pathname = `/api/files`;
+      uri.pathname = `/api/files/aggregate`;
     }
     else {
       uri.pathname = `/api/files/${exportFile.id}`;
@@ -296,9 +294,8 @@ function AdminOverview() {
     try {
       // Build the URL with all file IDs as query parameters
       const queryParams = new URLSearchParams();
-      queryParams.append('aggregate', 'true');
       selectedFiles.forEach(id => queryParams.append('id', id));
-      const url = `/api/files?${queryParams.toString()}`;
+      const url = `/api/files/aggregate?${queryParams.toString()}`;
 
       // Fetch the combined file
       const response = await fetch(url);

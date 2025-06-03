@@ -141,17 +141,11 @@ Alternatively install `eslint` in vscode
   - When no files found in directory (dangling directory): `"No file found"`
   - When server encounters an unexpected error: `"Internal Server Error"`
 
-### List or Aggregate Files
+### List File Metadata
 - **URL**: `/api/files`
 - **Method**: `GET`
-- **Query Parameters**:
-    - `aggregate`: Boolean flag to determine operation mode (optional)
-        - `false` (default): Returns metadata for all stored files
-        - `true`: Aggregates and converts multiple files
 
-    - `id`: List of file IDs to aggregate (required when `aggregate=true`, can be provided multiple times)
-
-#### Successful Response (When `aggregate=false` or not provided)
+#### Successful Response
 - **Code**: `200 OK`
 - **Content-Type**: `application/json`
 - **Response Body**:
@@ -166,7 +160,16 @@ Alternatively install `eslint` in vscode
     ]
   }
 ```
-#### Successful Response (When `aggregate=true`)
+
+#### Error Responses
+- **Code**: `500 Internal Server Error`
+    - When server encounters an unexpected error: `"Internal Server Error"`
+
+### Aggregate Files
+- **URL**: `/api/files/aggregate`
+- **Method**: `GET`
+
+#### Successful Response
 - **Code**: `200 OK`
 - **Content-Type**: `application/json`
 - **Headers**:
