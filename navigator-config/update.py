@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class MitreAttackDownloader:
-    def __init__(self, base_dir="mitre_attack_data"):
+    def __init__(self, base_dir="mitre_attack_local"):
         self.base_dir = Path(base_dir)
         self.base_dir.mkdir(exist_ok=True)
         
