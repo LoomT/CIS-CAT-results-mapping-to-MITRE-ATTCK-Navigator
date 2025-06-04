@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './globalstyle.css';
-import './popups.css';
+import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import NavigatorAPI from './NavigatorAPI.js';
 import { LanguageContext } from './main.jsx';
@@ -160,75 +160,6 @@ function UserScreen() {
     }
   }
 
-  const handleDownload = async (fileId, fileName) => {
-    console.log('downloading file: ' + fileId);
-    let response;
-    try {
-      response = await fetch(`/api/files/${fileId}`);
-    }
-    catch (error) {
-      console.error('Error downloading file:', error);
-      if (error.name === 'AbortError') {
-        alert('Downloading was cancelled. Please try again.');
-      }
-      else if (error instanceof TypeError) {
-        alert('Network error occurred. Please check your internet connection and try again.');
-      }
-      else {
-        // Fallback for unknown errors
-        alert('Failed to download file. Please try again.');
-      }
-      return;
-    }
-
-    if (!response.ok) {
-      console.error('Error downloading file:', response);
-      switch (response.status) {
-        case 400:
-          alert('Invalid file id');
-          break;
-        case 404:
-          alert('File not found');
-          break;
-        case 500:
-          alert('Server error occurred while downloading the file. Please try again later.');
-          break;
-        default:
-          alert(`Download failed: ${response.statusText}. Please try again.`);
-      }
-      return;
-    }
-
-    // Get the converted file from the response
-    let file;
-    try {
-      file = await response.blob();
-    }
-    catch (error) {
-      if (error instanceof DOMException) {
-        console.log('Download was cancelled by the user.');
-      }
-      else {
-        // Fallback for unknown errors
-        console.error('Error accessing or decoding response body:', error);
-        alert('Error accessing or decoding response body. Please try again.');
-      }
-      return;
-    }
-
-    // Create a download link for the modified file
-    const downloadUrl = window.URL.createObjectURL(file);
-
-    // Create a temporary link and trigger download
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(downloadUrl);
-  };
-
   /**
    * Handles file drop event.
    *
@@ -365,13 +296,12 @@ function UserScreen() {
               {files.map(file => (
                 <FileTableEntry
                   key={file.id}
-                  id={file.id}
+                  fileId={file.id}
                   filename={file.filename}
                   department={file.department}
                   time={file.time}
                   onExport={() => handleExportClick(file)}
                   onVisualize={() => handleVisualizeClick(file)}
-                  onDownload={() => handleDownload(file.id, file.filename)}
                   showCheckbox={false}
                 />
               ))}
