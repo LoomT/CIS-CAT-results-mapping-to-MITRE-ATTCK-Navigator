@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
 import './globalstyle.css';
-import './popups.css';
 import visualIcon from './assets/visual.png';
 import { useNavigate } from 'react-router-dom';
 import { LanguageContext } from './main.jsx';
@@ -59,9 +58,9 @@ function AdminLogin() {
   };
 
   return (
-    <div className="small-panel">
+    <div className="small-panel" data-testid="login-screen">
       {/* Top Center Title */}
-      <div className="user-title">
+      <div className="user-title" data-testid="admin-login-page-title">
         {t.adminLogin}
       </div>
 
@@ -69,7 +68,7 @@ function AdminLogin() {
       <div className="card">
         {/* TODO: translation */}
         <h2>Enter Token</h2>
-        <div className="password-field-container">
+        <div className="password-field-container" data-testid="password-field-container">
           <input
             type={showPassword ? 'text' : 'password'}
             value={token}
@@ -77,6 +76,7 @@ function AdminLogin() {
             onKeyDown={handleKeyDown}
             placeholder={t.enterToken}
             className="password-field"
+            data-testid="password-field"
           />
           <img
             src={visualIcon}
