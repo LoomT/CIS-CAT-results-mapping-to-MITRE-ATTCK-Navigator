@@ -183,40 +183,6 @@ button svg,
   vertical-align: middle;
 }
 
-.upload-button {
-  background-color: #6c5ce7;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  margin-top: 20px;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.upload-button:hover {
-  background-color: #a29bfe;
-}
-
-.view-button {
-  background-color: #00b894;
-  color: white;
-}
-
-.view-button:hover {
-  background-color: #55efc4;
-}
-
-.download-button {
-  background-color: #0984e3;
-  color: white;
-}
-
-.download-button:hover {
-  background-color: #74b9ff;
-}
-
 /** =======================================
  * || COLOR BUTTON VARIANTS ||
  * ======================================= */
@@ -308,22 +274,6 @@ h3 {
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-/** =======================================
- * || BACK BUTTON ||
- * ======================================= */
-.back-button {
-  position: absolute;
-  top: 10px;
-  left: 20px;
-  z-index: 100;
-}
-
-.back-button img {
-  height: 32px;
-  width: 32px;
-  cursor: pointer;
 }
 
 /** =======================================
