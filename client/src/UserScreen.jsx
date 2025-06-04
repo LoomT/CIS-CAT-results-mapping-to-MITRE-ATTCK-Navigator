@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useState } from 'react';
 import './globalstyle.css';
-import './popups.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import { LanguageContext } from './main.jsx';
 import { constructDownloadURL, handleDownload, handleFileUpload, handleSVGExport, handleVisualize } from './FileAPI.js';
@@ -191,7 +190,7 @@ function UserScreen() {
               {files.map(file => (
                 <FileTableEntry
                   key={file.id}
-                  id={file.id}
+                  fileId={file.id}
                   filename={file.filename}
                   department={file.department}
                   time={file.time}

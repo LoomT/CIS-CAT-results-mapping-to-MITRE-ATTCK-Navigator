@@ -16,7 +16,13 @@ function HomeScreen() {
         <h2>{t.chooseScreen}</h2>
         {/* Buttons for role selection */}
         <div className="button-container">
-          <Link className="button btn-blue" to="/admin">Admin</Link>
+          <Link
+            className="button btn-blue"
+            data-testid="home-screen-admin-button"
+            to="/admin"
+          >
+            Admin
+          </Link>
           <Link
             className="button btn-blue"
             data-testid="home-screen-user-button"

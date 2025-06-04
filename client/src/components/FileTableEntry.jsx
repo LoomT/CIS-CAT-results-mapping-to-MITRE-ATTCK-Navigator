@@ -6,20 +6,20 @@ import { useContext, useState } from 'react';
 /**
  * File table entry component for the user screen
  *
- * @param id the id of the file
+ * @param fileId the id of the file
  * @param filename name of the file
  * @param department department of the user
  * @param time time of conversion
  * @param onExport callback to trigger the export popup
  * @param onVisualize callback to trigger the visualization popup
  * @param onDownload callback to trigger the download
- * @param showCheckbox whether to show the checkbox
+ * @param showCheckbox whether the textbox should be shown or not (true for admin, false for user)
  * @param onCheckboxChange callback to trigger when the checkbox is changed
  * @returns {JSX.Element} the rendered file table entry component
  * @constructor FileTableEntry
  */
 const FileTableEntry = ({
-  id,
+  fileId,
   filename,
   department,
   time,
@@ -41,7 +41,7 @@ const FileTableEntry = ({
             checked={isChecked}
             onChange={() => {
               setIsChecked(!isChecked);
-              onCheckboxChange(isChecked, id);
+              onCheckboxChange(isChecked, fileId);
             }}
           />
         </td>
@@ -63,7 +63,7 @@ const FileTableEntry = ({
             <img src={downloadIcon} alt="download" className="icon" />
             {t.download}
           </button>
-          <iframe id={id}></iframe>
+          <iframe id={fileId}></iframe>
         </div>
       </td>
     </tr>

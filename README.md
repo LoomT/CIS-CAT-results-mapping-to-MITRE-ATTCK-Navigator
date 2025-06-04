@@ -30,6 +30,8 @@ Execute `python -m flask run` to start Flask server for development
 
 Docker should be installed
 
+In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain and ensure that local SSL certificates are properly configured for secure access.
+
 Build and start the application `docker-compose up --build`
 
 To run in detached mode `docker-compose up -d --build`
