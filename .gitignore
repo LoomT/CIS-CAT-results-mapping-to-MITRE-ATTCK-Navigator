@@ -15,6 +15,7 @@ __pycache__
 
 # Generated
 uploads
+navigator-config/mitre_attack_local/
 
 # Tests
 tests/e2e/node_modules
