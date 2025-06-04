@@ -128,7 +128,7 @@ function AdminOverview() {
               {files.map(file => (
                 <FileTableEntry
                   key={file.id}
-                  id={file.id}
+                  fileId={file.id}
                   filename={file.filename}
                   department={file.department}
                   time={file.time}
