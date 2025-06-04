@@ -8,16 +8,16 @@ import NavigatorAPI from './NavigatorAPI.js';
  * For a single file, the function modifies the URL to point to a specific file endpoint.
  * For multiple files, it sets up query parameters with file IDs and points to an aggregate endpoint.
  *
- * @async
  * @function
  * @param {Array<String>} fileIds - An array of file ids.
- * @returns {Promise<URL|void>} A Promise that resolves to a URL object pointing to the constructed download endpoint or null if no files are provided.
+ * @returns {URL|null} A URL object pointing to the constructed download endpoint or null if no files are provided.
  */
-export async function constructDownloadURL(fileIds) {
+export function constructDownloadURL(fileIds) {
   const uri = new URL(location.href);
   if (fileIds.length === 0) {
+    console.error('No files selected!');
     alert('No files selected!');
-    return;
+    return null;
   }
   else if (fileIds.length === 1) {
     // Use special endpoint for single file download
@@ -208,7 +208,7 @@ export const handleVisualize = (uri) => {
 /**
  * Handle SVG export & download
  */
-export async function handleSVGExport(uri, id) {
+export function handleSVGExport(uri, id) {
   /**
    * Dirty workaround to get a fresh handle to the iframe window
    * There are a couple of issues with reusing the old one
@@ -236,7 +236,7 @@ export async function handleSVGExport(uri, id) {
  * @async
  * @function
  * @param file {Object} - The file to be uploaded.
- * @returns {Promise<Object|void>} - A promise with the file id that resolves when the file is uploaded.
+ * @returns {Promise<Object|null>} - A promise with the file id that resolves when the file is uploaded.
  */
 export async function handleFileUpload(file) {
   const formData = new FormData();
@@ -264,7 +264,7 @@ export async function handleFileUpload(file) {
       console.error('Error uploading file:', error);
       alert('Failed to upload file. Please try again.');
     }
-    return;
+    return null;
   }
 
   if (!response.ok) {
@@ -279,7 +279,7 @@ export async function handleFileUpload(file) {
       default:
         alert(`Upload failed: ${response.statusText}. Please try again.`);
     }
-    return;
+    return null;
   }
   let data;
   try {
@@ -298,7 +298,7 @@ export async function handleFileUpload(file) {
       console.error('Error accessing or decoding response body:', error);
       alert('Error accessing or decoding response body. Please try again.');
     }
-    return;
+    return null;
   }
 
   console.log('File uploaded successfully. File ID:', data.id);

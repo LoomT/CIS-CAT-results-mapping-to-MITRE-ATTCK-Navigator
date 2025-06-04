@@ -68,18 +68,20 @@ function UserScreen() {
     }
 
     setUploading(true);
-    handleFileUpload(file)
-      .then((data) => {
-        if (!data) return;
-        // Append the new file to the files state
-        setFiles(prevFiles => [{
-          id: data.id,
-          filename: data.filename,
-          department: 'Default Department', // might want to make this dynamic
-          time: new Date().toISOString(),
-        }, ...prevFiles]);
-      })
-      .then(() => setUploading(false));
+    try {
+      const data = await handleFileUpload(file);
+      if (data === null) return;
+
+      setFiles(prevFiles => [{
+        id: data.id,
+        filename: data.filename,
+        department: 'Default Department', // might want to make this dynamic
+        time: new Date().toISOString(),
+      }, ...prevFiles]);
+    }
+    finally {
+      setUploading(false);
+    }
   }
 
   /**
@@ -198,18 +200,16 @@ function UserScreen() {
                     () => handleExportClick(file)
                   }
                   onVisualize={
-                    () => constructDownloadURL([file.id])
-                      .then(
-                        uri => handleVisualize(uri),
-                        (_) => {}, // Ignore errors
-                      )
+                    () => {
+                      const url = constructDownloadURL([file.id]);
+                      if (url !== null) handleVisualize(url);
+                    }
                   }
                   onDownload={
-                    () => constructDownloadURL([file.id])
-                      .then(
-                        uri => handleDownload(uri, file.filename),
-                        (_) => {}, // Ignore errors
-                      )
+                    () => {
+                      const url = constructDownloadURL([file.id]);
+                      if (url !== null) handleDownload(url, file.filename);
+                    }
                   }
                   showCheckbox={false}
                 />
@@ -228,11 +228,10 @@ function UserScreen() {
               <button
                 className="popup-button"
                 onClick={
-                  () => constructDownloadURL([currentFile.id])
-                    .then(
-                      uri => handleSVGExport(uri, currentFile.id),
-                      (_) => {}, // Ignore errors
-                    )
+                  () => {
+                    const url = constructDownloadURL([currentFile.id]);
+                    if (url !== null) handleSVGExport(url, currentFile.id);
+                  }
                 }
               >
                 SVG

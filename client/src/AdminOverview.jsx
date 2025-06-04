@@ -135,11 +135,10 @@ function AdminOverview() {
                       <button
                         className="btn-blue"
                         onClick={
-                          () => constructDownloadURL(selectedFiles)
-                            .then(
-                              uri => handleVisualize(uri),
-                              (_) => {}, // Ignore errors
-                            )
+                          () => {
+                            const url = constructDownloadURL(selectedFiles);
+                            if (url !== null) handleVisualize(url);
+                          }
                         }
                       >
                         Visualize
@@ -147,11 +146,10 @@ function AdminOverview() {
                       <button
                         className="btn-green"
                         onClick={
-                          () => constructDownloadURL(selectedFiles)
-                            .then(
-                              uri => handleDownload(uri, 'combined_results.json'),
-                              (_) => {}, // Ignore errors
-                            )
+                          () => {
+                            const url = constructDownloadURL(selectedFiles);
+                            if (url !== null) handleDownload(url, 'combined_results.json');
+                          }
                         }
                       >
                         Download
@@ -191,18 +189,16 @@ function AdminOverview() {
                     () => handleExportClick(file, false)
                   }
                   onVisualize={
-                    () => constructDownloadURL([file.id])
-                      .then(
-                        uri => handleVisualize(uri),
-                        (_) => {}, // Ignore errors
-                      )
+                    () => {
+                      const url = constructDownloadURL([file.id]);
+                      if (url !== null) handleVisualize(url);
+                    }
                   }
                   onDownload={
-                    () => constructDownloadURL([file.id])
-                      .then(
-                        uri => handleDownload(uri, file.filename),
-                        (_) => {}, // Ignore errors
-                      )
+                    () => {
+                      const url = constructDownloadURL([file.id]);
+                      if (url !== null) handleDownload(url, file.filename);
+                    }
                   }
                   showCheckbox={true}
                   onCheckboxChange={handleCheckboxChange}
@@ -223,16 +219,14 @@ function AdminOverview() {
                 className="popup-button"
                 onClick={
                   exportAggregate
-                    ? () => constructDownloadURL(selectedFiles)
-                        .then(
-                          uri => handleSVGExport(uri, null), // TODO
-                          (_) => {}, // Ignore errors
-                        )
-                    : () => constructDownloadURL([exportFile.id])
-                        .then(
-                          uri => handleSVGExport(uri, exportFile.id),
-                          (_) => {}, // Ignore errors
-                        )
+                    ? () => {
+                        const url = constructDownloadURL(selectedFiles);
+                        if (url !== null) handleSVGExport(url, null); // TODO
+                      }
+                    : () => {
+                        const url = constructDownloadURL([exportFile.id]);
+                        if (url !== null) handleSVGExport(url, exportFile.id);
+                      }
                 }
               >
                 SVG
