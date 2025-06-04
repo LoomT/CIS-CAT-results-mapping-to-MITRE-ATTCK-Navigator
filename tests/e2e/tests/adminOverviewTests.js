@@ -2,13 +2,9 @@ import AdminOverview from '../../../client/src/AdminOverview.jsx';
 import { LanguageContext } from '../../../client/src/main.jsx';
 
 describe('AdminOverview tests', () => {
-  it('renders correctly', () => {
-    cy.mount(
-      <LanguageContext.Provider value={{ adminOverview: 'Admin Overview' }}>
-        <AdminOverview />
-      </LanguageContext.Provider>
-    );
-    cy.contains('Admin Overview'); // or other assertions
+  it('renders correctly without context', () => {
+    cy.mount(<AdminOverview/>);
+    cy.contains('Admin Overview');
   });
 });
 
