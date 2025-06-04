@@ -8,8 +8,20 @@ try:
 except ImportError:
     from .convert import convert_cis_to_attack
 
+try:
+    from database import (init_db, db_save_file, db_get_all_files,
+                          db_get_file_by_id)
+except ImportError:
+    from .database import (init_db, db_save_file, db_get_all_files,
+                           db_get_file_by_id)
 
-from flask import (Flask, request, send_file, Response)
+try:
+    from helpers import extract_metadata
+except ImportError:
+    from .helpers import extract_metadata
+
+from flask import (Flask, request, send_file, Response, jsonify)
+
 from flask.cli import load_dotenv
 from werkzeug.utils import secure_filename
 
@@ -20,6 +32,17 @@ app = Flask(__name__, static_folder=os.getenv('FLASK_STATIC_FOLDER'),
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
+# initialize the database
+print("Initializing database")
+init_db(app)
+
+
+@app.get('/api/files/')
+def get_all_files() -> Response:
+    """Returns all files in the database."""
+    all_files = db_get_all_files()
+    return jsonify([vars(f) for f in all_files]), 200
 
 
 @app.get("/api/files/<file_id>")
@@ -61,6 +84,7 @@ def get_file(file_id: str) -> tuple[str, int] | Response:
 def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
     """Endpoint for uploading, converting and storing the converted file.
     Returns a response with the unique id of the converted file."""
+    # TODO: Note to self: why are we generating uuid twice?
     unique_id = str(uuid.uuid4())
     try:
         if 'file' not in request.files:
@@ -90,6 +114,22 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
             UPLOAD_FOLDER, unique_id, modified_filename
         )
 
+        # DATABASE PART #
+        try:
+            metaData = extract_metadata(file)
+            # Set remaining metadata fields
+            metaData.id = unique_id
+            metaData.ip_address = request.remote_addr
+            metaData.file_name = modified_filename
+
+            db_save_file(metaData)
+        except ValueError as ve:
+            print(f"Error extracting metadata: {ve}")
+            return "Invalid file format", 500
+
+        print(db_get_all_files())
+        # END OF DATABASE PART #
+
         try:
             cis_data = json.load(file.stream)
         except json.JSONDecodeError:
@@ -100,12 +140,11 @@ def convert_and_save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
             json.dump(attck_data, F, ensure_ascii=False, indent=2)
 
         # Send the id of the modified file back to the client
-        return {
-            'id': unique_id,
-            'filename': modified_filename,
-        }, 201
+        # TODO: Update readme on enpoint changes
+        return jsonify(vars(db_get_file_by_id(unique_id))), 201
 
     except Exception as e:
+        # TODO: Add db cleanup if file upload fails
         # Clean up on error, remove the directory with all its files
         if os.path.exists(os.path.join(UPLOAD_FOLDER, unique_id)):
             shutil.rmtree(os.path.join(UPLOAD_FOLDER, unique_id))
