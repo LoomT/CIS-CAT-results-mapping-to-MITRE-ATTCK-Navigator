@@ -86,7 +86,7 @@ function AdminOverview() {
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
-        <div className="card">
+        <div className="card upload-section">
           <h2>{t.filterFiles}</h2>
           <div className="section-header">
             <p>{t.departmentFilter}</p>
@@ -104,14 +104,16 @@ function AdminOverview() {
 
           <div className="section-header">
             <label>
+              <p>{t.onlyLatestFiles}</p>
               <input type="checkbox" />
-              {t.onlyLatestFiles}
             </label>
           </div>
 
           <div className="section-header">
             <p>{t.dateRange}</p>
+            <p>From</p>
             <input type="date" />
+            <p>To</p>
             <input type="date" />
           </div>
 
