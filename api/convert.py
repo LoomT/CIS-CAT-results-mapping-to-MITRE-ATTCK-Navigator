@@ -104,6 +104,10 @@ def generate_techniques(cis_data: dict) -> list[dict]:
     for rule in cis_data.get('rules', []):
         rid = rule.get('rule-id', '')
         result = rule.get('result', '').lower()
+        # ignore anything that isn’t exactly "pass" or "fail"
+        if result not in ('pass', 'fail'):
+            continue
+
         parts = rid.split('_')
         if len(parts) < 4:
             continue
@@ -127,7 +131,7 @@ def generate_techniques(cis_data: dict) -> list[dict]:
             print(f"No mapping for '{rid}' (high={high}, low={low}).")
             continue
 
-        passed_flag = (result != 'fail')
+        passed_flag = (result == 'pass')
         for tech in matched_techs:
             raw_entries.append((tech, passed_flag, rid))
 
@@ -174,6 +178,10 @@ def combine_results(cis_data_list: list[dict]) -> dict:
             if not rid:
                 continue
             result = rule.get('result', '').lower()
+            # ignore anything that isn’t exactly "pass" or "fail"
+
+            if result not in ('pass', 'fail'):
+                continue
             if rid not in merged:
                 merged[rid] = {
                     'rule-id': rid,
