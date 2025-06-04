@@ -53,12 +53,12 @@ def gradient_color(fraction: float) -> str:
 
 def _accumulate_entries(
     entries: list[tuple[str, bool, str]],
-    aggregator: dict[str, dict]
+    aggregator: dict[str, dict],
+    include_comments: bool
 ) -> None:
     """
     Given a list of (techniqueID, passed_flag, comment_id) tuples,
-    update aggregator counts and comments. comment_id is what gets printed
-    before the “: Pass/Fail”.
+    update aggregator counts and optionally comments.
     """
     for tech_id, passed_flag, comment_id in entries:
         entry = aggregator.setdefault(
@@ -68,35 +68,43 @@ def _accumulate_entries(
         entry['total'] += 1
         if passed_flag:
             entry['pass'] += 1
-        status = 'Pass' if passed_flag else 'Fail'
-        entry['comments'].append(f"{comment_id} : {status}")
+        if include_comments:
+            status = 'Pass' if passed_flag else 'Fail'
+            entry['comments'].append(f"{comment_id} : {status}")
 
 
 def _assemble_techniques(
-    aggregator: dict[str, dict]
+    aggregator: dict[str, dict],
+    include_comments: bool
 ) -> list[dict]:
     """
     Build the list of technique dicts from an aggregator mapping.
+    If include_comments is False, 'comment' will be empty.
     """
     techniques: list[dict] = []
     for tech_id, data in aggregator.items():
         total = data['total']
         passed = data['pass']
         frac = passed / total if total else 0
+        comment_text = "\n".join(data['comments']) if include_comments else ''
         techniques.append({
             'techniqueID': tech_id,
             'score': round(frac, 2),
             'color': gradient_color(frac),
-            'comment': "\n".join(data['comments'])
+            'comment': comment_text
         })
     return techniques
 
 
-def generate_techniques(cis_data: dict) -> list[dict]:
+def generate_techniques(
+    cis_data: dict,
+    include_comments: bool = False
+) -> list[dict]:
     """
     Aggregate CIS rule results into ATT&CK techniques,
     summarizing each test as "rule-id : Pass/Fail".
     Uses pre-loaded mapping dictionaries for lookups.
+    include_comments toggles whether comments are included.
     """
     aggregator: dict[str, dict] = {}
     raw_entries: list[tuple[str, bool, str]] = []
@@ -128,18 +136,20 @@ def generate_techniques(cis_data: dict) -> list[dict]:
             matched_techs.update(_CONTROL_MAP.get(high, []))
 
         if not matched_techs:
-            print(f"No mapping for '{rid}' (high={high}, low={low}).")
             continue
 
         passed_flag = (result == 'pass')
         for tech in matched_techs:
             raw_entries.append((tech, passed_flag, rid))
 
-    _accumulate_entries(raw_entries, aggregator)
-    return _assemble_techniques(aggregator)
+    _accumulate_entries(raw_entries, aggregator, include_comments)
+    return _assemble_techniques(aggregator, include_comments)
 
 
-def build_layer(cis_data: dict, techniques: list[dict]) -> dict:
+def build_layer(
+    cis_data: dict,
+    techniques: list[dict]
+) -> dict:
     """
     Build the final Navigator layer JSON with header and techniques.
     """
@@ -157,19 +167,26 @@ def build_layer(cis_data: dict, techniques: list[dict]) -> dict:
     return layer
 
 
-def convert_cis_to_attack(cis_data: dict) -> dict:
+def convert_cis_to_attack(
+    cis_data: dict,
+    include_comments: bool = False
+) -> dict:
     """
     Load mapping, generate techniques, and build the full Navigator layer.
+    By default, comments are omitted.
     """
-    techniques = generate_techniques(cis_data)
+    techniques = generate_techniques(cis_data, include_comments)
     return build_layer(cis_data, techniques)
 
 
-def combine_results(cis_data_list: list[dict]) -> dict:
+def combine_results(
+    cis_data_list: list[dict],
+    include_comments: bool = False
+) -> dict:
     """
     Combine multiple CIS datasets at the rule level: if a rule fails in any,
     mark it as 'fail', otherwise 'pass'. Then run the normal CIS→ATT&CK
-    conversion on the merged ruleset.
+    conversion on the merged ruleset. Comments optional.
     """
     merged: dict[str, dict] = {}
     for cis in cis_data_list:
@@ -179,7 +196,6 @@ def combine_results(cis_data_list: list[dict]) -> dict:
                 continue
             result = rule.get('result', '').lower()
             # ignore anything that isn’t exactly "pass" or "fail"
-
             if result not in ('pass', 'fail'):
                 continue
             if rid not in merged:
@@ -197,4 +213,4 @@ def combine_results(cis_data_list: list[dict]) -> dict:
         'rules': list(merged.values())
     }
 
-    return convert_cis_to_attack(combined_cis)
+    return convert_cis_to_attack(combined_cis, include_comments)
