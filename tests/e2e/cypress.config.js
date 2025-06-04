@@ -13,4 +13,15 @@ export default defineConfig({
       // implement node event listeners here
     },
   },
+  component: {
+    devServer: {
+      framework: "react",
+      bundler: "vite", // or "webpack" if you prefer
+    },
+    specPattern: 'tests/component/**/*.cy.{js,jsx,ts,tsx}', // separate folder for component tests
+    supportFile: 'support/component.js', // optional separate support for component tests
+    setupNodeEvents(on, config) {
+      // component test event listeners (optional)
+    },
+  },
 });

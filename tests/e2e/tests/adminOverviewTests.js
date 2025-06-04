@@ -3,7 +3,7 @@ import { LanguageContext } from '../../../client/src/main.jsx';
 
 describe('AdminOverview tests', () => {
   it('renders correctly without context', () => {
-    cy.mount(<AdminOverview/>);
+    cy.mount(<AdminOverview />);
     cy.contains('Admin Overview');
   });
 });
