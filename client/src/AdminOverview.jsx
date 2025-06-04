@@ -86,37 +86,54 @@ function AdminOverview() {
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
-        <div className="card">
+        <div className="card upload-section">
+          <h2>{t.filterFiles}</h2>
           <div className="section-header">
-            <h2>{t.departmentFilter}</h2>
-            <select id="departmentFilter">
-              <option>All Departments</option>
+            <p>{t.departmentFilter}</p>
+            <select id="departmentFilter" multiple size={3}>
               <option>Department 1</option>
               <option>Department 2</option>
+              <option>Department 3</option>
             </select>
           </div>
 
           <div className="section-header">
-            <h2>{t.searchHosts}</h2>
-            <input
-              type="text"
-              placeholder="Search hosts..."
-              value={hostSearch}
-              onChange={e => setHostSearch(e.target.value)}
-            />
+            <p>{t.searchHosts}</p>
+            <input type="text" placeholder="Search hosts..." />
+          </div>
+
+          <div className="section-header">
+            <label>
+              <p>{t.onlyLatestFiles}</p>
+              <input type="checkbox" />
+            </label>
+          </div>
+
+          <div className="section-header">
+            <p>{t.dateRange}</p>
+            <p>From</p>
+            <input type="date" />
+            <p>To</p>
+            <input type="date" />
+          </div>
+
+          <div className="section-header">
+            <p>{t.benchmarkTypes}</p>
+            <select>
+              <option>All Types</option>
+              <option>Type 1</option>
+              <option>Type 2</option>
+              <option>Type 3</option>
+            </select>
           </div>
         </div>
 
         {/* File Table Section */}
         <div className="card file-table-section">
-          <h2>{t.filesList}</h2>
-          {/* TODO */}
-          <p className="section-description">Description placeholder</p>
           <table className="files-table">
             <thead>
               <tr>
-                {/* TODO */}
-                <th>Select</th>
+                <th>{t.select}</th>
                 <th>{t.name}</th>
                 <th>{t.department}</th>
                 <th>{t.date}</th>

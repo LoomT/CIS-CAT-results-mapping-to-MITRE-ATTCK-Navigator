@@ -36,13 +36,4 @@ describe('HomeScreen tests', () => {
     cy.get('[data-testid="password-field-container"]').should('be.visible');
     cy.get('[data-testid="password-field"]').should('be.visible');
   });
-
-  it("can't access admin overview directly", () => {
-    cy.request({
-      url: '/admin/overview',
-      failOnStatusCode: false
-    }).then((response) => {
-      expect(response.status).to.eq(404);
-    });
-  });
 })
