@@ -1,3 +1,4 @@
+import React from 'react';
 import AdminOverview from '../../../client/src/AdminOverview.jsx';
 import { LanguageContext } from '../../../client/src/main.jsx';
 
@@ -17,5 +18,4 @@ describe('AdminOverview security', () => {
       expect(response.status).to.eq(404);
     });
   });
-
 })
