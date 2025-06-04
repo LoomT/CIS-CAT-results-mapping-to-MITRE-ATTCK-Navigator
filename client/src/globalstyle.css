@@ -159,7 +159,10 @@ nav {
  * || IFRAME (HIDDEN) ||
  * ======================================= */
 iframe {
-  display: none;
+  position: absolute;
+  width:0;
+  height:0;
+  border:0;
 }
 
 /** =======================================
