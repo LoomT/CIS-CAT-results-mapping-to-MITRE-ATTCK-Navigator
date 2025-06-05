@@ -86,20 +86,45 @@ nav {
 
 .upload-section {
   max-width: 20%;
-  min-width: 10%;
+  min-width: 15%;
   height: max-content;
-  flex: initial;
+  flex: 0 1 min-content;
+}
+
+.admin-side-section {
+  max-width: 20%;
+  min-width: 15%;
+  height: max-content;
+  flex: 0 1 min-content;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-side-section input {
+  width: calc(100% - 16px);
+}
+
+.admin-side-section select {
+  width: 100%;
+}
+
+.admin-side-section button {
+  width: 100%;
+}
+
+.admin-side-section .button-container {
+  flex-direction: column;
 }
 
 .file-table-section {
-  flex: 1;
-  text-align: center;
+  flex: 1 0 0;
 }
 
 /** =======================================
  * || FILE TABLE ||
  * ======================================= */
-.files-table {
+table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
@@ -109,7 +134,7 @@ nav {
   border: none;
 }
 
-.files-table thead {
+table thead {
   background-color: #f3f4f6;
   color: #374151;
   text-align: left;
@@ -117,42 +142,34 @@ nav {
   border-bottom: 2px solid #e5e7eb;
 }
 
-.files-table th,
-.files-table td {
+table th,
+table td {
   padding: 0.75rem 1rem;
   border: none;
-  white-space: nowrap;
+  white-space: wrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.files-table td:first-child,
-.files-table th:first-child {
-  text-align: center;
-  white-space: wrap;
-  width: auto;
-}
-
-.files-table td:last-child {
-  width: fit-content;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: center;
-}
-
-.files-table tbody tr {
+table tbody tr {
   border-bottom: 1px solid #e5e7eb;
   transition: background-color 0.2s ease-in-out;
 }
 
-.files-table tbody tr:last-child {
+table tbody tr:last-child {
   border-bottom: none;
 }
 
-.files-table tbody tr:hover {
+table tbody tr:hover {
   background-color: #f9fafb;
+}
+
+table .button-container {
+  gap: 0.5rem;
+}
+
+.long-word {
+  word-break: break-word;
 }
 
 /** =======================================
@@ -175,6 +192,21 @@ button,
   justify-content: center;
   gap: 0.5rem;
   vertical-align: middle;
+}
+
+button:disabled,
+.button:disabled {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+button:disabled:hover,
+.button:disabled:hover {
+  background-color: inherit;
+  box-shadow: none;
 }
 
 button img,
@@ -209,6 +241,21 @@ button svg,
 .btn-purple {
   background-color: #ede9fe;
   color: #5b21b6;
+}
+
+.btn-blue:disabled {
+  background-color: #eff6ff;
+  color: #93c5fd;
+}
+
+.btn-green:disabled {
+  background-color: #ecfdf5;
+  color: #6ee7b7;
+}
+
+.btn-purple:disabled {
+  background-color: #f5f3ff;
+  color: #c4b5fd;
 }
 
 /** =======================================
@@ -298,7 +345,7 @@ h3 {
  * ======================================= */
 .section-header {
   text-align: left;
-  margin-bottom: 1rem;
+  flex: auto;
 }
 
 .section-header h2 {

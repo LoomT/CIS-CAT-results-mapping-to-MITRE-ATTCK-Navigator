@@ -1,10 +1,14 @@
-import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
 import './globalstyle.css';
-import backIcon from './assets/back.png';
 import FileTableEntry from './components/FileTableEntry.jsx';
-import NavigatorAPI from './NavigatorAPI.js';
 import { LanguageContext } from './main.jsx';
+import {
+  constructDownloadURL,
+  fetchFilesMetadata,
+  handleDownload,
+  handleSVGExport,
+  handleVisualize,
+} from './FileAPI.js';
 
 /**
  * AdminOverview Component
@@ -17,30 +21,24 @@ import { LanguageContext } from './main.jsx';
 
 function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
-  const [currentFile, setFile] = useState({});
+  const [exportFile, setExportFile] = useState({});
+  const [exportAggregate, setExportAggregate] = useState(false);
   const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
-  const [files] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const t = useContext(LanguageContext);
 
-  /**
-   * Opens the visualization popup.
-   */
-  const handleVisualizeClick = () => {
-    let uri = new URL(location.href);
-
-    uri.pathname = `/api/files/${file.id}`;
-    let targetWindow = window.open('/attack-navigator/index.html');
-
-    let client = new NavigatorAPI(targetWindow, uri.toString(), false);
-
-    setShowPopup(true);
-  };
+  useEffect(() => {
+    // Call the handleRefresh function when the component mounts
+    handleRefresh();
+  }, []);
 
   /**
    * Opens the export popup.
    */
-  const handleExportClick = (file) => {
-    setFile(file);
+  const handleExportClick = (file, aggregate) => {
+    setExportFile(file);
+    setExportAggregate(aggregate);
     setShowExportPopup(true);
   };
 
@@ -52,31 +50,34 @@ function AdminOverview() {
   };
 
   /**
-   * Handle SVG export & download
+   * Handles the change event for a checkbox by toggling its checked state
+   * and updating the selected files list accordingly.
+   *
+   * @param {boolean} isChecked - The current checked state of the checkbox.
+   * @param {string|number} fileId - The unique identifier of the file associated with the checkbox.
    */
-  const handleSVGExportClick = () => {
-    let uri = new URL(location.href);
+  const handleCheckboxChange = (isChecked, fileId) => {
+    isChecked = !isChecked;
+    setSelectedFiles((prevSelected) => {
+      // If the ID is already in the array, remove it; otherwise, add it
+      if (!isChecked) {
+        return prevSelected.filter(id => id !== fileId);
+      }
+      else {
+        return [...prevSelected, fileId];
+      }
+    });
+  };
 
-    /**
-     * Dirty workaround to get a fresh handle to the iframe window
-     * There are a couple of issues with reusing the old one
-     * Specifically that navigation takes time. A lot of time
-     * So when we modify the src the window will still point to the
-     * old window object. Theres definitely a better solution than this
-     * But let's mark this as TODO */
-
-    const newIframe = document.createElement('iframe');
-    newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
-    newIframe.src = '/attack-navigator/index.html';
-    newIframe.id = currentFile.id;
-
-    let frame = document.getElementById(currentFile.id);
-    frame.parentNode.replaceChild(newIframe, frame);
-
-    uri.pathname = `/api/files/${currentFile.id}`;
-    let targetWindow = newIframe.contentWindow;
-
-    let client = new NavigatorAPI(targetWindow, uri.toString(), true);
+  const handleRefresh = () => {
+    fetchFilesMetadata().then((files) => {
+      setFiles(files.map(file => ({
+        id: file.id,
+        filename: file.filename,
+        department: 'Default Department',
+        time: new Date().toISOString(),
+      })));
+    });
   };
 
   return (
@@ -86,7 +87,7 @@ function AdminOverview() {
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
-        <div className="card">
+        <div className="card admin-side-section">
           <div className="section-header">
             <h2>{t.departmentFilter}</h2>
             <select id="departmentFilter">
@@ -105,6 +106,58 @@ function AdminOverview() {
               onChange={e => setHostSearch(e.target.value)}
             />
           </div>
+          <button className="btn-blue" onClick={() => handleRefresh()}>Refresh</button>
+          <div>
+            <h2>Aggregation</h2>
+            {selectedFiles.length === 0
+              ? (
+                  <>
+                    <p>No files selected</p>
+                    <div className="button-container">
+                      <button className="btn-purple" disabled={true}>Export</button>
+                      <button className="btn-blue" disabled={true}>Visualize</button>
+                      <button className="btn-green" disabled={true}>Download</button>
+                    </div>
+                  </>
+                )
+              : (
+                  <>
+                    <p>{'Selected files: ' + selectedFiles.length}</p>
+                    <div className="button-container">
+                      <button
+                        className="btn-purple"
+                        onClick={
+                          () => handleExportClick(null, true)
+                        }
+                      >
+                        Export
+                      </button>
+                      <button
+                        className="btn-blue"
+                        onClick={
+                          () => {
+                            const url = constructDownloadURL(selectedFiles);
+                            if (url !== null) handleVisualize(url);
+                          }
+                        }
+                      >
+                        Visualize
+                      </button>
+                      <button
+                        className="btn-green"
+                        onClick={
+                          () => {
+                            const url = constructDownloadURL(selectedFiles);
+                            if (url !== null) handleDownload(url, 'combined_results.json');
+                          }
+                        }
+                      >
+                        Download
+                      </button>
+                    </div>
+                  </>
+                )}
+          </div>
         </div>
 
         {/* File Table Section */}
@@ -112,7 +165,7 @@ function AdminOverview() {
           <h2>{t.filesList}</h2>
           {/* TODO */}
           <p className="section-description">Description placeholder</p>
-          <table className="files-table">
+          <table>
             <thead>
               <tr>
                 {/* TODO */}
@@ -132,9 +185,23 @@ function AdminOverview() {
                   filename={file.filename}
                   department={file.department}
                   time={file.time}
-                  onExport={() => handleExportClick(file)}
-                  onVisualize={() => handleVisualizeClick(file)}
+                  onExport={
+                    () => handleExportClick(file, false)
+                  }
+                  onVisualize={
+                    () => {
+                      const url = constructDownloadURL([file.id]);
+                      if (url !== null) handleVisualize(url);
+                    }
+                  }
+                  onDownload={
+                    () => {
+                      const url = constructDownloadURL([file.id]);
+                      if (url !== null) handleDownload(url, file.filename);
+                    }
+                  }
                   showCheckbox={true}
+                  onCheckboxChange={handleCheckboxChange}
                 />
               ))}
             </tbody>
@@ -148,7 +215,22 @@ function AdminOverview() {
           <div className="popup">
             <h3 className="popup-heading">{t.chooseFormat}</h3>
             <div className="popup-buttons">
-              <button className="popup-button" onClick={handleSVGExportClick()}>SVG</button>
+              <button
+                className="popup-button"
+                onClick={
+                  exportAggregate
+                    ? () => {
+                        const url = constructDownloadURL(selectedFiles);
+                        if (url !== null) handleSVGExport(url, null); // TODO
+                      }
+                    : () => {
+                        const url = constructDownloadURL([exportFile.id]);
+                        if (url !== null) handleSVGExport(url, exportFile.id);
+                      }
+                }
+              >
+                SVG
+              </button>
               <button className="popup-button">PNG</button>
               <button className="popup-cancel" onClick={handlePopupClose}>
                 {t.cancel}
