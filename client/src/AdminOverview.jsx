@@ -22,7 +22,7 @@ import {
 
 function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
-  const [files] = useState([]);
+  const [files, setFiles] = useState([]);
   const [exportFile, setExportFile] = useState({});
   const [exportAggregate, setExportAggregate] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
