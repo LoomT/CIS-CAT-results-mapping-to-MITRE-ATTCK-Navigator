@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import Select from 'react-select';
 import { Link } from 'react-router-dom';
 import './globalstyle.css';
 import backIcon from './assets/back.png';
@@ -18,9 +19,18 @@ import { LanguageContext } from './main.jsx';
 function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
   const [currentFile, setFile] = useState({});
-  const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
   const [files] = useState([]);
   const t = useContext(LanguageContext);
+
+  const optionsDepts = [
+    { value: 'dept1', label: 'Department 1' },
+    { value: 'dept2', label: 'Department 2' },
+  ];
+
+  const optionsBMs = [
+    { value: 'enterprise', label: 'Enterprise' },
+    { value: 'mobile', label: 'Mobile' },
+  ];
 
   /**
    * Opens the visualization popup.
@@ -90,11 +100,11 @@ function AdminOverview() {
           <h2>{t.filterFiles}</h2>
           <div className="section-header">
             <p>{t.departmentFilter}</p>
-            <select id="departmentFilter" multiple size={3}>
-              <option>Department 1</option>
-              <option>Department 2</option>
-              <option>Department 3</option>
-            </select>
+            <Select
+              isMulti
+              options={optionsDepts}
+              id="department-filter"
+            />
           </div>
 
           <div className="section-header">
@@ -119,12 +129,11 @@ function AdminOverview() {
 
           <div className="section-header">
             <p>{t.benchmarkTypes}</p>
-            <select>
-              <option>All Types</option>
-              <option>Type 1</option>
-              <option>Type 2</option>
-              <option>Type 3</option>
-            </select>
+            <Select
+              isMulti
+              options={optionsBMs}
+              id="department-filter"
+            />
           </div>
         </div>
 
