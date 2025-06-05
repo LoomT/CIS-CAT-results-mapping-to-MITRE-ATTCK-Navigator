@@ -100,7 +100,7 @@ function AdminOverview() {
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
-        <div className="card upload-section">
+        <div className="card admin-side-section">
           <h2>{t.filterFiles}</h2>
           <div className="section-header">
             <p>{t.departmentFilter}</p>
