@@ -3,11 +3,11 @@ describe('AdminOverview tests', () => {
     cy.visit('/admin');
     cy.get('[data-testid="password-field"]').type('correct-token{enter}', { force: true });
 
-    cy.get('select#departmentFilter').should('exist');
+    cy.get('[data-testid="department-filter"]').should('exist');
     cy.get('input[type="text"][placeholder="Search hosts..."]').should('exist');
     cy.get('input[type="checkbox"]').should('exist');
     cy.get('input[type="datetime-local"]').should('have.length', 2); // from and to
-    cy.get('select').last().should('contain', 'All Types');
+    cy.get('[data-testid="benchmark-filter"]').should('exist');
   });
 
   it('renders file table headers correctly', () => {
