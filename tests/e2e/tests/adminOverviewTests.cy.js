@@ -23,9 +23,7 @@ describe('AdminOverview tests', () => {
 
     cy.get('table.files-table tbody tr').should('have.length', 0); // because files = []
   });
-});
 
-describe('AdminOverview security', () => {
   it("can't access admin overview directly", () => {
     cy.request({
       url: '/admin/overview',
@@ -34,4 +32,4 @@ describe('AdminOverview security', () => {
       expect(response.status).to.eq(404);
     });
   });
-})
+});
