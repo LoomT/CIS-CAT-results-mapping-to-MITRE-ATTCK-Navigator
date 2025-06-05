@@ -1,7 +1,3 @@
-import React from 'react';
-import AdminOverview from '../../../client/src/AdminOverview.jsx';
-import { LanguageContext } from '../../../client/src/main.jsx';
-
 describe('AdminOverview tests', () => {
   it('displays all filter controls', () => {
     cy.visit('/admin');

@@ -13,12 +13,4 @@ export default defineConfig({
       // implement node event listeners here
     },
   },
-  component: {
-    devServer: {
-      framework: "react",
-      bundler: "vite",
-    },
-    specPattern: 'tests/**/*.cy.{js,jsx,ts,tsx}',
-    supportFile: 'support/components.js',
-  },
 });
