@@ -3,9 +3,29 @@ import AdminOverview from '../../../client/src/AdminOverview.jsx';
 import { LanguageContext } from '../../../client/src/main.jsx';
 
 describe('AdminOverview tests', () => {
-  it('renders correctly without context', () => {
-    cy.mount(<AdminOverview />);
-    cy.contains('Admin Overview');
+  it('displays all filter controls', () => {
+    cy.visit('/admin');
+    cy.get('[data-testid="password-field"]').type('correct-token{enter}', { force: true });
+
+    cy.get('select#departmentFilter').should('exist');
+    cy.get('input[type="text"][placeholder="Search hosts..."]').should('exist');
+    cy.get('input[type="checkbox"]').should('exist');
+    cy.get('input[type="date"]').should('have.length', 2); // from and to
+    cy.get('select').last().should('contain', 'All Types');
+  });
+
+  it('renders file table headers correctly', () => {
+    cy.visit('/admin');
+    cy.get('[data-testid="password-field"]').type('correct-token{enter}', { force: true });
+
+    cy.get('table.files-table thead').within(() => {
+      cy.contains('th', 'Name');
+      cy.contains('th', 'Department');
+      cy.contains('th', 'Date');
+      cy.contains('th', 'Actions');
+    });
+
+    cy.get('table.files-table tbody tr').should('have.length', 0); // because files = []
   });
 });
 
