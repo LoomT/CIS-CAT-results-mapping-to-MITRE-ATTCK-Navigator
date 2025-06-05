@@ -1,3 +1,5 @@
+//TODO: the password field shouldnt be hardcoded, the tests will also have to be updated accordingly
+
 describe('AdminOverview tests', () => {
   it('displays all filter controls', () => {
     cy.visit('/admin');

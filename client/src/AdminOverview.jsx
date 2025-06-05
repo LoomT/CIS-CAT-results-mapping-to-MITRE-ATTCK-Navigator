@@ -32,16 +32,20 @@ function AdminOverview() {
     // Call the handleRefresh function when the component mounts
     handleRefresh();
   }, []);
+  /**
+   * Defines options for the department dropdown. Probably a TODO to not hardcode this
+   */
   const optionsDepts = [
     { value: 'dept1', label: 'Department 1' },
     { value: 'dept2', label: 'Department 2' },
   ];
-
+  /**
+   * Defines options for the benchmark type dropdown. Probably a TODO to not hardcode this
+   */
   const optionsBMs = [
     { value: 'enterprise', label: 'Enterprise' },
     { value: 'mobile', label: 'Mobile' },
   ];
-
   /**
    * Opens the export popup.
    */
