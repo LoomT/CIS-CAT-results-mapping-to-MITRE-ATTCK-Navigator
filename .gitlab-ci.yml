@@ -76,7 +76,7 @@ python_tests:
     key:
       files:
         - api/requirements.txt
-      prefix: "$CI_JOB_NAME"
+        - tests/requirements.txt
     paths:
       - .venv/lib/
   before_script:
@@ -84,7 +84,7 @@ python_tests:
     - python -m venv .venv
     - source .venv/bin/activate
     - pip install -r api/requirements.txt
-    - pip install pytest
+    - pip install -r tests/requirements.txt
   script:
     - python -m pytest -q
 
