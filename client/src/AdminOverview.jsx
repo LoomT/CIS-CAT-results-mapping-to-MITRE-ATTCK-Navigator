@@ -103,7 +103,8 @@ function AdminOverview() {
             <Select
               isMulti
               options={optionsDepts}
-              data-testid="department-filter"
+              className="department-filter"
+              classNamePrefix="react-select"
             />
           </div>
 
@@ -132,7 +133,8 @@ function AdminOverview() {
             <Select
               isMulti
               options={optionsBMs}
-              data-testid="benchmark-filter"
+              className="benchmark-filter"
+              classNamePrefix="react-select"
             />
           </div>
         </div>
