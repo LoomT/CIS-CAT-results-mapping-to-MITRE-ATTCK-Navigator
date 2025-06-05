@@ -6,7 +6,7 @@ describe('AdminOverview tests', () => {
     cy.get('select#departmentFilter').should('exist');
     cy.get('input[type="text"][placeholder="Search hosts..."]').should('exist');
     cy.get('input[type="checkbox"]').should('exist');
-    cy.get('input[type="date"]').should('have.length', 2); // from and to
+    cy.get('input[type="datetime-local"]').should('have.length', 2); // from and to
     cy.get('select').last().should('contain', 'All Types');
   });
 

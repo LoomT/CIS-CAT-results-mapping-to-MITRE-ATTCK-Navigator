@@ -382,8 +382,8 @@ select {
   font-size: 16px;
   transition: all 0.3s ease;
 }
-/* Datepicker with visible blue calendar icon */
-input[type="date"] {
+/* Datepicker with visible grey calendar icon */
+input[type="datetime-local"] {
   position: relative;
   background-color: #fff;
   color: #000;
@@ -396,7 +396,7 @@ input[type="date"] {
   appearance: auto;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   position: absolute;
   right: 8px;

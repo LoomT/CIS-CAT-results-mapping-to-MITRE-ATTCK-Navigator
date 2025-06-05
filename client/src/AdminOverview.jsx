@@ -112,9 +112,9 @@ function AdminOverview() {
           <div className="section-header">
             <p>{t.dateRange}</p>
             <p>From</p>
-            <input type="date" />
+            <input type="datetime-local" />
             <p>To</p>
-            <input type="date" />
+            <input type="datetime-local" />
           </div>
 
           <div className="section-header">
