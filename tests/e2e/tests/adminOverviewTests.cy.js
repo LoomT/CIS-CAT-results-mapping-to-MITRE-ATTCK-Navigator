@@ -10,6 +10,7 @@ describe('AdminOverview tests', () => {
     cy.get('input[type="checkbox"]').should('exist');
     cy.get('input[type="datetime-local"]').should('have.length', 2); // from and to
     cy.get('.benchmark-filter-testid').should('exist');
+    cy.get('.hostname-filter-testid').should('exist');
   });
 
   it('renders file table headers correctly', () => {

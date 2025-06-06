@@ -46,6 +46,13 @@ function AdminOverview() {
     { value: 'enterprise', label: 'Enterprise' },
     { value: 'mobile', label: 'Mobile' },
   ];
+    /**
+   * Defines options for the benchmark type dropdown. Probably a TODO to not hardcode this
+   */
+  const optionsHosts = [
+    { value: 'ho1', label: 'Host 1' },
+    { value: 'ho2', label: 'Host 2' },
+  ];
   /**
    * Opens the export popup.
    */
@@ -128,7 +135,7 @@ function AdminOverview() {
             <p>{t.searchHosts}</p>
             <Select
               isMulti
-              options={optionsBMs}
+              options={optionsHosts}
               className="hostname-filter-testid"
               classNamePrefix="react-select"
             />
