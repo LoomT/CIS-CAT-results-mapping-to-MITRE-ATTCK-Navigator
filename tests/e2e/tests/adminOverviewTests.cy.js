@@ -6,7 +6,7 @@ describe('AdminOverview tests', () => {
     cy.get('[data-testid="password-field"]').type('correct-token{enter}', { force: true });
 
     cy.get('.department-filter-testid').should('exist');
-    cy.get('input[type="text"][placeholder="Search hosts..."]').should('exist');
+    cy.get('input[type="text"][placeholder="Search files..."]').should('exist');
     cy.get('input[type="checkbox"]').should('exist');
     cy.get('input[type="datetime-local"]').should('have.length', 2); // from and to
     cy.get('.benchmark-filter-testid').should('exist');
