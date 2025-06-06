@@ -436,7 +436,7 @@ input[type="datetime-local"] {
   color: #000;
   border: 1px solid #ccc;
   border-radius: 4px;
-  padding: 6px 30px 6px 8px;
+  padding: 8px 8px 8px 8px;
   font-size: 14px;
   cursor: pointer;
   -webkit-appearance: textfield;
