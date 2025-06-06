@@ -103,6 +103,11 @@ function AdminOverview() {
         <div className="card admin-side-section">
           <h2>{t.filterFiles}</h2>
           <div className="section-header">
+            <p>{t.searchFiles}</p>
+            <input type="text" placeholder="Search files..." />
+          </div>
+
+          <div className="section-header">
             <p>{t.departmentFilter}</p>
             <Select
               isMulti
@@ -113,15 +118,20 @@ function AdminOverview() {
           </div>
 
           <div className="section-header">
-            <p>{t.searchHosts}</p>
-            <input type="text" placeholder="Search hosts..." />
-          </div>
-
-          <div className="section-header">
             <label>
               <p>{t.onlyLatestFiles}</p>
               <input type="checkbox" />
             </label>
+          </div>
+
+          <div className="section-header">
+            <p>{t.searchHosts}</p>
+            <Select
+              isMulti
+              options={optionsBMs}
+              className="hostname-filter-testid"
+              classNamePrefix="react-select"
+            />
           </div>
 
           <div className="section-header">
