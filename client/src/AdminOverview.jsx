@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import Select from 'react-select';
 import './globalstyle.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import { LanguageContext } from './main.jsx';
@@ -21,10 +22,9 @@ import {
 
 function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
+  const [files, setFiles] = useState([]);
   const [exportFile, setExportFile] = useState({});
   const [exportAggregate, setExportAggregate] = useState(false);
-  const [hostSearch, setHostSearch] = useState(''); // TODO: currently unused
-  const [files, setFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const t = useContext(LanguageContext);
 
@@ -32,7 +32,27 @@ function AdminOverview() {
     // Call the handleRefresh function when the component mounts
     handleRefresh();
   }, []);
-
+  /**
+   * Defines options for the department dropdown. Probably a TODO to not hardcode this
+   */
+  const optionsDepts = [
+    { value: 'dept1', label: 'Department 1' },
+    { value: 'dept2', label: 'Department 2' },
+  ];
+  /**
+   * Defines options for the benchmark type dropdown. Probably a TODO to not hardcode this
+   */
+  const optionsBMs = [
+    { value: 'enterprise', label: 'Enterprise' },
+    { value: 'mobile', label: 'Mobile' },
+  ];
+    /**
+   * Defines options for the benchmark type dropdown. Probably a TODO to not hardcode this
+   */
+  const optionsHosts = [
+    { value: 'ho1', label: 'Host 1' },
+    { value: 'ho2', label: 'Host 2' },
+  ];
   /**
    * Opens the export popup.
    */
@@ -88,22 +108,54 @@ function AdminOverview() {
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
         <div className="card admin-side-section">
+          <h2>{t.filterFiles}</h2>
           <div className="section-header">
-            <h2>{t.departmentFilter}</h2>
-            <select id="departmentFilter">
-              <option>All Departments</option>
-              <option>Department 1</option>
-              <option>Department 2</option>
-            </select>
+            <p>{t.searchFiles}</p>
+            <input type="text" placeholder="Search files..." />
           </div>
 
           <div className="section-header">
-            <h2>{t.searchHosts}</h2>
-            <input
-              type="text"
-              placeholder="Search hosts..."
-              value={hostSearch}
-              onChange={e => setHostSearch(e.target.value)}
+            <p>{t.departmentFilter}</p>
+            <Select
+              isMulti
+              options={optionsDepts}
+              className="department-filter-testid"
+              classNamePrefix="react-select"
+            />
+          </div>
+
+          <div className="section-header">
+            <label>
+              <p>{t.onlyLatestFiles}</p>
+              <input type="checkbox" />
+            </label>
+          </div>
+
+          <div className="section-header">
+            <p>{t.searchHosts}</p>
+            <Select
+              isMulti
+              options={optionsHosts}
+              className="hostname-filter-testid"
+              classNamePrefix="react-select"
+            />
+          </div>
+
+          <div className="section-header">
+            <p>{t.dateRange}</p>
+            <p>From</p>
+            <input type="datetime-local" />
+            <p>To</p>
+            <input type="datetime-local" />
+          </div>
+
+          <div className="section-header">
+            <p>{t.benchmarkTypes}</p>
+            <Select
+              isMulti
+              options={optionsBMs}
+              className="benchmark-filter-testid"
+              classNamePrefix="react-select"
             />
           </div>
           <button className="btn-blue" onClick={() => handleRefresh()}>Refresh</button>
@@ -162,14 +214,10 @@ function AdminOverview() {
 
         {/* File Table Section */}
         <div className="card file-table-section">
-          <h2>{t.filesList}</h2>
-          {/* TODO */}
-          <p className="section-description">Description placeholder</p>
-          <table>
+          <table className="files-table">
             <thead>
               <tr>
-                {/* TODO */}
-                <th>Select</th>
+                <th>{t.select}</th>
                 <th>{t.name}</th>
                 <th>{t.department}</th>
                 <th>{t.date}</th>

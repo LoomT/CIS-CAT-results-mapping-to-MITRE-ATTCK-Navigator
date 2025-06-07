@@ -429,6 +429,83 @@ select {
   font-size: 16px;
   transition: all 0.3s ease;
 }
+/* Datepicker with visible grey calendar icon */
+input[type="datetime-local"] {
+  position: relative;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 8px 8px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  -webkit-appearance: textfield;
+  appearance: auto;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background: url('data:image/svg+xml;utf8,<svg fill="%236b7280" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H5V9h14v9z"/></svg>') no-repeat center center;
+  background-size: 16px 16px;
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* Department multiselect scrollbar - WebKit */
+select[multiple] {
+  scrollbar-width: thin;
+  scrollbar-color: #bbb #fff;
+}
+
+select[multiple]::-webkit-scrollbar {
+  width: 8px;
+}
+
+select[multiple]::-webkit-scrollbar-track {
+  background: #fff;
+}
+
+select[multiple]::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 4px;
+  border: 2px solid #fff;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #6b7280;
+  border-color: #6b7280;
+}
+
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 
 /** =======================================
  * || ERROR MESSAGES ||

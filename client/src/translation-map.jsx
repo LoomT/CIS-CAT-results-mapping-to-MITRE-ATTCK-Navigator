@@ -2,6 +2,9 @@ const translations = {
   en: {
     adminToken: 'Enter Admin Token',
     delete: 'Delete',
+    select: 'Select',
+    filterFiles: 'Filter files',
+    searchFiles: 'Search by filename',
     user: 'User',
     export: 'Export',
     visualize: 'Visualize',
@@ -32,10 +35,16 @@ const translations = {
     enterToken: 'Enter your token',
     size: 'Filesize',
     chooseScreen: 'Choose your screen',
+    onlyLatestFiles: 'Only show latest files per host',
+    dateRange: 'Search within date range',
+    benchmarkTypes: 'Select benchmark types',
   },
   nl: {
     adminToken: 'Voer admin token in',
     delete: 'Verwijder',
+    select: 'Selecteren',
+    filterFiles: 'Filter bestanden',
+    searchFiles: 'Zoek op bestandsnaam',
     export: 'Exporteren',
     visualize: 'Visualiseer',
     download: 'Downloaden',
@@ -65,6 +74,9 @@ const translations = {
     size: 'Bestandsgrootte',
     user: 'Gebruiker',
     chooseScreen: 'Kies uw scherm',
+    onlyLatestFiles: 'Toon alleen meest recente bestanden per host',
+    dateRange: 'Zoek binnen 2 data',
+    benchmarkTypes: 'Selecteer benchmark typen',
   },
 };
 
