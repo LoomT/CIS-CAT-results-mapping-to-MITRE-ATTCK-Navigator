@@ -78,4 +78,5 @@ describe('AdminOverview UI Tests (Frontend Only)', () => {
     cy.visit('/admin/overview');
     cy.url().should('not.include', '/admin/overview');
   });
+
 });
