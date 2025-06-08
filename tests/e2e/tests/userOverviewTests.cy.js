@@ -15,7 +15,7 @@ describe('UserScreen UI Tests (Frontend Only)', () => {
   it('shows upload instructions and file input trigger', () => {
     cy.get('[data-testid="user-screen-upload-section"]').within(() => {
       cy.contains('Drag and drop');
-      cy.contains('Choose File').should('exist');
+      cy.contains('Choose file').should('exist');
     });
   });
 
