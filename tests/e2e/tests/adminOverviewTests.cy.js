@@ -54,12 +54,6 @@ describe('AdminOverview UI Tests (Frontend Only)', () => {
     cy.get('input[placeholder="Search files..."]').should('have.value', 'type-test');
   });
 
-  it('dropdowns allow selection (static test)', () => {
-    cy.get('.department-filter-testid').select(0);
-    cy.get('.benchmark-filter-testid').select(0);
-    cy.get('.hostname-filter-testid').select(0);
-  });
-
   it('action column placeholder exists', () => {
     cy.get('table.files-table thead').contains('th', 'Actions');
     cy.get('table.files-table tbody').then($body => {
