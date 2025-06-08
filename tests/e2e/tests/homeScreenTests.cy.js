@@ -36,7 +36,7 @@ describe('HomeScreen tests', () => {
   });
 
     it('renders the choose screen title', () => {
-    cy.get('h2').should('contain.text', 'Choose Screen'); // or from `t.chooseScreen`
+    cy.get('h2').should('contain.text', 'Choose your screen');
   });
 
     it('displays both Admin and User buttons with correct classes', () => {
