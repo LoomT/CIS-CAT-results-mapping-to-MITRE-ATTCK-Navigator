@@ -55,9 +55,9 @@ describe('AdminOverview UI Tests (Frontend Only)', () => {
   });
 
   it('dropdowns allow selection (static test)', () => {
-    cy.get('.department-filter-testid select').select(0);
-    cy.get('.benchmark-filter-testid select').select(0);
-    cy.get('.hostname-filter-testid select').select(0);
+    cy.get('.department-filter-testid').select(0);
+    cy.get('.benchmark-filter-testid').select(0);
+    cy.get('.hostname-filter-testid').select(0);
   });
 
   it('action column placeholder exists', () => {
@@ -73,10 +73,12 @@ describe('AdminOverview UI Tests (Frontend Only)', () => {
     cy.get('body').should('not.contain.text', 'Error');
   });
 
-  it("can't access overview directly without login", () => {
-    cy.visit('/');
-    cy.visit('/admin/overview');
-    cy.url().should('not.include', '/admin/overview');
-  });
-
+  it("can't access admin overview directly", () => {
+    cy.request({
+      url: '/admin/overview',
+      failOnStatusCode: false
+    }).then((response) => {
+      expect(response.status).to.eq(404);
+    });
+    });
 });
