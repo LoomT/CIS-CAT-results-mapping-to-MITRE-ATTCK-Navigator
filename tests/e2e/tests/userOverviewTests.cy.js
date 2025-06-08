@@ -44,9 +44,10 @@ describe('UserScreen UI Tests (Frontend Only)', () => {
 
   it('handles drag enter and leave visually', () => {
     cy.get('.upload-area')
-      .trigger('dragenter')
-      .should('have.class', 'drag-active')
-      .trigger('dragleave')
-      .should('not.have.class', 'drag-active');
+      cy.get('.upload-area').trigger('dragenter');
+      cy.get('.upload-area').should('have.class', 'drag-active');
+
+      cy.get('.upload-area').trigger('dragleave');
+      cy.get('.upload-area').should('not.have.class', 'drag-active');
   });
 });
