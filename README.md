@@ -9,6 +9,8 @@ First make sure all the submodules are cloned as well `git submodule update --in
 
 Then run `npm run build '--' --deploy-url /attack-navigator/ --base-href /attack-navigator/ --configuration production --aot=false --build-optimizer=false` to build the navigator
 
+*Optionally* for a fully offline experience install `pip install -r ./navigator-config/requirements.txt` and in the `navigator-config` run the `python update.py` to download all the files required to run the navigator fully offline.
+
 ### Client
 
 In the client directory
