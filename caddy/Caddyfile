@@ -3,9 +3,6 @@
 	# Uses internal CA for local certificate generation
 	# local_certs
 	# cert_lifetime 30d
-
-	# We're using provided certificates
-	auto_https off
 }
 
 # HTTPS with auto-generated local certificates
