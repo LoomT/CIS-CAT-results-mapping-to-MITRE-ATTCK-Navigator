@@ -7,6 +7,7 @@ import {
   constructDownloadURL,
   fetchFilesMetadata,
   handleDownload,
+  handlePDFExport,
   handleSVGExport,
   handleVisualize,
 } from './FileAPI.js';
@@ -161,6 +162,7 @@ function AdminOverview() {
           <button className="btn-blue" onClick={() => handleRefresh()}>Refresh</button>
           <div>
             <h2>Aggregation</h2>
+            <iframe id="aggregateFrame"></iframe>
             {selectedFiles.length === 0
               ? (
                   <>
@@ -269,7 +271,7 @@ function AdminOverview() {
                   exportAggregate
                     ? () => {
                         const url = constructDownloadURL(selectedFiles);
-                        if (url !== null) handleSVGExport(url, null); // TODO
+                        if (url !== null) handleSVGExport(url, 'aggregateFrame');
                       }
                     : () => {
                         const url = constructDownloadURL([exportFile.id]);
@@ -279,7 +281,38 @@ function AdminOverview() {
               >
                 SVG
               </button>
-              <button className="popup-button">PNG</button>
+              <button
+                className="popup-button"
+                onClick={
+                  exportAggregate
+                    ? () => {
+                        const url = constructDownloadURL(selectedFiles);
+                        if (url !== null) handlePDFExport([url], ['aggregateFrame']); // TODO
+                      }
+                    : () => {
+                        const url = constructDownloadURL([exportFile.id]);
+                        if (url !== null) handlePDFExport([url], [exportFile.id]);
+                      }
+                }
+              >
+                Aggregate PDF
+              </button>
+              <button
+                className="popup-button"
+                onClick={
+                  exportAggregate
+                    ? () => {
+                        const uris = selectedFiles.map(fileId => constructDownloadURL([fileId]));
+                        if (uris.every(url => url !== null)) handlePDFExport(uris, selectedFiles);
+                      }
+                    : () => {
+                        const url = constructDownloadURL([exportFile.id]);
+                        if (url !== null) handlePDFExport([url], [exportFile.id]);
+                      }
+                }
+              >
+                All PDF
+              </button>
               <button className="popup-cancel" onClick={handlePopupClose}>
                 {t.cancel}
               </button>
