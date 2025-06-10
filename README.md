@@ -34,6 +34,8 @@ Docker should be installed
 
 In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain and ensure that local SSL certificates are properly configured for secure access.
 
+Before building the container the attack navigator must be build to be used in full offline mode.
+
 Build and start the application `docker-compose up --build`
 
 To run in detached mode `docker-compose up -d --build`
