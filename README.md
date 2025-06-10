@@ -30,7 +30,8 @@ Execute `python -m flask run` to start Flask server for development
 
 Docker should be installed
 
-In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain and ensure that local SSL certificates are properly configured for secure access.
+In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain.  
+In addition to changing the `Caddyfile` also add the certificates to `caddy/certs/private.key` and `caddy/certs/cert.crt`. To generate a sample certificate run `gen.sh` in `caddy/`.
 
 Build and start the application `docker-compose up --build`
 

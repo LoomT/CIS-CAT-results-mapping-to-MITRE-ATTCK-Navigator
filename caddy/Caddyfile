@@ -1,14 +1,18 @@
 # Global options
 {
 	# Uses internal CA for local certificate generation
-	local_certs
-
+	# local_certs
 	# cert_lifetime 30d
+
+	# We're using provided certificates
+	auto_https off
 }
 
 # HTTPS with auto-generated local certificates
 # These are the supported domains for now
 localhost:443, cis-cat.local:443 {
+	tls /etc/caddy/certs/cert.crt /etc/caddy/certs/private.key
+	
 	reverse_proxy web:5000
 
 	# Caddy will automatically generate and renew certificates

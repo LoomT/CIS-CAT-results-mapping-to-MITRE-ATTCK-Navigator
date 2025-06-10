@@ -19,6 +19,7 @@ services:
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy/logs:/var/log/caddy
+      - ./caddy/certs:/etc/caddy/certs:ro  # Mount certificates directory
       - caddy_data:/data
       - caddy_config:/config
     networks:
