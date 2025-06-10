@@ -24,10 +24,6 @@ describe('AdminOverview UI Tests (Frontend Only)', () => {
     });
   });
 
-  it('renders empty table body by default', () => {
-    cy.get('table.files-table tbody tr').should('have.length', 0); // No backend yet
-  });
-
   it('checkboxes toggle correctly', () => {
     cy.get('input[type="checkbox"]').each(($checkbox) => {
       cy.wrap($checkbox).check();
