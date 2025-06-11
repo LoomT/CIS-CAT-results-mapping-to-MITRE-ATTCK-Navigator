@@ -5,6 +5,7 @@ import FileTableEntry from './components/FileTableEntry.jsx';
 import { LanguageContext } from './main.jsx';
 import {
   constructDownloadURL,
+  constructDownloadURLFromFileIds,
   fetchFilesMetadata,
   handleDownload,
   handleSVGExport,
@@ -19,40 +20,41 @@ import {
  * - A list of files with actions for visualization and download, and a checkbox to select multiple rows (currently not functional)
  * - A popup for choosing visualization formats (SVG or PNG).
  */
-
 function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
   const [files, setFiles] = useState([]);
   const [exportFile, setExportFile] = useState({});
   const [exportAggregate, setExportAggregate] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [optionsDepts, setOptionsDepts] = useState([]);
+  const [selectedDepts, setSelectedDepts] = useState([]);
+  const [optionsBenchTypes, setOptionsBenchTypes] = useState([]);
+  const [selectedBenchTypes, setSelectedBenchTypes] = useState([]);
+  const [optionsHosts, setOptionsHosts] = useState([]);
+  const [selectedHosts, setSelectedHosts] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [totalNumberOfFiles, setTotalNumberOfFiles] = useState(0);
   const t = useContext(LanguageContext);
 
   useEffect(() => {
-    // Call the handleRefresh function when the component mounts
-    handleRefresh();
+    // Load the options for the dropdowns when the component mounts
+    fetchFilesMetadata().then((result) => {
+      if (result === null) return;
+      setOptionsDepts(result.filters.department.map(
+        dept => ({ value: dept.id, label: dept.name }),
+      ));
+      setOptionsBenchTypes(result.filters.benchmark.map(
+        bench => ({ value: bench.id, label: bench.name }),
+      ));
+      setOptionsHosts(result.filters.hostname.map(
+        host => ({ value: host.id, label: host.name }),
+      ));
+      // Load the files on the file list
+      handleRefresh(result);
+    });
   }, []);
-  /**
-   * Defines options for the department dropdown. Probably a TODO to not hardcode this
-   */
-  const optionsDepts = [
-    { value: 'dept1', label: 'Department 1' },
-    { value: 'dept2', label: 'Department 2' },
-  ];
-  /**
-   * Defines options for the benchmark type dropdown. Probably a TODO to not hardcode this
-   */
-  const optionsBMs = [
-    { value: 'enterprise', label: 'Enterprise' },
-    { value: 'mobile', label: 'Mobile' },
-  ];
-    /**
-   * Defines options for the benchmark type dropdown. Probably a TODO to not hardcode this
-   */
-  const optionsHosts = [
-    { value: 'ho1', label: 'Host 1' },
-    { value: 'ho2', label: 'Host 2' },
-  ];
   /**
    * Opens the export popup.
    */
@@ -89,15 +91,46 @@ function AdminOverview() {
     });
   };
 
-  const handleRefresh = () => {
-    fetchFilesMetadata().then((result) => {
-      setFiles(result.data.map(file => ({
-        id: file.id,
-        filename: file.filename,
-        department: 'Default Department',
-        time: new Date().toISOString(),
-      })));
-    });
+  /**
+   * Asynchronous function to handle the refresh operation for file metadata.
+   *
+   * This function fetches metadata for files if a result parameter is not provided
+   * or processes a provided result object. It updates the state with selected
+   * properties of the file metadata.
+   *
+   * @async
+   * @function
+   * @param {Object|null} [result=null] - Optional result data containing metadata of files.
+   * If no result is provided, the function will fetch data using `fetchFilesMetadata`.
+   * @returns {void}
+   */
+  const handleRefresh = async (result = null) => {
+    isLoading.current = true;
+    setCurrentPage(0);
+
+    if (result === null) {
+      result = await fetchFilesMetadata(
+        searchText,
+        selectedDepts.map(dept => dept.value),
+        selectedBenchTypes.map(bench => bench.value),
+        selectedHosts.map(host => host.value),
+        dateFrom,
+        dateTo,
+        0,
+        pageSize,
+      );
+    }
+    if (result === null) {
+      isLoading.current = false;
+      return;
+    }
+
+    setFiles(result.data.map(file => ({
+      id: file.id,
+      filename: file.filename,
+      department: file.department ? file.department.name : 'None',
+      time: file.time_created ? file.time_created.replace('T', ' ') : null,
+    })));
   };
 
   return (
@@ -111,7 +144,18 @@ function AdminOverview() {
           <h2>{t.filterFiles}</h2>
           <div className="section-header">
             <p>{t.searchFiles}</p>
-            <input type="text" placeholder="Search files..." />
+            <input
+              type="text"
+              placeholder="Search files..."
+              value={searchText}
+              onChange={e => setSearchText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleRefresh();
+                }
+              }}
+            />
           </div>
 
           <div className="section-header">
@@ -119,6 +163,8 @@ function AdminOverview() {
             <Select
               isMulti
               options={optionsDepts}
+              value={selectedDepts}
+              onChange={setSelectedDepts}
               className="department-filter-testid"
               classNamePrefix="react-select"
             />
@@ -136,6 +182,8 @@ function AdminOverview() {
             <Select
               isMulti
               options={optionsHosts}
+              value={selectedHosts}
+              onChange={setSelectedHosts}
               className="hostname-filter-testid"
               classNamePrefix="react-select"
             />
@@ -144,16 +192,26 @@ function AdminOverview() {
           <div className="section-header">
             <p>{t.dateRange}</p>
             <p>From</p>
-            <input type="datetime-local" />
+            <input
+              type="datetime-local"
+              value={dateFrom}
+              onChange={e => setDateFrom(e.target.value)}
+            />
             <p>To</p>
-            <input type="datetime-local" />
+            <input
+              type="datetime-local"
+              value={dateTo}
+              onChange={e => setDateTo(e.target.value)}
+            />
           </div>
 
           <div className="section-header">
             <p>{t.benchmarkTypes}</p>
             <Select
               isMulti
-              options={optionsBMs}
+              options={optionsBenchTypes}
+              value={selectedBenchTypes}
+              onChange={setSelectedBenchTypes}
               className="benchmark-filter-testid"
               classNamePrefix="react-select"
             />
@@ -210,6 +268,7 @@ function AdminOverview() {
                   </>
                 )}
           </div>
+          <button className="btn-blue" onClick={() => handleRefresh()}>Search</button>
         </div>
 
         {/* File Table Section */}

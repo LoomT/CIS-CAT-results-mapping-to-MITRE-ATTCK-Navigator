@@ -32,6 +32,42 @@ export function constructDownloadURL(fileIds) {
   return uri;
 }
 
+function constructQueryParams(
+  filename = '',
+  departments = [],
+  benchmarks = [],
+  hostnames = [],
+  dateFrom = '',
+  dateTo = '',
+) {
+  const queryParams = new URLSearchParams();
+  if (filename.length > 0) {
+    queryParams.append('search', filename);
+  }
+  if (departments.length > 0) {
+    departments.forEach(department => queryParams.append('department', department));
+  }
+  if (benchmarks.length > 0) {
+    benchmarks.forEach(benchmark => queryParams.append('benchmark', benchmark));
+  }
+  if (hostnames.length > 0) {
+    hostnames.forEach(hostname => queryParams.append('hostname', hostname));
+  }
+  if (dateFrom.length > 0) {
+    dateFrom = dateFrom.replaceAll('-', '')
+      .replaceAll(':', '')
+      .concat('00');
+    queryParams.append('min_time', dateFrom);
+  }
+  if (dateTo.length > 0) {
+    dateTo = dateTo.replaceAll('-', '')
+      .replaceAll(':', '')
+      .concat('00');
+    queryParams.append('max_time', dateTo);
+  }
+  return queryParams;
+}
+
 /**
  * Asynchronously handles downloading a file from the given URI and saves it with the specified filename.
  *
@@ -147,12 +183,38 @@ export async function handleDownload(uri, filename) {
  *
  * @async
  * @function
- * @returns {Promise<Object[]|void>} A promise that resolves to an array of file metadata objects if successful, or `void` if an error occurs.
+ * @returns {Promise<Object|null>} A promise that resolves to an object with file metadata if successful, or `null` if an error occurs.
  */
-export async function fetchFilesMetadata() {
+export async function fetchFilesMetadata(
+  filename = '',
+  departments = [],
+  benchmarks = [],
+  hostnames = [],
+  dateFrom = '',
+  dateTo = '',
+  page = 0,
+  pageSize = 20,
+) {
   let response;
   try {
-    response = await fetch('/api/files/');
+    const queryParams = constructQueryParams(
+      filename,
+      departments,
+      benchmarks,
+      hostnames,
+      dateFrom,
+      dateTo,
+    );
+
+    // Add pagination parameters
+    queryParams.append('page', page.toString());
+    queryParams.append('page_size', pageSize.toString());
+
+    const url = new URL(location.href);
+    url.pathname = '/api/files';
+    queryParams.forEach((value, key) => url.searchParams.append(key, value));
+    console.log('fetching files metadata from: ' + url.toString());
+    response = await fetch(url);
   }
   catch (error) {
     console.error('Error refreshing files:', error);
@@ -166,13 +228,13 @@ export async function fetchFilesMetadata() {
       // Fallback for unknown errors
       alert('Failed to refresh files. Please try again.');
     }
-    return;
+    return null;
   }
   if (!response.ok) {
     // Only 500 is possible for this endpoint at the moment
     console.error('Error fetching files:', response);
     alert('Server error occurred while refreshing the files. Please try again later.');
-    return;
+    return null;
   }
   let result;
   try {
@@ -188,7 +250,7 @@ export async function fetchFilesMetadata() {
       console.error('Error accessing or decoding response body:', error);
       alert('Error accessing or decoding response body. Please try again.');
     }
-    return;
+    return null;
   }
 
   console.log(result);
