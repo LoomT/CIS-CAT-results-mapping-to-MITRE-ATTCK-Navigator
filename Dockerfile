@@ -30,6 +30,12 @@ WORKDIR /app
 # Copy earlier since this is unlikely to change
 COPY --from=navigator-builder /build/attack-navigator/nav-app/dist/ ./static/attack-navigator
 
+# Copy the local config.json
+COPY ./navigator-config/mitre_attack_local/config/config_local.json ./static/attack-navigator/assets/config.json
+
+# Copy the local JSON blobs
+COPY ./navigator-config/mitre_attack_local ./static/attack-navigator/mitre_attack_local
+
 # Copy requirements first to leverage Docker cache
 COPY api/requirements.txt .
 RUN pip install -r requirements.txt

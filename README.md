@@ -9,6 +9,8 @@ First make sure all the submodules are cloned as well `git submodule update --in
 
 Then run `npm run build '--' --deploy-url /attack-navigator/ --base-href /attack-navigator/ --configuration production --aot=false --build-optimizer=false` to build the navigator
 
+*Optionally* for a fully offline experience install `pip install -r ./navigator-config/requirements.txt` and in the `navigator-config` run the `python update.py` to download all the files required to run the navigator fully offline.
+
 ### Client
 
 In the client directory
@@ -31,6 +33,8 @@ Execute `python -m flask run` to start Flask server for development
 Docker should be installed
 
 In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain and ensure that local SSL certificates are properly configured for secure access.
+
+Before building the container the attack navigator must be build to be used in full offline mode.
 
 Build and start the application `docker-compose up --build`
 
