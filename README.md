@@ -105,6 +105,7 @@ Alternatively install `eslint` in vscode
 - **Code**: `201 Created`
 - **Content-Type**: `application/json`
 - **Response Body**:
+# TODO: Change response
   ```json
   {
     "id": "string",       // Unique identifier for the file
@@ -157,14 +158,48 @@ Alternatively install `eslint` in vscode
 - **Response Body**:
 ``` json
   {
-    "files": [
-      {
-        "id": "string",       // Unique identifier for the file
-        "filename": "string"  // Name of the file
+  "data": [ // Up to page size of benchmarks
+    {
+      "benchmark": {
+        "id": 2,
+        "name": "CIS_Microsoft_Windows_11_Enterprise_Benchmark"
       },
-      ...
+      "department": null,
+      "file_name": "LAPTOP-BUP-CIS_Microsoft_Windows_11_Enterprise_Benchmark-20200506T093226Z-Passing.json",
+      "host_name": "LAPTOP-BUP",
+      "id": "f622f6f8-af0a-4c92-9a38-aace29cc21bb",
+      "result": "Passing",
+      "time_created": "2020-05-06T09:32:26"
+    }
+  ],
+  "filters": { // Filters to allow further more precise picking of files
+    "benchmarks": [
+      {
+        "count": 1,
+        "name": "CIS_Microsoft_Windows_11_Enterprise_Benchmark"
+      }
+    ],
+    "departments": [
+      {
+        "count": 1,
+        "name": "None"
+      }
+    ],
+    "max_time_created": "2020-05-06T09:32:26",
+    "min_time_created": "2020-05-06T09:32:26",
+    "results": [
+      {
+        "count": 1,
+        "name": "Passing"
+      }
     ]
+  }, // Info for pagination
+  "pagination": {
+    "page": 0,
+    "page_size": 20,
+    "total_count": 1
   }
+}
 ```
 
 #### Error Responses
@@ -175,6 +210,7 @@ Alternatively install `eslint` in vscode
 - **URL**: `/api/files/aggregate`
 - **Method**: `GET`
 
+Accepts same query parameters as api/files to aggregate all files that are matching the criteria
 #### Successful Response
 - **Code**: `200 OK`
 - **Content-Type**: `application/json`
@@ -198,6 +234,5 @@ Alternatively install `eslint` in vscode
 - All files are stored in a dedicated uploads directory
 - Each file is stored in its own unique directory identified by UUID
 - Filenames are sanitized for security
-- Original files are removed after processing
 - Error responses include cleanup of any partially created resources
 - Mappings are loaded from an Excel spreadsheed. Currently included file is from [CIS Security](https://www.cisecurity.org/insights/white-papers/cis-controls-v8-master-mapping-to-mitre-enterprise-attck-v82)

@@ -174,9 +174,9 @@ export async function fetchFilesMetadata() {
     alert('Server error occurred while refreshing the files. Please try again later.');
     return;
   }
-  let files;
+  let result;
   try {
-    files = (await response.json()).files;
+    result = await response.json();
   }
   catch (error) {
     console.error('Error downloading file:', error);
@@ -191,9 +191,9 @@ export async function fetchFilesMetadata() {
     return;
   }
 
-  console.log(files);
+  console.log(result);
 
-  return files;
+  return result;
 }
 
 /**
