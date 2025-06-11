@@ -65,7 +65,7 @@ function AdminLogin() {
       </div>
 
       {/* Token Input Section */}
-      <div className="card">
+      <div className="card padded">
         {/* TODO: translation */}
         <h2>Enter Token</h2>
         <div className="password-field-container" data-testid="password-field-container">

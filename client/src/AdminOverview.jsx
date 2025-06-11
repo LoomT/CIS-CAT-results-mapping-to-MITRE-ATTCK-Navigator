@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Select from 'react-select';
 import './globalstyle.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
@@ -11,6 +11,19 @@ import {
   handleSVGExport,
   handleVisualize,
 } from './FileAPI.js';
+
+// used for scroll-to-bottom event
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
 /**
  * AdminOverview Component
@@ -29,19 +42,33 @@ function AdminOverview() {
   const [isAllFilesChecked, setAllFilesChecked] = useState(false);
   const [optionsDepts, setOptionsDepts] = useState([]);
   const [selectedDepts, setSelectedDepts] = useState([]);
+  const [activeDepts, setActiveDepts] = useState([]);
   const [optionsBenchTypes, setOptionsBenchTypes] = useState([]);
   const [selectedBenchTypes, setSelectedBenchTypes] = useState([]);
+  const [activeBenchTypes, setActiveBenchTypes] = useState([]);
   const [optionsHosts, setOptionsHosts] = useState([]);
   const [selectedHosts, setSelectedHosts] = useState([]);
+  const [activeHosts, setActiveHosts] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [activeSearchText, setActiveSearchText] = useState('');
   const [dateFrom, setDateFrom] = useState('');
+  const [activeDateFrom, setActiveDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [activeDateTo, setActiveDateTo] = useState('');
+
   const [totalNumberOfFiles, setTotalNumberOfFiles] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMoreFiles, setHasMoreFiles] = useState(false);
+  const [pageSize] = useState(20);
+  const loadMoreAbortController = useRef(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isSearching, setIsSearching] = useState(true);
+
   const t = useContext(LanguageContext);
 
   useEffect(() => {
     // Load the options for the dropdowns when the component mounts
-    fetchFilesMetadata().then((result) => {
+    fetchFilesMetadata(0, pageSize).then((result) => {
       if (result === null) return;
       setOptionsDepts(result.filters.department.map(
         dept => ({ value: dept.id, label: dept.name }),
@@ -56,6 +83,24 @@ function AdminOverview() {
       handleRefresh(result);
     });
   }, []);
+
+  useEffect(() => {
+    if (!hasMoreFiles) return; // don't register the scroll listener if there are no files left to load
+    const handleScroll = debounce(() => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      // Check if user has scrolled to near the bottom (within 100px)
+      if (scrollTop + windowHeight >= documentHeight - 100) {
+        loadMoreFiles();
+      }
+    }, 100);
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isLoadingMore, isSearching, hasMoreFiles, currentPage, activeSearchText, activeDepts, activeBenchTypes, activeHosts, activeDateFrom, activeDateTo]);
+
   /**
    * Opens the export popup.
    */
@@ -93,36 +138,44 @@ function AdminOverview() {
   };
 
   /**
-   * Asynchronous function to handle the refresh operation for file metadata.
+   * Asynchronous function to handle the refresh operation for the file table.
    *
    * This function fetches metadata for files if a result parameter is not provided
-   * or processes a provided result object. It updates the state with selected
-   * properties of the file metadata.
+   * or processes a provided result object. The used search parameters are set as active
+   * for loading next pages such that newly selected options don't take effect until search is pressed.
+   *
+   * Will abort `loadMoreFiles` fetch operation if it was ongoing.
    *
    * @async
    * @function
    * @param {Object|null} [result=null] - Optional result data containing metadata of files.
    * If no result is provided, the function will fetch data using `fetchFilesMetadata`.
-   * @returns {void}
+   * @return {Promise<void>} Resolves when the loading process is complete. Returns nothing explicitly.
    */
-  const handleRefresh = async (result = null) => {
-    isLoading.current = true;
+  async function handleRefresh(result = null) {
+    // Cancel any ongoing loadMoreFiles request
+    if (loadMoreAbortController.current) {
+      loadMoreAbortController.current.abort();
+      loadMoreAbortController.current = null;
+    }
+
+    setIsSearching(true);
     setCurrentPage(0);
 
     if (result === null) {
       result = await fetchFilesMetadata(
+        0,
+        pageSize,
         searchText,
         selectedDepts.map(dept => dept.value),
         selectedBenchTypes.map(bench => bench.value),
         selectedHosts.map(host => host.value),
         dateFrom,
         dateTo,
-        0,
-        pageSize,
       );
     }
     if (result === null) {
-      isLoading.current = false;
+      setIsSearching(false);
       return;
     }
 
@@ -132,8 +185,92 @@ function AdminOverview() {
       department: file.department ? file.department.name : 'None',
       time: file.time_created ? file.time_created.replace('T', ' ') : null,
     })));
-  };
 
+    // lock in the active search parameters
+    // to be able to load more pages using these
+    setActiveSearchText(searchText);
+    setActiveDepts(selectedDepts.map(dept => dept.value));
+    setActiveBenchTypes(selectedBenchTypes.map(bench => bench.value));
+    setActiveHosts(selectedHosts.map(host => host.value));
+    setActiveDateFrom(dateFrom);
+    setActiveDateTo(dateTo);
+
+    setTotalNumberOfFiles(result.pagination.total_count);
+
+    // Check if there are more files to load
+    const totalPages = Math.ceil(result.pagination.total_count / pageSize);
+    setHasMoreFiles(totalPages > 1);
+    setAllFilesChecked(false);
+    setIsSearching(false);
+  }
+
+  /**
+   * Loads additional files metadata and appends it to the existing list of files.
+   * Manages the loading state and fetches data based on the current page, active filters, and other parameters.
+   * Handles aborting of ongoing requests and checks if more files are available to load.
+   *
+   * @async
+   * @function
+   * @return {Promise<void>} Resolves when the loading process is complete. Returns nothing explicitly.
+   */
+  async function loadMoreFiles() {
+    if (isLoadingMore || isSearching || !hasMoreFiles) return;
+
+    if (loadMoreAbortController.current) {
+      // Should not happen as filesAreBeingLoaded should have been true
+      console.error('Unexpected abort controller in loadMoreFiles: ', loadMoreAbortController.current);
+      return;
+    }
+
+    loadMoreAbortController.current = new AbortController();
+    setIsLoadingMore(true);
+    const nextPage = currentPage + 1;
+
+    const result = await fetchFilesMetadata(
+      nextPage,
+      pageSize,
+      activeSearchText,
+      activeDepts.map(dept => dept.value),
+      activeBenchTypes.map(bench => bench.value),
+      activeHosts.map(host => host.value),
+      activeDateFrom,
+      activeDateTo,
+      loadMoreAbortController.current.signal,
+    );
+
+    if (result === null) {
+      setIsLoadingMore(false);
+      loadMoreAbortController.current = null;
+      return;
+    }
+
+    // Append new files to existing ones
+    const newFiles = result.data.map(file => ({
+      id: file.id,
+      filename: file.filename,
+      department: file.department ? file.department.name : 'None',
+      time: file.time_created ? file.time_created.replace('T', ' ') : null,
+    }));
+
+    setFiles(prevFiles => [...prevFiles, ...newFiles]);
+    setCurrentPage(nextPage);
+
+    // Check if there are more files to load
+    const totalPages = Math.ceil(result.pagination.total_count / pageSize);
+    setHasMoreFiles(nextPage < totalPages - 1);
+    setIsLoadingMore(false);
+    loadMoreAbortController.current = null;
+  }
+
+  /**
+   * Constructs a download URL based on the selected files or filters.
+   * If no files are selected, the method returns null. If all files are
+   * checked, it constructs the URL using the provided query parameters.
+   * Otherwise, it generates the URL based on the selected file IDs.
+   *
+   * @return {URL|null} A download URL as a string, or null if no files
+   *         are selected (edge case handled when buttons are disabled).
+   */
   function constructAggregateDownloadURL() {
     if (files.length === 0) return null; // should not happen as the buttons are disabled
     else if (isAllFilesChecked) {
@@ -158,7 +295,7 @@ function AdminOverview() {
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
-        <div className="card admin-side-section">
+        <div className="card admin-side-section padded">
           <h2>{t.filterFiles}</h2>
           <div className="section-header">
             <p>{t.searchFiles}</p>
@@ -188,12 +325,13 @@ function AdminOverview() {
             />
           </div>
 
-          <div className="section-header">
-            <label>
-              <p>{t.onlyLatestFiles}</p>
-              <input type="checkbox" />
-            </label>
-          </div>
+          {/* TODO in seperate issue */}
+          {/* <div className="section-header"> */}
+          {/*  <label> */}
+          {/*    <p>{t.onlyLatestFiles}</p> */}
+          {/*    <input type="checkbox" /> */}
+          {/*  </label> */}
+          {/* </div> */}
 
           <div className="section-header">
             <p>{t.searchHosts}</p>
@@ -234,7 +372,27 @@ function AdminOverview() {
               classNamePrefix="react-select"
             />
           </div>
-          <button className="btn-blue" onClick={() => handleRefresh()}>Search</button>
+          <button
+            className="btn-blue"
+            onClick={() => handleRefresh()}
+            disabled={isSearching}
+          >
+            {isSearching
+              ? (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span>Searching</span>
+                    <div className="loading-dots">
+                      <span className="dot">.</span>
+                      <span className="dot">.</span>
+                      <span className="dot">.</span>
+                    </div>
+                  </div>
+                )
+              : (
+                  'Search'
+                )}
+          </button>
+
           <p>{'Showing ' + totalNumberOfFiles + ' files'}</p>
           <h2>Aggregation</h2>
           {files.length === 0 || (selectedFiles.length === 0 && !isAllFilesChecked)
@@ -289,7 +447,7 @@ function AdminOverview() {
 
         {/* File Table Section */}
         <div className="card file-table-section">
-          <table className="files-table">
+          <table>
             <thead>
               <tr>
                 <th>
@@ -336,6 +494,25 @@ function AdminOverview() {
               ))}
             </tbody>
           </table>
+
+          {/* Loading indicator */}
+          {isLoadingMore && (
+            <div className="loading-container">
+              <div className="loading-bounce">
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+          )}
+
+          {/* End of results indicator */}
+          {!hasMoreFiles && files.length > 0 && (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <p>No more files to load</p>
+            </div>
+          )}
+
         </div>
       </div>
 

@@ -32,6 +32,17 @@ export function constructDownloadURLFromFileIds(fileIds) {
   return uri;
 }
 
+/**
+ * Constructs a download URL based on the provided query parameters.
+ *
+ * @param {string} filename - The name of the file to download.
+ * @param {Array<string>} departments - List of department names to filter the data.
+ * @param {Array<string>} benchmarks - List of benchmarks to filter the data.
+ * @param {Array<string>} hostnames - List of hostnames to filter the data.
+ * @param {string} dateFrom - The start date for the data query in ISO format.
+ * @param {string} dateTo - The end date for the data query in ISO format.
+ * @return {URL} A URL object representing the constructed download URL.
+ */
 export function constructDownloadURLFromQueryParams(
   filename,
   departments,
@@ -55,6 +66,17 @@ export function constructDownloadURLFromQueryParams(
   return url;
 }
 
+/**
+ * Constructs query parameters based on the given inputs and returns them as a URLSearchParams object.
+ *
+ * @param {string} filename - The filename to be used as a search query. If empty, no filename parameter is added.
+ * @param {string[]} departments - An array of department names to filter by. Each department is added as a separate parameter.
+ * @param {string[]} benchmarks - An array of benchmark identifiers to filter by. Each benchmark is added as a separate parameter.
+ * @param {string[]} hostnames - An array of hostnames to filter by. Each hostname is added as a separate parameter.
+ * @param {string} dateFrom - The starting date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no minimum time parameter is added.
+ * @param {string} dateTo - The ending date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no maximum time parameter is added.
+ * @return {URLSearchParams} A URLSearchParams object containing the constructed query parameters.
+ */
 function constructQueryParams(
   filename = '',
   departments = [],
@@ -209,14 +231,15 @@ export async function handleDownload(uri, filename) {
  * @returns {Promise<Object|null>} A promise that resolves to an object with file metadata if successful, or `null` if an error occurs.
  */
 export async function fetchFilesMetadata(
+  page = 0,
+  pageSize = 20,
   filename = '',
   departments = [],
   benchmarks = [],
   hostnames = [],
   dateFrom = '',
   dateTo = '',
-  page = 0,
-  pageSize = 20,
+  signal = null,
 ) {
   let response;
   try {
@@ -237,14 +260,14 @@ export async function fetchFilesMetadata(
     url.pathname = '/api/files';
     queryParams.forEach((value, key) => url.searchParams.append(key, value));
     console.log('fetching files metadata from: ' + url.toString());
-    response = await fetch(url);
+    response = await fetch(url, { signal });
   }
   catch (error) {
-    console.error('Error refreshing files:', error);
     if (error.name === 'AbortError') {
-      alert('Refresh was cancelled. Please try again.');
+      return null; // Abort fetch
     }
-    else if (error instanceof TypeError) {
+    console.error('Error refreshing files:', error);
+    if (error instanceof TypeError) {
       alert('Network error occurred. Please check your internet connection and try again.');
     }
     else {
