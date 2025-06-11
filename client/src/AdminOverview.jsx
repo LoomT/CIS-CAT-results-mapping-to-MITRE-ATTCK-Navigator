@@ -47,9 +47,9 @@ function AdminOverview() {
     { value: 'enterprise', label: 'Enterprise' },
     { value: 'mobile', label: 'Mobile' },
   ];
-    /**
-   * Defines options for the benchmark type dropdown. Probably a TODO to not hardcode this
-   */
+  /**
+ * Defines options for the benchmark type dropdown. Probably a TODO to not hardcode this
+ */
   const optionsHosts = [
     { value: 'ho1', label: 'Host 1' },
     { value: 'ho2', label: 'Host 2' },
@@ -281,38 +281,42 @@ function AdminOverview() {
               >
                 SVG
               </button>
-              <button
-                className="popup-button"
-                onClick={
-                  exportAggregate
-                    ? () => {
-                        const url = constructDownloadURL(selectedFiles);
-                        if (url !== null) handlePDFExport([url], ['aggregateFrame']); // TODO
-                      }
-                    : () => {
+
+              {exportAggregate
+                ? (
+                    <>
+                      <button
+                        className="popup-button"
+                        onClick={() => {
+                          const url = constructDownloadURL(selectedFiles);
+                          if (url !== null) handlePDFExport([url], ['aggregateFrame']);
+                        }}
+                      >
+                        Aggregate PDF
+                      </button>
+                      <button
+                        className="popup-button"
+                        onClick={() => {
+                          const uris = selectedFiles.map(fileId => constructDownloadURL([fileId]));
+                          if (uris.every(url => url !== null)) handlePDFExport(uris, selectedFiles);
+                        }}
+                      >
+                        All PDF
+                      </button>
+                    </>
+                  )
+                : (
+                    <button
+                      className="popup-button"
+                      onClick={() => {
                         const url = constructDownloadURL([exportFile.id]);
                         if (url !== null) handlePDFExport([url], [exportFile.id]);
-                      }
-                }
-              >
-                Aggregate PDF
-              </button>
-              <button
-                className="popup-button"
-                onClick={
-                  exportAggregate
-                    ? () => {
-                        const uris = selectedFiles.map(fileId => constructDownloadURL([fileId]));
-                        if (uris.every(url => url !== null)) handlePDFExport(uris, selectedFiles);
-                      }
-                    : () => {
-                        const url = constructDownloadURL([exportFile.id]);
-                        if (url !== null) handlePDFExport([url], [exportFile.id]);
-                      }
-                }
-              >
-                All PDF
-              </button>
+                      }}
+                    >
+                      PDF
+                    </button>
+                  )}
+
               <button className="popup-cancel" onClick={handlePopupClose}>
                 {t.cancel}
               </button>
