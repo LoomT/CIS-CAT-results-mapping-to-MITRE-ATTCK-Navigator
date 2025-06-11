@@ -275,12 +275,12 @@ function AdminOverview() {
     if (files.length === 0) return null; // should not happen as the buttons are disabled
     else if (isAllFilesChecked) {
       return constructDownloadURLFromQueryParams(
-        searchText,
-        selectedDepts.map(dept => dept.value),
-        selectedBenchTypes.map(bench => bench.value),
-        selectedHosts.map(host => host.value),
-        dateFrom,
-        dateTo,
+        activeSearchText,
+        activeDepts.map(dept => dept.value),
+        activeBenchTypes.map(bench => bench.value),
+        activeHosts.map(host => host.value),
+        activeDateFrom,
+        activeDateTo,
       );
     }
     else {
