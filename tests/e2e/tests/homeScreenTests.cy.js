@@ -39,6 +39,6 @@ describe('HomeScreen tests', () => {
     cy.get('[data-testid="home-screen-admin-user-management"]').click();
 
     // Verify that we navigated to the Admin overview screen
-    cy.get('.user-management-dashboard').should('exist');
+    cy.get('[data-testid="user-management-dashboard"]').should('exist');
   });
 })

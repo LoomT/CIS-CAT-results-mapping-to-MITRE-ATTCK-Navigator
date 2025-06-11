@@ -14,7 +14,6 @@ describe('AdminOverview tests', () => {
 
   it('renders file table headers correctly', () => {
     cy.visit('/admin');
-    cy.get('[data-testid="password-field"]').type('correct-token{enter}', { force: true });
 
     cy.get('table.files-table thead').within(() => {
       cy.contains('th', 'Name');

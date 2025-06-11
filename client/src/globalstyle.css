@@ -362,46 +362,6 @@ h3 {
 }
 
 /** =======================================
- * || PASSWORD FIELDS ||
- * ======================================= */
-.password-field-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-top: 1rem;
-}
-
-.password-field {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  padding-right: 3rem;
-  font-size: 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  background-color: #f9fafb;
-  color: #374151;
-  font-family: 'Roboto', sans-serif;
-}
-
-.password-field::placeholder {
-  color: #6b7280;
-}
-
-.toggle-visibility-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 20px;
-  width: 20px;
-  cursor: pointer;
-  opacity: 0.7;
-  z-index: 2;
-  object-fit: contain;
-  pointer-events: auto;
-}
-
-/** =======================================
  * || ICON SIZING ||
  * ======================================= */
 img.back-icon,
