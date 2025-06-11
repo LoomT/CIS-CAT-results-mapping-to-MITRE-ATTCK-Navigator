@@ -16,7 +16,7 @@ describe('AdminOverview UI Tests (Frontend Only)', () => {
   });
 
   it('renders table headers correctly', () => {
-    cy.get('table.files-table thead').within(() => {
+    cy.get('table thead').within(() => {
       cy.contains('th', 'Name');
       cy.contains('th', 'Department');
       cy.contains('th', 'Date');
@@ -51,10 +51,10 @@ describe('AdminOverview UI Tests (Frontend Only)', () => {
   });
 
   it('action column placeholder exists', () => {
-    cy.get('table.files-table thead').contains('th', 'Actions');
-    cy.get('table.files-table tbody').then($body => {
+    cy.get('table thead').contains('th', 'Actions');
+    cy.get('table tbody').then($body => {
       if ($body.find('td').length > 0) {
-        cy.get('table.files-table tbody td').last().should('exist');
+        cy.get('table tbody td').last().should('exist');
       }
     });
   });
