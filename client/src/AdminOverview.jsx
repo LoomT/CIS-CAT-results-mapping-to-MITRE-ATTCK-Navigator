@@ -4,8 +4,8 @@ import './globalstyle.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import { LanguageContext } from './main.jsx';
 import {
-  constructDownloadURL,
   constructDownloadURLFromFileIds,
+  constructDownloadURLFromQueryParams,
   fetchFilesMetadata,
   handleDownload,
   handleSVGExport,
@@ -26,6 +26,7 @@ function AdminOverview() {
   const [exportFile, setExportFile] = useState({});
   const [exportAggregate, setExportAggregate] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [isAllFilesChecked, setAllFilesChecked] = useState(false);
   const [optionsDepts, setOptionsDepts] = useState([]);
   const [selectedDepts, setSelectedDepts] = useState([]);
   const [optionsBenchTypes, setOptionsBenchTypes] = useState([]);
@@ -133,6 +134,23 @@ function AdminOverview() {
     })));
   };
 
+  function constructAggregateDownloadURL() {
+    if (files.length === 0) return null; // should not happen as the buttons are disabled
+    else if (isAllFilesChecked) {
+      return constructDownloadURLFromQueryParams(
+        searchText,
+        selectedDepts.map(dept => dept.value),
+        selectedBenchTypes.map(bench => bench.value),
+        selectedHosts.map(host => host.value),
+        dateFrom,
+        dateTo,
+      );
+    }
+    else {
+      return constructDownloadURLFromFileIds(selectedFiles);
+    }
+  }
+
   return (
     <div className="full-panel">
       {/* Top Title */}
@@ -216,59 +234,57 @@ function AdminOverview() {
               classNamePrefix="react-select"
             />
           </div>
-          <button className="btn-blue" onClick={() => handleRefresh()}>Refresh</button>
-          <div>
-            <h2>Aggregation</h2>
-            {selectedFiles.length === 0
-              ? (
-                  <>
-                    <p>No files selected</p>
-                    <div className="button-container">
-                      <button className="btn-purple" disabled={true}>Export</button>
-                      <button className="btn-blue" disabled={true}>Visualize</button>
-                      <button className="btn-green" disabled={true}>Download</button>
-                    </div>
-                  </>
-                )
-              : (
-                  <>
-                    <p>{'Selected files: ' + selectedFiles.length}</p>
-                    <div className="button-container">
-                      <button
-                        className="btn-purple"
-                        onClick={
-                          () => handleExportClick(null, true)
-                        }
-                      >
-                        Export
-                      </button>
-                      <button
-                        className="btn-blue"
-                        onClick={
-                          () => {
-                            const url = constructDownloadURL(selectedFiles);
-                            if (url !== null) handleVisualize(url);
-                          }
-                        }
-                      >
-                        Visualize
-                      </button>
-                      <button
-                        className="btn-green"
-                        onClick={
-                          () => {
-                            const url = constructDownloadURL(selectedFiles);
-                            if (url !== null) handleDownload(url, 'combined_results.json');
-                          }
-                        }
-                      >
-                        Download
-                      </button>
-                    </div>
-                  </>
-                )}
-          </div>
           <button className="btn-blue" onClick={() => handleRefresh()}>Search</button>
+          <p>{'Showing ' + totalNumberOfFiles + ' files'}</p>
+          <h2>Aggregation</h2>
+          {files.length === 0 || (selectedFiles.length === 0 && !isAllFilesChecked)
+            ? (
+                <>
+                  <p>No files selected</p>
+                  <div className="button-container">
+                    <button className="btn-purple" disabled={true}>Export</button>
+                    <button className="btn-blue" disabled={true}>Visualize</button>
+                    <button className="btn-green" disabled={true}>Download</button>
+                  </div>
+                </>
+              )
+            : (
+                <>
+                  <p>{'Selected files: ' + (isAllFilesChecked ? totalNumberOfFiles : selectedFiles.length)}</p>
+                  <div className="button-container">
+                    <button
+                      className="btn-purple"
+                      onClick={
+                        () => handleExportClick(null, true)
+                      }
+                    >
+                      Export
+                    </button>
+                    <button
+                      className="btn-blue"
+                      onClick={
+                        () => {
+                          const url = constructAggregateDownloadURL();
+                          if (url !== null) handleVisualize(url);
+                        }
+                      }
+                    >
+                      Visualize
+                    </button>
+                    <button
+                      className="btn-green"
+                      onClick={
+                        () => {
+                          const url = constructAggregateDownloadURL();
+                          if (url !== null) handleDownload(url, 'combined_results.json');
+                        }
+                      }
+                    >
+                      Download
+                    </button>
+                  </div>
+                </>
+              )}
         </div>
 
         {/* File Table Section */}
@@ -276,7 +292,13 @@ function AdminOverview() {
           <table className="files-table">
             <thead>
               <tr>
-                <th>{t.select}</th>
+                <th>
+                  <input
+                    type="checkbox"
+                    checked={isAllFilesChecked}
+                    onChange={() => setAllFilesChecked(!isAllFilesChecked)}
+                  />
+                </th>
                 <th>{t.name}</th>
                 <th>{t.department}</th>
                 <th>{t.date}</th>
@@ -297,18 +319,19 @@ function AdminOverview() {
                   }
                   onVisualize={
                     () => {
-                      const url = constructDownloadURL([file.id]);
+                      const url = constructDownloadURLFromFileIds([file.id]);
                       if (url !== null) handleVisualize(url);
                     }
                   }
                   onDownload={
                     () => {
-                      const url = constructDownloadURL([file.id]);
+                      const url = constructDownloadURLFromFileIds([file.id]);
                       if (url !== null) handleDownload(url, file.filename);
                     }
                   }
                   showCheckbox={true}
                   onCheckboxChange={handleCheckboxChange}
+                  isAllFilesChecked={isAllFilesChecked}
                 />
               ))}
             </tbody>
@@ -327,11 +350,11 @@ function AdminOverview() {
                 onClick={
                   exportAggregate
                     ? () => {
-                        const url = constructDownloadURL(selectedFiles);
+                        const url = constructAggregateDownloadURL();
                         if (url !== null) handleSVGExport(url, null); // TODO
                       }
                     : () => {
-                        const url = constructDownloadURL([exportFile.id]);
+                        const url = constructDownloadURLFromFileIds([exportFile.id]);
                         if (url !== null) handleSVGExport(url, exportFile.id);
                       }
                 }

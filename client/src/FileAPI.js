@@ -12,7 +12,7 @@ import NavigatorAPI from './NavigatorAPI.js';
  * @param {Array<String>} fileIds - An array of file ids.
  * @returns {URL|null} A URL object pointing to the constructed download endpoint or null if no files are provided.
  */
-export function constructDownloadURL(fileIds) {
+export function constructDownloadURLFromFileIds(fileIds) {
   const uri = new URL(location.href);
   if (fileIds.length === 0) {
     console.error('No files selected!');
@@ -30,6 +30,29 @@ export function constructDownloadURL(fileIds) {
   }
   console.log('constructed URL for fetching files: ' + uri.toString());
   return uri;
+}
+
+export function constructDownloadURLFromQueryParams(
+  filename,
+  departments,
+  benchmarks,
+  hostnames,
+  dateFrom,
+  dateTo,
+) {
+  const url = new URL(location.href);
+  url.pathname = '/api/files/aggregate';
+  const queryParams = constructQueryParams(
+    filename,
+    departments,
+    benchmarks,
+    hostnames,
+    dateFrom,
+    dateTo,
+  );
+  queryParams.forEach((value, key) => url.searchParams.append(key, value));
+  console.log('constructed URL for fetching files: ' + url.toString());
+  return url;
 }
 
 function constructQueryParams(
