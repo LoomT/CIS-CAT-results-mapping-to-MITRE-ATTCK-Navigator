@@ -90,8 +90,8 @@ function AdminOverview() {
   };
 
   const handleRefresh = () => {
-    fetchFilesMetadata().then((files) => {
-      setFiles(files.map(file => ({
+    fetchFilesMetadata().then((result) => {
+      setFiles(result.data.map(file => ({
         id: file.id,
         filename: file.filename,
         department: 'Default Department',
