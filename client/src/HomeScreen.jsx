@@ -25,6 +25,13 @@ function HomeScreen() {
           </Link>
           <Link
             className="button btn-blue"
+            data-testid="home-screen-admin-button"
+            to="/admin/user-management"
+          >
+            Admin Dashboard
+          </Link>
+          <Link
+            className="button btn-blue"
             data-testid="home-screen-user-button"
             to="/manual-conversion"
           >

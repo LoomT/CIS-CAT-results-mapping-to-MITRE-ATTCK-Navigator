@@ -6,6 +6,7 @@ import UserScreen from './UserScreen.jsx';
 import HomeScreen from './HomeScreen.jsx';
 import AdminLogin from './AdminLogin.jsx';
 import AdminOverview from './AdminOverview.jsx';
+import UserManagementDashboard from './UserManagementDashboard.jsx';
 import translations from './translation-map';
 
 export const LanguageContext = createContext(translations['en']);
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/manual-conversion" element={<UserScreen />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/overview" element={<AdminOverview />} />
+          <Route path="/admin/user-management" element={<UserManagementDashboard />} />
         </Routes>
       </BrowserRouter>
     </LanguageProvider>

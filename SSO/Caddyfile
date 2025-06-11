@@ -1,0 +1,13 @@
+:3000 {
+	handle_path /login {
+		rewrite * /login.html
+		file_server
+	}
+
+	# Fallback to reverse proxy for everything else
+	handle {
+		reverse_proxy 172.24.80.1:5173 {
+			header_up X-Forwarded-User {http.request.cookie.sso_user}
+		}
+	}
+}
