@@ -4,7 +4,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
 import UserScreen from './UserScreen.jsx';
 import HomeScreen from './HomeScreen.jsx';
-import AdminLogin from './AdminLogin.jsx';
 import AdminOverview from './AdminOverview.jsx';
 import UserManagementDashboard from './UserManagementDashboard.jsx';
 import translations from './translation-map';
@@ -24,8 +23,7 @@ createRoot(document.getElementById('root')).render(
         <Routes>
           <Route index element={<HomeScreen />} />
           <Route path="/manual-conversion" element={<UserScreen />} />
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/admin/overview" element={<AdminOverview />} />
+          <Route path="/admin" element={<AdminOverview />} />
           <Route path="/admin/user-management" element={<UserManagementDashboard />} />
         </Routes>
       </BrowserRouter>

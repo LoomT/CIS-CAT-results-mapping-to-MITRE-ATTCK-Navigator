@@ -216,7 +216,10 @@ function UserManagementDashboard() {
   };
 
   return (
-    <div className="full-panel">
+    <div
+      className="full-panel"
+      data-testid="user-management-dashboard"
+    >
       {/* Top Title */}
       <div className="user-title">User Management Dashboard</div>
 

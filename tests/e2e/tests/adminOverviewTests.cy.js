@@ -3,7 +3,6 @@
 describe('AdminOverview tests', () => {
   it('displays all filter controls', () => {
     cy.visit('/admin');
-    cy.get('[data-testid="password-field"]').type('correct-token{enter}', { force: true });
 
     cy.get('.department-filter-testid').should('exist');
     cy.get('input[type="text"][placeholder="Search files..."]').should('exist');

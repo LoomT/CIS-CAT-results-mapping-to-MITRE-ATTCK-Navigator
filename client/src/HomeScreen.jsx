@@ -25,10 +25,10 @@ function HomeScreen() {
           </Link>
           <Link
             className="button btn-blue"
-            data-testid="home-screen-admin-button"
+            data-testid="home-screen-admin-user-management"
             to="/admin/user-management"
           >
-            Admin Dashboard
+            User Management
           </Link>
           <Link
             className="button btn-blue"
