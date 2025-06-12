@@ -36,11 +36,12 @@ class BaseModel(db.Model):
 
         # Add related objects to the dictionary
         for rel in self.__mapper__.relationships:
-            related_obj = getattr(self, rel.key)
-            if related_obj is not None:
-                result_dict[rel.key] = related_obj.to_dict()
-            else:
-                result_dict[rel.key] = None
+            if rel.key not in hidden_fields:
+                related_obj = getattr(self, rel.key)
+                if related_obj is not None:
+                    result_dict[rel.key] = related_obj.to_dict()
+                else:
+                    result_dict[rel.key] = None
 
         return result_dict
 
