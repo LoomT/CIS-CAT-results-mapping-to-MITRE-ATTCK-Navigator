@@ -9,13 +9,21 @@ try:
     from convert import convert_cis_to_attack, combine_results
     from utils import find_file, ClientException
     from db.db import initialize_db
-    from db.db_methods import get_metadata
+    from db.db_methods import get_metadata, get_user_department, \
+        get_all_departments_with_access, get_department_by_name, \
+        create_department, delete_department, \
+        get_all_users_with_departments, get_department, \
+        add_user_to_department, remove_user_from_department
     from db.db_utils import extract_metadata
 except ImportError:
     from .convert import convert_cis_to_attack, combine_results
     from .utils import find_file, ClientException
     from .db.db import initialize_db
-    from .db.db_methods import get_metadata
+    from .db.db_methods import get_metadata, get_user_department, \
+        get_all_departments_with_access, get_department_by_name, \
+        create_department, delete_department, \
+        get_all_users_with_departments, get_department, \
+        add_user_to_department, remove_user_from_department
     from .db.db_utils import extract_metadata
 
 
@@ -60,12 +68,6 @@ def register_routes(app):
     """Register all routes with the app"""
     upload_folder = app.config['UPLOAD_FOLDER']
     db = app.db
-
-    user_management_data = {
-        'departments': {},  # {id: {'name': str, 'created_by': str}}
-        'department_users': {},  # {dept_id: [user_handles]}
-        'next_dept_id': 1,
-    }
 
     # Parse super admins from environment variable
     SUPER_ADMINS = set()
@@ -120,46 +122,44 @@ def register_routes(app):
 
         return decorated_function
 
-    def get_user_department(user_handle):
-        """Get the department ID that a user is assigned to (if any)"""
-        for dept_id, users in user_management_data['department_users'].items():
-            if user_handle in users:
-                return dept_id
-        return None
-
-    def can_access_department(user_handle, department_id):
+    def api_can_access_department(user_handle, department_id):
         """Check if user can access a specific department"""
         if user_handle in SUPER_ADMINS:
             return True
         user_dept = get_user_department(user_handle)
-        return user_dept == str(department_id)
+        return user_dept == int(department_id)
 
     @app.get('/api/admin/departments')
     @require_admin
-    def get_departments():
+    def api_get_departments():
         """
         Get all departments (super admins see all,
         dept admins see only theirs)
         """
-        departments = []
-
-        for dept_id, dept_info in user_management_data['departments'].items():
-            if g.is_super_admin or can_access_department(g.current_user,
-                                                         dept_id):
-                departments.append(
+        try:
+            departments = get_all_departments_with_access(
+                g.current_user, 
+                g.is_super_admin
+            )
+            
+            return {
+                'departments': [
                     {
-                        'id': dept_id,
-                        'name': dept_info['name'],
-                        'created_by': dept_info.get('created_by', 'unknown'),
+                        'id': dept.id,
+                        'name': dept.name,
                     }
-                )
-
-        return {'departments': departments}, 200
+                    for dept in departments
+                ]
+            }, 200
+        except Exception as e:
+            print(f"Error fetching departments: {e}")
+            return {'message': 'Error fetching departments'}, 500
 
     @app.post('/api/admin/departments')
     @require_super_admin
-    def create_department():
+    def api_create_department():
         """Create a new department (super admin only)"""
+        
         data = request.get_json()
 
         if not data or not data.get('name'):
@@ -167,74 +167,63 @@ def register_routes(app):
 
         dept_name = data['name'].strip()
 
-        # Check if department name already exists
-        for dept_info in user_management_data['departments'].values():
-            if dept_info['name'].lower() == dept_name.lower():
+        try:
+            # Check if department name already exists
+            existing_dept = get_department_by_name(dept_name)
+            if existing_dept:
                 return {'message': 'Department name already exists'}, 400
 
-        # Create new department
-        dept_id = str(user_management_data['next_dept_id'])
-        user_management_data['departments'][dept_id] = {
-            'name': dept_name,
-            'created_by': g.current_user,
-        }
-        user_management_data['department_users'][dept_id] = []
-        user_management_data['next_dept_id'] += 1
+            # Create new department
+            department = create_department(dept_name)
 
-        return {
-            'department': {
-                'id': dept_id,
-                'name': dept_name,
-                'created_by': g.current_user,
-            }
-        }, 201
+            return {
+                'department': {
+                    'id': department.id,
+                    'name': department.name,
+                }
+            }, 201
+        except Exception as e:
+            print(f"Error creating department: {e}")
+            db.session.rollback()
+            return {'message': 'Error creating department'}, 500
 
-    @app.delete('/api/admin/departments/<department_id>')
+    @app.delete('/api/admin/departments/<int:department_id>')
     @require_super_admin
-    def delete_department(department_id):
+    def api_delete_department(department_id):
         """Delete a department and all its user assignments
         (super admin only)"""
-        if department_id not in user_management_data['departments']:
-            return {'message': 'Department not found'}, 404
-
-        # Remove department and its users
-        del user_management_data['departments'][department_id]
-        if department_id in user_management_data['department_users']:
-            del user_management_data['department_users'][department_id]
-
-        return {'message': 'Department deleted successfully'}, 200
+        
+        try:
+            if delete_department(department_id):
+                return {'message': 'Department deleted successfully'}, 200
+            else:
+                return {'message': 'Department not found'}, 404
+        except Exception as e:
+            print(f"Error deleting department: {e}")
+            db.session.rollback()
+            return {'message': 'Error deleting department'}, 500
 
     @app.get('/api/admin/users')
     @require_admin
-    def get_users():
+    def api_get_users():
         """Get all users and their department assignments"""
-        users = []
-
-        for dept_id, user_handles in user_management_data[
-            'department_users'
-        ].items():
-            if g.is_super_admin or can_access_department(g.current_user,
-                                                         dept_id):
-                dept_name = (
-                    user_management_data['departments']
-                    .get(dept_id, {})
-                    .get('name', 'Unknown')
-                )
-                for handle in user_handles:
-                    users.append(
-                        {
-                            'handle': handle,
-                            'department_id': dept_id,
-                            'department_name': dept_name,
-                        }
-                    )
-
-        return {'users': users}, 200
+        
+        try:
+            users = get_all_users_with_departments(
+                g.is_super_admin,
+                g.current_user
+            )
+            
+            return {'users': users}, 200
+        except Exception as e:
+            print(f"Error fetching users: {e}")
+            return {'message': 'Error fetching users'}, 500
 
     @app.post('/api/admin/department-users')
     @require_super_admin
-    def add_user_to_department():
+    def api_add_user_to_department():
         """Add a user to a department (super admin only)"""
+        
         data = request.get_json()
 
         if (
@@ -245,38 +234,41 @@ def register_routes(app):
             return {'message':
                     'Department ID and user handle are required'}, 400
 
-        dept_id = data['department_id']
-        user_handle = data['user_handle'].strip()
+        try:
+            dept_id = int(data['department_id'])
+            user_handle = data['user_handle'].strip()
 
-        # Validate department exists
-        if dept_id not in user_management_data['departments']:
-            return {'message': 'Department not found'}, 404
+            # Validate department exists
+            department = get_department(dept_id)
+            if not department:
+                return {'message': 'Department not found'}, 404
 
-        # Check if user is already in any department
-        current_dept = get_user_department(user_handle)
-        if current_dept:
-            dept_name = (
-                user_management_data['departments']
-                .get(current_dept, {})
-                .get('name', 'Unknown')
-            )
-            return {
-                'message':
-                f'User is already assigned to department: {dept_name}'
-            }, 400
+            # Check if user is already in any department
+            current_dept_id = get_user_department(user_handle)
+            if current_dept_id:
+                current_dept = get_department(current_dept_id)
+                dept_name = current_dept.name if current_dept else 'Unknown'
+                return {
+                    'message':
+                    f'User is already assigned to department: {dept_name}'
+                }, 400
 
-        # Add user to department
-        if dept_id not in user_management_data['department_users']:
-            user_management_data['department_users'][dept_id] = []
+            # Add user to department
+            add_user_to_department(dept_id, user_handle)
 
-        user_management_data['department_users'][dept_id].append(user_handle)
-
-        return {'message': 'User added to department successfully'}, 201
+            return {'message': 'User added to department successfully'}, 201
+        except ValueError:
+            return {'message': 'Invalid department ID'}, 400
+        except Exception as e:
+            print(f"Error adding user to department: {e}")
+            db.session.rollback()
+            return {'message': 'Error adding user to department'}, 500
 
     @app.delete('/api/admin/department-users')
     @require_super_admin
-    def remove_user_from_department():
+    def api_remove_user_from_department():
         """Remove a user from a department (super admin only)"""
+        
         data = request.get_json()
 
         if (
@@ -287,26 +279,29 @@ def register_routes(app):
             return {'message':
                     'Department ID and user handle are required'}, 400
 
-        dept_id = data['department_id']
-        user_handle = data['user_handle'].strip()
+        try:
+            dept_id = int(data['department_id'])
+            user_handle = data['user_handle'].strip()
 
-        # Validate department exists
-        if dept_id not in user_management_data['departments']:
-            return {'message': 'Department not found'}, 404
+            # Validate department exists
+            department = get_department(dept_id)
+            if not department:
+                return {'message': 'Department not found'}, 404
 
-        # Remove user from department
-        if dept_id in user_management_data['department_users']:
-            try:
-                user_management_data['department_users'][dept_id].remove(
-                    user_handle
-                )
+            # Remove user from department
+            if remove_user_from_department(dept_id, user_handle):
                 return {
                     'message': 'User removed from department successfully'
                 }, 200
-            except ValueError:
+            else:
                 return {'message': 'User not found in department'}, 404
-
-        return {'message': 'User not found in department'}, 404
+                
+        except ValueError:
+            return {'message': 'Invalid department ID'}, 400
+        except Exception as e:
+            print(f"Error removing user from department: {e}")
+            db.session.rollback()
+            return {'message': 'Error removing user from department'}, 500
 
     @app.get("/api/files/<file_id>")
     def get_converted_file(file_id: str) -> tuple[str, int] | Response:

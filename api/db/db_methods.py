@@ -6,10 +6,12 @@ from sqlalchemy.orm import aliased
 from enum import Enum
 
 try:
-    from db.models import Metadata, Benchmark, Department, Result, Hostname
+    from db.models import Metadata, Benchmark, Department, Result, Hostname, \
+        DepartmentUser
     from db.db import db
 except ImportError:
-    from .models import Metadata, Benchmark, Department, Result, Hostname
+    from .models import Metadata, Benchmark, Department, Result, Hostname, \
+        DepartmentUser
     from .db import db
 
 
@@ -95,6 +97,123 @@ def get_hostname(name: str) -> Hostname:
         db.session.rollback()
         hostname = db.session.execute(stmt).scalar_one_or_none()
     return hostname
+
+# Department and User Management Methods
+
+
+def get_department(department_id: int) -> Department | None:
+    """Retrieve a department by ID."""
+    return db.session.get(Department, department_id)
+
+
+def get_department_by_name(name: str) -> Department | None:
+    """Retrieve a department by name."""
+    stmt = select(Department).where(Department.name == name)
+    return db.session.execute(stmt).scalar_one_or_none()
+
+
+def create_department(name: str) -> Department:
+    """Create a new department."""
+    department = Department(name=name)
+    db.session.add(department)
+    db.session.commit()
+    return department
+
+
+def delete_department(department_id: int) -> bool:
+    """Delete a department and all its user assignments."""
+    department = get_department(department_id)
+    if department:
+        db.session.delete(department)
+        db.session.commit()
+        return True
+    return False
+
+
+def get_user_department(user_handle: str) -> int | None:
+    """Get the department ID that a user is assigned to (if any)."""
+    stmt = select(DepartmentUser.department_id).where(
+        DepartmentUser.user_handle == user_handle
+    )
+    result = db.session.execute(stmt).scalar_one_or_none()
+    return result
+
+
+def get_department_users(department_id: int) -> list[DepartmentUser]:
+    """Get all users in a department."""
+    stmt = select(DepartmentUser).where(
+        DepartmentUser.department_id == department_id
+    )
+    return db.session.execute(stmt).scalars().all()
+
+
+def add_user_to_department(department_id: int, user_handle: str) \
+      -> DepartmentUser:
+    """Add a user to a department."""
+    dept_user = DepartmentUser(
+        department_id=department_id,
+        user_handle=user_handle
+    )
+    db.session.add(dept_user)
+    db.session.commit()
+    return dept_user
+
+
+def remove_user_from_department(department_id: int, user_handle: str) -> bool:
+    """Remove a user from a department."""
+    stmt = select(DepartmentUser).where(
+        and_(
+            DepartmentUser.department_id == department_id,
+            DepartmentUser.user_handle == user_handle
+        )
+    )
+    dept_user = db.session.execute(stmt).scalar_one_or_none()
+    if dept_user:
+        db.session.delete(dept_user)
+        db.session.commit()
+        return True
+    return False
+
+
+def get_all_departments_with_access(user_handle: str,
+                                    is_super_admin: bool) -> list[Department]:
+    """Get all departments that a user has access to."""
+    if is_super_admin:
+        stmt = select(Department).order_by(Department.name)
+        return db.session.execute(stmt).scalars().all()
+
+    # Get user's department
+    user_dept_id = get_user_department(user_handle)
+    if user_dept_id:
+        return [get_department(user_dept_id)]
+    return []
+
+
+def get_all_users_with_departments(is_super_admin: bool,
+                                   user_handle: str) -> list[dict]:
+    """Get all users with their department assignments."""
+    if is_super_admin:
+        stmt = select(DepartmentUser).join(Department)
+    else:
+        # Department admins only see users in their department
+        user_dept_id = get_user_department(user_handle)
+        if not user_dept_id:
+            return []
+        stmt = select(DepartmentUser).where(
+            DepartmentUser.department_id == user_dept_id
+        ).join(Department)
+    
+    dept_users = db.session.execute(stmt).scalars().all()
+    
+    # Manually construct the response to avoid serialization issues
+    return [
+        {
+            'handle': du.user_handle,
+            'department_id': du.department_id,
+            'department_name': du.department.name if du.department else None
+        }
+        for du in dept_users
+    ]
 
 
 # TODO: Add department filter which comes from request token
