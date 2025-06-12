@@ -21,9 +21,14 @@ class Filter_type(Enum):
     OTHER = 3
 
 
-def get_metadata(args, ids: bool = False) -> dict | list[str]:
+def get_metadata(user_handle: str,
+                 is_super_admin: bool,
+                 args: dict,
+                 ids: bool = False) -> dict | list[str]:
     """Converting from arguments in request.args to function arguments."""
     return execute_query(
+        user_handle,
+        is_super_admin,
         min_time=datetime.fromisoformat(args.get('min_time'))
         if args.get('min_time') else None,
         max_time=datetime.fromisoformat(args.get('max_time'))
@@ -206,12 +211,6 @@ def get_all_users_with_departments() -> list[dict]:
     ]
 
 
-# TODO: Add department filter which comes from request token
-# Might need to swap to names to be able to create them on the spot
-def get_allowed_departments() -> list[int | None]:
-    return [None, 1, 2]  # Placeholder for actual department retrieval
-
-
 def compute_filter(column, options_list):
     """Creates a filter on a column based on equality"""
     # set to make sure there is at most 1 None or null
@@ -227,7 +226,8 @@ def compute_filter(column, options_list):
     # Add all other options (str or id)
     if options:
         filters.append(column.in_(options))
-    if filters:
+
+    if len(filters) > 0:
         return or_(*filters)
     return None
 
@@ -240,28 +240,31 @@ def compute_filter_minmax(column, min_value, max_value):
     if max_value:
         filters.append(column <= max_value)
 
-    if filters:
+    if len(filters) > 0:
         return and_(*filters)
     return None
 
 
-def compute_authorized_subquery() -> Subquery:
+def compute_authorized_subquery(user_handle: str,
+                                is_super_admin: bool) -> Subquery:
 
-    departments = get_allowed_departments()
+    departments = get_all_departments_with_access(user_handle, is_super_admin)
+    departments = list(map(lambda s: s.id, departments))
+
     filters = compute_filter(Metadata.department_id, departments)
-
-    # If no departments are available, make query return nothing
-    if departments == []:
-        filters.append(sql.false())
 
     # Start creating base query
     stmt = select(Metadata)
     if filters is not None:
         stmt = stmt.where(filters)
+    else:
+        stmt = stmt.where(sql.false())
     return stmt.subquery()
 
 
 def execute_query(
+    user_handle: str,
+    is_super_admin: bool,
     min_time: datetime | None = None,
     max_time: datetime | None = None,
     departments: list[int | str | None] = [],
@@ -290,7 +293,7 @@ def execute_query(
     """
 
     # Compute subquery of whats allowed
-    base_subquery = compute_authorized_subquery()
+    base_subquery = compute_authorized_subquery(user_handle, is_super_admin)
     mdt_alias = aliased(Metadata, base_subquery)
 
     # Time filters

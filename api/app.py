@@ -346,6 +346,7 @@ def register_routes(app):
         )
 
     @app.get('/api/files', strict_slashes=False)
+    @require_admin
     def get_files_metadata() -> tuple[str, int] | dict:
         """
         Endpoint for retrieving a list of all stored files' Metadata.
@@ -358,7 +359,9 @@ def register_routes(app):
 
         # query Metadata objects from the database based on request arguments
         try:
-            return get_metadata(request.args)
+            return get_metadata(g.get('current_user'),
+                                g.get('is_super_admin'),
+                                request.args)
         except Exception as e:
             print(f"Failed fetching metadata: {e}")
             return "Internal server error", 500
