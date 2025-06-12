@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useState } from 'react';
 import './globalstyle.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import { LanguageContext } from './main.jsx';
-import { constructDownloadURL, handleDownload, handleFileUpload, handleSVGExport, handleVisualize } from './FileAPI.js';
+import { constructDownloadURL, handleDownload, handleFileUpload, handlePDFExport, handleSVGExport, handleVisualize } from './FileAPI.js';
 
 /**
  * UserScreen Component
@@ -236,7 +236,17 @@ function UserScreen() {
               >
                 SVG
               </button>
-              <button className="popup-button">PNG</button>
+              <button
+                className="popup-button"
+                onClick={
+                  () => {
+                    const url = constructDownloadURL([currentFile.id]);
+                    if (url !== null) handlePDFExport([url], [currentFile.id]);
+                  }
+                }
+              >
+                PDF
+              </button>
               <button className="popup-cancel" onClick={handleClosePopup}>
                 {t.cancel}
               </button>
