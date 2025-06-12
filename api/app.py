@@ -378,7 +378,9 @@ def register_routes(app):
         # If no file ids are provided, try the request arguments
         # if no IDs, then return 400 Bad Request
         if not file_ids:
-            file_ids = get_metadata(request.args, ids=True)
+            file_ids = get_metadata(g.get('current_user'),
+                                    g.get('is_super_admin'),
+                                    request.args, ids=True)
             if not file_ids:
                 return "No file ids were found " \
                        "matching the query constraints", 404

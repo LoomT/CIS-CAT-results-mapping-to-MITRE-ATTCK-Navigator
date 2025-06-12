@@ -254,10 +254,12 @@ def compute_authorized_subquery(user_handle: str,
     filters = compute_filter(Metadata.department_id, departments)
 
     # Start creating base query
+
+    # The filters might be None because we do not assign files to departments
     stmt = select(Metadata)
     if filters is not None:
         stmt = stmt.where(filters)
-    else:
+    elif not is_super_admin:
         stmt = stmt.where(sql.false())
     return stmt.subquery()
 
@@ -342,7 +344,7 @@ def execute_query(
     ids_stmt = select(mdt_alias.id).select_from(mdt_alias)
     count_stmt = select(func.count()).select_from(mdt_alias)
 
-    if filters is not None:
+    if len(filters) > 0:
         data_stmt = data_stmt.where(and_(*filters))
         ids_stmt = ids_stmt.where(and_(*filters))
         count_stmt = count_stmt.where(and_(*filters))
