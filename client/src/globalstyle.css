@@ -34,13 +34,78 @@
 nav {
   width: calc(100% - 2em);
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   padding: 1em;
   background-color: #ffffff;
+  align-items: center;
+  gap: 1em;
   /* position: sticky; */
   /* top: 0; */
   /* z-index: 1000; */
 }
+
+.nav-left, .nav-center, .nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-left {
+  justify-content: flex-start;
+  order: 1;
+}
+
+.nav-center {
+  justify-content: center;
+  order: 2;
+  flex: 1;
+}
+
+.nav-right {
+  justify-content: flex-end;
+  order: 3;
+}
+
+/* User Display Styles */
+.user-display {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  justify-content: center;
+}
+
+.user-display.loading {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.user-display.guest {
+  color: #6c757d;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #495057;
+  background: #e9ecef;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
 
 /** =======================================
  * || TOP BAR ||

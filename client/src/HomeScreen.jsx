@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import './globalstyle.css';
 import { Link } from 'react-router-dom';
-import { LanguageContext } from './main.jsx';
+import { LanguageContext, AuthContext } from './main.jsx';
 
 /**
  * HomeScreen Component
@@ -10,49 +10,7 @@ import { LanguageContext } from './main.jsx';
  */
 function HomeScreen() {
   const t = useContext(LanguageContext);
-  const [authStatus, setAuthStatus] = useState({
-    user: null,
-    is_super_admin: false,
-    is_department_admin: false,
-    loading: true,
-  });
-
-  useEffect(() => {
-    fetchAuthStatus();
-  }, []);
-
-  const fetchAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/auth/status');
-      if (response.ok) {
-        const data = await response.json();
-        setAuthStatus({
-          user: data.user,
-          is_super_admin: data.is_super_admin,
-          is_department_admin: data.is_department_admin,
-          loading: false,
-        });
-      }
-      else {
-        // If auth status fails, assume no permissions
-        setAuthStatus({
-          user: null,
-          is_super_admin: false,
-          is_department_admin: false,
-          loading: false,
-        });
-      }
-    }
-    catch (error) {
-      console.error('Error fetching auth status:', error);
-      setAuthStatus({
-        user: null,
-        is_super_admin: false,
-        is_department_admin: false,
-        loading: false,
-      });
-    }
-  };
+  const authStatus = useContext(AuthContext);
 
   // Show loading state while checking permissions
   if (authStatus.loading) {
