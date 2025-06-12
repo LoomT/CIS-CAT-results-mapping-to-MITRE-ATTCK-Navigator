@@ -6,8 +6,8 @@
 
 	# Fallback to reverse proxy for everything else
 	handle {
-		reverse_proxy localhost:5173 {
-			header_up X-Forwarded-User {http.request.cookie.sso_user}
+		reverse_proxy localhost:{$UPSTREAM_PORT:5173} {
+			header_up X-Forwarded-User {cookie.sso_user}
 		}
 	}
 }

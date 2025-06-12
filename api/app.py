@@ -9,7 +9,7 @@ try:
     from convert import convert_cis_to_attack, combine_results
     from utils import find_file, ClientException
     from db.db import initialize_db
-    from db.db_methods import get_metadata, get_user_department, \
+    from db.db_methods import get_metadata, get_user_departments, \
         get_all_departments_with_access, get_department_by_name, \
         create_department, delete_department, \
         get_all_users_with_departments, get_department, \
@@ -19,7 +19,7 @@ except ImportError:
     from .convert import convert_cis_to_attack, combine_results
     from .utils import find_file, ClientException
     from .db.db import initialize_db
-    from .db.db_methods import get_metadata, get_user_department, \
+    from .db.db_methods import get_metadata, get_user_departments, \
         get_all_departments_with_access, get_department_by_name, \
         create_department, delete_department, \
         get_all_users_with_departments, get_department, \
@@ -43,6 +43,27 @@ def create_app(config=None):
 
     # Default configuration
     app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'uploads')
+    app.config['SUPER_ADMINS'] = set()
+
+    # Parse super admins from environment variable
+    super_admin_env = os.getenv('SUPER_ADMINS', "")
+    if super_admin_env:
+        app.config['SUPER_ADMINS'] = set(
+            handle.strip()
+            for handle in super_admin_env.split(';')
+            if handle.strip()
+        )
+
+    app.config['TRUSTED_IPS'] = set()
+
+    # Parse trusted IP addresses from environment variable
+    trusted_ips_env = os.getenv('TRUSTED_IPS', "")
+    if trusted_ips_env:
+        app.config['TRUSTED_IPS'] = set(
+            ip.strip()
+            for ip in trusted_ips_env.split(';')
+            if ip.strip()
+        )
 
     # Apply any additional configuration
     if config:
@@ -69,25 +90,8 @@ def register_routes(app):
     upload_folder = app.config['UPLOAD_FOLDER']
     db = app.db
 
-    # Parse super admins from environment variable
-    SUPER_ADMINS = set()
-    super_admin_env = os.getenv('SUPER_ADMINS', "")
-    if super_admin_env:
-        SUPER_ADMINS = set(
-            handle.strip()
-            for handle in super_admin_env.split(';')
-            if handle.strip()
-        )
-
-    # Parse trusted IP addresses from environment variable
-    TRUSTED_IPS = set()
-    trusted_ips_env = os.getenv('TRUSTED_IPS', "")
-    if trusted_ips_env:
-        TRUSTED_IPS = set(
-            ip.strip()
-            for ip in trusted_ips_env.split(';')
-            if ip.strip()
-        )
+    SUPER_ADMINS = app.config['SUPER_ADMINS']
+    TRUSTED_IPS = app.config['TRUSTED_IPS']
 
     @app.before_request
     def before_request():
@@ -107,8 +111,8 @@ def register_routes(app):
         if is_trusted_ip and user_handle:
             g.current_user = user_handle.strip()
             g.is_super_admin = g.current_user in SUPER_ADMINS
-            g.is_department_admin = get_user_department(g.current_user) \
-                is not None
+            g.is_department_admin = len(get_all_departments_with_access(
+                g.current_user, g.is_super_admin)) > 0
         else:
             g.current_user = None
             g.is_super_admin = False
@@ -142,13 +146,6 @@ def register_routes(app):
             return f(*args, **kwargs)
 
         return decorated_function
-
-    def api_can_access_department(user_handle, department_id):
-        """Check if user can access a specific department"""
-        if user_handle in SUPER_ADMINS:
-            return True
-        user_dept = get_user_department(user_handle)
-        return user_dept == int(department_id)
 
     @app.get('/api/admin/departments')
     @require_admin
@@ -260,13 +257,11 @@ def register_routes(app):
                 return {'message': 'Department not found'}, 404
 
             # Check if user is already in any department
-            current_dept_id = get_user_department(user_handle)
-            if current_dept_id:
-                current_dept = get_department(current_dept_id)
-                dept_name = current_dept.name if current_dept else 'Unknown'
+            deps = get_user_departments(user_handle)
+            if any([dep.id == dept_id for dep in deps]):
                 return {
                     'message':
-                    f'User is already assigned to department: {dept_name}'
+                    'User is already assigned to this department'
                 }, 400
 
             # Add user to department
@@ -317,6 +312,15 @@ def register_routes(app):
             print(f"Error removing user from department: {e}")
             db.session.rollback()
             return {'message': 'Error removing user from department'}, 500
+
+    @app.get('/api/auth/status')
+    def get_auth_status():
+        """Get current user's authentication status"""
+        return {
+            'user': g.get('current_user'),
+            'is_super_admin': g.get('is_super_admin', False),
+            'is_department_admin': g.get('is_department_admin', False),
+        }, 200
 
     @app.get("/api/files/<file_id>")
     def get_converted_file(file_id: str) -> tuple[str, int] | Response:

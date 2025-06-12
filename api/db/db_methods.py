@@ -130,13 +130,16 @@ def delete_department(department_id: int) -> bool:
     return False
 
 
-def get_user_department(user_handle: str) -> int | None:
-    """Get the department ID that a user is assigned to (if any)."""
-    stmt = select(DepartmentUser.department_id).where(
-        DepartmentUser.user_handle == user_handle
+def get_user_departments(user_handle: str) -> list[Department]:
+    """Return all Department rows linked to user_handle (may be empty)."""
+    stmt = (
+        select(Department)
+        .join(DepartmentUser, Department.id == DepartmentUser.department_id)
+        .where(DepartmentUser.user_handle == user_handle)
+        .order_by(Department.name)
+        .distinct()
     )
-    result = db.session.execute(stmt).scalar_one_or_none()
-    return result
+    return db.session.execute(stmt).scalars().all()
 
 
 def get_department_users(department_id: int) -> list[DepartmentUser]:
@@ -183,25 +186,13 @@ def get_all_departments_with_access(user_handle: str,
         return db.session.execute(stmt).scalars().all()
 
     # Get user's department
-    user_dept_id = get_user_department(user_handle)
-    if user_dept_id:
-        return [get_department(user_dept_id)]
-    return []
+    return get_user_departments(user_handle)
 
 
 def get_all_users_with_departments(is_super_admin: bool,
                                    user_handle: str) -> list[dict]:
     """Get all users with their department assignments."""
-    if is_super_admin:
-        stmt = select(DepartmentUser).join(Department)
-    else:
-        # Department admins only see users in their department
-        user_dept_id = get_user_department(user_handle)
-        if not user_dept_id:
-            return []
-        stmt = select(DepartmentUser).where(
-            DepartmentUser.department_id == user_dept_id
-        ).join(Department)
+    stmt = select(DepartmentUser).join(Department)
 
     dept_users = db.session.execute(stmt).scalars().all()
 
