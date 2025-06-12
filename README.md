@@ -155,57 +155,99 @@ Alternatively install `eslint` in vscode
   - When no files found in directory (dangling directory): `"No file found"`
   - When server encounters an unexpected error: `"Internal Server Error"`
 
-### List File Metadata
+### List File Metadata ir IDs
 - **URL**: `/api/files`
 - **Method**: `GET`
+- **Optional Query Parameters**:
+  - `verbose`: if `true` will return full metadata of retrieved files, else will return a list of file ids
+  - `search`: will filter on file whose filenames contain the search string
+  - `hostname`: hostname id to limit results to, can contain multiple
+  - `benchmark`: benchmark type id to limit results to, can contain multiple
+  - `result`: result type id of the report to limit results to, can contain multiple
+  - `department`: department id to limit results to, can contain multiple
+  - `min_time`: lower bound of report's creation date-time in ISO 8601 format, e.g., 2025-06-13T20:26:30Z
+  - `max_time`: upper bound of report's creation date-time in ISO 8601 format
+  - `page`: page index of results, starts at 0, default is 0 if omitted
+  - `page_size`: page size of results, default is 20 if omitted
 
 #### Successful Response
 - **Code**: `200 OK`
 - **Content-Type**: `application/json`
 - **Response Body**:
+
+if query parameters contains `verbose=true`:
 ``` json
-  {
-  "data": [ // Up to page size of benchmarks
+{
+  "data": [
     {
       "benchmark": {
-        "id": 2,
-        "name": "CIS_Microsoft_Windows_11_Enterprise_Benchmark"
+        "id": 1,
+        "name": "CIS_Microsoft_Windows_11_Stand"
       },
-      "department": null,
-      "file_name": "LAPTOP-BUP-CIS_Microsoft_Windows_11_Enterprise_Benchmark-20200506T093226Z-Passing.json",
-      "host_name": "LAPTOP-BUP",
-      "id": "f622f6f8-af0a-4c92-9a38-aace29cc21bb",
-      "result": "Passing",
-      "time_created": "2020-05-06T09:32:26"
+      "department": {
+        "id": 1,
+        "name": "some department"
+      },
+      "filename": "DESKTOP-123-CIS_Microsoft_Windows_11_Stand-alone_Benchmark-20250519T174834Z.json",
+      "hostname": {
+        "id": 1,
+        "name": "DESKTOP-123"
+      },
+      "id": "c39a05a3-d0b2-4b4a-b74d-414b2e79a428",
+      "result": {
+        "id": 1,
+        "name": "Passing"
+      },
+      "time_created": "2025-06-12T19:23:21"
     }
   ],
-  "filters": { // Filters to allow further more precise picking of files
-    "benchmarks": [
+  "filters": {
+    "benchmark": [
       {
         "count": 1,
-        "name": "CIS_Microsoft_Windows_11_Enterprise_Benchmark"
+        "id": 1,
+        "name": "CIS_Microsoft_Windows_11_Stand"
       }
     ],
-    "departments": [
+    "department": [
       {
         "count": 1,
-        "name": "None"
+        "id": 1,
+        "name": "some department"
       }
     ],
-    "max_time_created": "2020-05-06T09:32:26",
-    "min_time_created": "2020-05-06T09:32:26",
-    "results": [
+    "hostname": [
       {
         "count": 1,
+        "id": 1,
+        "name": "DESKTOP-123"
+      }
+    ],
+    "result": [
+      {
+        "count": 1,
+        "id": 1,
         "name": "Passing"
       }
-    ]
-  }, // Info for pagination
+    ],
+    "time": {
+      "global_max_value": "Thu, 12 Jun 2025 19:23:21 GMT",
+      "global_min_value": "Tue, 06 May 2025 09:32:26 GMT",
+      "local_max_value": "Thu, 12 Jun 2025 19:23:21 GMT",
+      "local_min_value": "Tue, 06 May 2025 09:32:26 GMT"
+    }
+  },
   "pagination": {
     "page": 0,
     "page_size": 20,
     "total_count": 1
   }
+}
+```
+else
+```json
+{
+  "ids": ["id1", "id2"]
 }
 ```
 

@@ -101,15 +101,11 @@ function constructQueryParams(
     hostnames.forEach(hostname => queryParams.append('hostname', hostname));
   }
   if (dateFrom.length > 0) {
-    dateFrom = dateFrom.replaceAll('-', '')
-      .replaceAll(':', '')
-      .concat('00');
+    dateFrom = dateFrom.concat(':00Z');
     queryParams.append('min_time', dateFrom);
   }
   if (dateTo.length > 0) {
-    dateTo = dateTo.replaceAll('-', '')
-      .replaceAll(':', '')
-      .concat('00');
+    dateTo = dateTo.concat(':00Z');
     queryParams.append('max_time', dateTo);
   }
   return queryParams;
@@ -215,6 +211,90 @@ export async function handleDownload(uri, filename) {
 }
 
 /**
+ * Asynchronously fetches ids for files from the server.
+ *
+ * This function makes a `GET` request to the `/api/files/` endpoint to retrieve all ids of files.
+ *
+ * If the fetch operation succeeds and the response can be properly decoded, it logs the retrieved file ids and returns them.
+ * Otherwise, it displays appropriate error messages to the user and logs the errors to the console.
+ *
+ * @async
+ * @function
+ * @param {string} filename - The filename to be used as a search query. If empty, no filename parameter is added.
+ * @param {string[]} departments - An array of department names to filter by. Each department is added as a separate parameter.
+ * @param {string[]} benchmarks - An array of benchmark identifiers to filter by. Each benchmark is added as a separate parameter.
+ * @param {string[]} hostnames - An array of hostnames to filter by. Each hostname is added as a separate parameter.
+ * @param {string} dateFrom - The starting date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no minimum time parameter is added.
+ * @param {string} dateTo - The ending date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no maximum time parameter is added.
+ * @returns {Promise<Object|null>} A promise that resolves to an object with file id list if successful, or `null` if an error occurs.
+ */
+export async function fetchFilesIDs(
+  filename = '',
+  departments = [],
+  benchmarks = [],
+  hostnames = [],
+  dateFrom = '',
+  dateTo = '',
+) {
+  let response;
+  try {
+    const queryParams = constructQueryParams(
+      filename,
+      departments,
+      benchmarks,
+      hostnames,
+      dateFrom,
+      dateTo,
+    );
+
+    const url = new URL(location.href);
+    url.pathname = '/api/files';
+    queryParams.forEach((value, key) => url.searchParams.append(key, value));
+    console.log('fetching files ids from: ' + url.toString());
+    response = await fetch(url);
+  }
+  catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return null; // Abort fetch
+    }
+    console.error('Error refreshing files:', error);
+    if (error instanceof TypeError) {
+      alert('Network error occurred. Please check your internet connection and try again.');
+    }
+    else {
+      // Fallback for unknown errors
+      alert('Failed to refresh files. Please try again.');
+    }
+    return null;
+  }
+  if (!response.ok) {
+    // Only 500 is possible for this endpoint at the moment
+    console.error('Error fetching files:', response);
+    alert('Server error occurred while refreshing the files. Please try again later.');
+    return null;
+  }
+  let ids;
+  try {
+    ids = (await response.json()).ids;
+  }
+  catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return null;
+    }
+    else {
+      // Fallback for unknown errors
+      console.error('Error accessing or decoding response body:', error);
+      alert('Error accessing or decoding response body. Please try again.');
+    }
+    return null;
+  }
+
+  console.log(ids);
+
+  return ids;
+}
+
+/**
  * Asynchronously fetches metadata for files from the server.
  *
  * This function makes a `GET` request to the `/api/files/` endpoint to retrieve metadata for files.
@@ -270,6 +350,7 @@ export async function fetchFilesMetadata(
     const url = new URL(location.href);
     url.pathname = '/api/files';
     queryParams.forEach((value, key) => url.searchParams.append(key, value));
+    url.searchParams.append('verbose', 'true');
     console.log('fetching files metadata from: ' + url.toString());
     response = await fetch(url, { signal });
   }

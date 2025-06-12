@@ -6,6 +6,7 @@ import { LanguageContext } from './main.jsx';
 import {
   constructDownloadURLFromFileIds,
   constructDownloadURLFromQueryParams,
+  fetchFilesIDs,
   fetchFilesMetadata,
   handleDownload,
   handlePDFExport,
@@ -555,10 +556,26 @@ function AdminOverview() {
                       </button>
                       <button
                         className="popup-button"
+                        disabled={isAllFilesChecked && hasMoreFiles} // TODO not loaded in files will not have an iframe for them to be loaded in
                         onClick={() => {
-                          //TODO
-                          const uris = selectedFiles.map(fileId => constructDownloadURLFromFileIds([fileId]));
-                          if (uris.every(url => url !== null)) handlePDFExport(uris, selectedFiles);
+                          if (!isAllFilesChecked) {
+                            const uris = selectedFiles.map(fileId => constructDownloadURLFromFileIds([fileId]));
+                            if (uris.every(url => url !== null)) handlePDFExport(uris, selectedFiles);
+                          }
+                          else {
+                            // TODO not loaded in files will not have an iframe for them to be loaded in
+                            fetchFilesIDs(
+                              activeSearchText,
+                              activeDepts.map(dept => dept.value),
+                              activeBenchTypes.map(bench => bench.value),
+                              activeHosts.map(host => host.value),
+                              activeDateFrom,
+                              activeDateTo,
+                            ).then((filesToDownload) => {
+                              const uris = filesToDownload.map(fileId => constructDownloadURLFromFileIds([fileId]));
+                              if (uris.every(url => url !== null)) handlePDFExport(uris, filesToDownload);
+                            });
+                          }
                         }}
                       >
                         All PDF
