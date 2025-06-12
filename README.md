@@ -106,7 +106,7 @@ Alternatively install `eslint` in vscode
 - **Method**: `POST`
 - **Content-Type**: `multipart/form-data`
 - **Request Body**:
-  - `file`: File to be uploaded (required)
+  - `file`: File to be uploaded (required), should have original generated filename to be parsed correctly
 
 #### Successful Response
 - **Code**: `201 Created`
