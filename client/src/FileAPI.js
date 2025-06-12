@@ -307,14 +307,14 @@ export async function handlePDFExport(uris, ids) {
  * @param file {Object} - The file to be uploaded.
  * @returns {Promise<Object|null>} - A promise with the file id that resolves when the file is uploaded.
  */
-export async function handleFileUpload(file) {
+export async function handleFileUpload(file, departmentId) {
   const formData = new FormData();
   formData.append('file', file);
 
   console.log('uploading file: ' + formData);
   let response;
   try {
-    response = await fetch('/api/files/', {
+    response = await fetch(`/api/files/?department_id=${encodeURIComponent(departmentId)}`, {
       method: 'POST',
       body: formData,
     });

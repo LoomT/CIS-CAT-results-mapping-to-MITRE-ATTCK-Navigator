@@ -13,7 +13,10 @@ try:
         get_all_departments_with_access, get_department_by_name, \
         create_department, delete_department, \
         get_all_users_with_departments, get_department, \
-        add_user_to_department, remove_user_from_department
+        add_user_to_department, remove_user_from_department, \
+        get_bearer_token_by_token, update_bearer_token_last_used, \
+        create_bearer_token, verify_bearer_token_access, \
+        revoke_bearer_token, get_bearer_tokens_for_departments
     from db.db_utils import extract_metadata
 except ImportError:
     from .convert import convert_cis_to_attack, combine_results
@@ -23,7 +26,10 @@ except ImportError:
         get_all_departments_with_access, get_department_by_name, \
         create_department, delete_department, \
         get_all_users_with_departments, get_department, \
-        add_user_to_department, remove_user_from_department
+        add_user_to_department, remove_user_from_department, \
+        get_bearer_token_by_token, update_bearer_token_last_used, \
+        create_bearer_token, verify_bearer_token_access, \
+        revoke_bearer_token, get_bearer_tokens_for_departments
     from .db.db_utils import extract_metadata
 
 
@@ -97,7 +103,25 @@ def register_routes(app):
 
     @app.before_request
     def before_request():
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            token_str = auth_header[7:]  # Remove 'Bearer ' prefix
+            token = get_bearer_token_by_token(token_str)
 
+            if token:
+                # Update last used timestamp
+                update_bearer_token_last_used(token)
+
+                # Set context for bearer token authentication
+                g.current_user = token.machine_name
+                g.is_super_admin = False
+                g.is_department_admin = False
+                g.is_bearer_token = True
+                g.bearer_token = token
+                g.department_id = token.department_id
+                return
+
+        # If no bearer token, proceed with SSO or default authentication
         if app.config['ENABLE_SSO']:
             # Get the client's IP address
             # Check X-Forwarded-For header first for caddy
@@ -117,14 +141,18 @@ def register_routes(app):
                 g.is_super_admin = g.current_user in SUPER_ADMINS
                 g.is_department_admin = len(get_all_departments_with_access(
                     g.current_user, g.is_super_admin)) > 0
+                g.is_bearer_token = False
             else:
                 g.current_user = None
                 g.is_super_admin = False
                 g.is_department_admin = False
+                g.is_bearer_token = False
         else:
+            # SSO disabled - default admin access (unless using bearer token)
             g.current_user = "admin"
             g.is_super_admin = True
             g.is_department_admin = True
+            g.is_bearer_token = False
 
     def require_super_admin(f):
         """Decorator to require super admin privileges"""
@@ -154,6 +182,138 @@ def register_routes(app):
             return f(*args, **kwargs)
 
         return decorated_function
+
+    def require_auth(f):
+        """
+        Decorator to require admin privileges
+        (super admin or department admin)
+        """
+
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not g.get('current_user'):
+                return {'message': 'Authentication required'}, 401
+            if not (g.get('is_super_admin') or g.get('is_department_admin')\
+                    or g.get('is_bearer_token')):
+                return {'message': 'Admin privileges required'}, 403
+            return f(*args, **kwargs)
+
+        return decorated_function
+
+    @app.get('/api/admin/bearer-tokens')
+    @require_admin
+    def api_get_bearer_tokens():
+        """Get all bearer tokens for departments the user has access to."""
+        try:
+            # Get accessible departments
+            departments = get_all_departments_with_access(
+                g.current_user,
+                g.is_super_admin
+            )
+            department_ids = [dept.id for dept in departments]
+
+            # Get tokens for these departments
+            tokens = get_bearer_tokens_for_departments(department_ids)
+
+            return {
+                'tokens': [
+                    {
+                        'id': token.id,
+                        'machine_name': token.machine_name,
+                        'department_id': token.department_id,
+                        'department_name': token.department.name,
+                        'created_at': token.created_at.isoformat(),
+                        'last_used': token.last_used.isoformat()
+                        if token.last_used else None,
+                        'created_by': token.created_by,
+                        'is_active': token.is_active
+                    }
+                    for token in tokens
+                ],
+                'departments': [
+                    {
+                        'id': dept.id,
+                        'name': dept.name
+                    }
+                    for dept in departments
+                ]
+            }, 200
+        except Exception as e:
+            print(f"Error fetching bearer tokens: {e}")
+            return {'message': 'Error fetching bearer tokens'}, 500
+
+    @app.post('/api/admin/bearer-tokens')
+    @require_admin
+    def api_create_bearer_token():
+        """Create a new bearer token for a department."""
+        data = request.get_json()
+
+        if not data or not data.get('department_id') \
+                or not data.get('machine_name'):
+            return {
+                'message': 'Department ID and machine name are required'
+            }, 400
+
+        try:
+            dept_id = int(data['department_id'])
+            machine_name = data['machine_name'].strip()
+
+            # Verify user has access to this department
+            departments = get_all_departments_with_access(
+                g.current_user,
+                g.is_super_admin
+            )
+            department_ids = [dept.id for dept in departments]
+
+            if dept_id not in department_ids:
+                return {
+                    'message': 'You do not have access to this department'
+                }, 403
+
+            # Create the token
+            token = create_bearer_token(
+                department_id=dept_id,
+                machine_name=machine_name,
+                created_by=g.current_user
+            )
+
+            # Return the token data INCLUDING the actual token
+            # This is the only time we'll show the full token
+            return {
+                'token': token.to_dict_with_token()
+            }, 201
+
+        except ValueError:
+            return {'message': 'Invalid department ID'}, 400
+        except Exception as e:
+            print(f"Error creating bearer token: {e}")
+            db.session.rollback()
+            return {'message': 'Error creating bearer token'}, 500
+
+    @app.delete('/api/admin/bearer-tokens/<int:token_id>')
+    @require_admin
+    def api_revoke_bearer_token(token_id):
+        """Revoke a bearer token."""
+        try:
+            # Verify user has access to this token's department
+            departments = get_all_departments_with_access(
+                g.current_user,
+                g.is_super_admin
+            )
+            department_ids = [dept.id for dept in departments]
+
+            if not verify_bearer_token_access(token_id, department_ids):
+                return {'message': 'You do not have access to this token'}, 403
+
+            if revoke_bearer_token(token_id):
+                return {'message': 'Token revoked successfully'}, 200
+            else:
+                return {'message': 'Token not found'}, 404
+
+        except Exception as e:
+            print(f"Error revoking bearer token: {e}")
+            db.session.rollback()
+            return {'message': 'Error revoking bearer token'}, 500
 
     @app.get('/api/admin/departments')
     @require_admin
@@ -404,6 +564,7 @@ def register_routes(app):
         )
 
     @app.post('/api/files/')
+    @require_auth
     def save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         """Endpoint for uploading, converting and storing the converted file.
         Returns a response with the unique id of the converted file."""
@@ -415,6 +576,8 @@ def register_routes(app):
             file = request.files['file']
             if file.filename == '':
                 return "No selected file", 400
+
+            department_id = request.args.get('department_id', type=int)
 
             # Secure the filename to be able to safely store it
             filename = secure_filename(file.filename)
@@ -452,7 +615,30 @@ def register_routes(app):
                 metadata.id = unique_id
                 metadata.ip_address = request.remote_addr
                 metadata.filename = filename
+                # Handle department assignment
 
+                if hasattr(g, 'is_bearer_token') and g.is_bearer_token:
+                    metadata.department_id = g.department_id
+                elif department_id:
+                    # Verify user has access to this department
+                    departments = get_all_departments_with_access(
+                        g.current_user,
+                        g.is_super_admin
+                    )
+                    department_ids = [dept.id for dept in departments]
+
+                    if department_id not in department_ids:
+                        shutil.rmtree(os.path.join(upload_folder, unique_id))
+                        return {
+                            'message': 'You do not have access '
+                            'to this department'
+                        }, 403
+                    print(metadata)
+                    metadata.department_id = department_id
+                else:
+                    return {
+                        'message': 'No department supplied'
+                    }, 403
                 db.session.add(metadata)
                 db.session.commit()
                 db.session.refresh(metadata)

@@ -137,3 +137,45 @@ class DepartmentUser(BaseModel):
         sa.UniqueConstraint('department_id', 'user_handle',
                             name='_department_user_uc'),
     )
+
+
+class BearerToken(BaseModel):
+    """Model representing bearer tokens for automated uploads."""
+    __tablename__ = "bearer_token"
+    __hidden_fields__ = {"token"}  # Hide token from default serialization
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    token: Mapped[str] = mapped_column(
+        sa.String(36),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+    machine_name: Mapped[str] = mapped_column(nullable=False)
+    department_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("department.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        sa.DateTime,
+        default=func.now()
+    )
+    last_used: Mapped[datetime.datetime | None] = mapped_column(
+        sa.DateTime,
+        nullable=True
+    )
+    is_active: Mapped[bool] = mapped_column(
+        default=True,
+        index=True
+    )
+    created_by: Mapped[str] = mapped_column(nullable=False)
+
+    # Relationship to department
+    department: Mapped["Department"] = relationship("Department")
+
+    def to_dict_with_token(self):
+        """Special method to include token in response (use carefully)"""
+        result = self.to_dict()
+        result['token'] = self.token
+        return result

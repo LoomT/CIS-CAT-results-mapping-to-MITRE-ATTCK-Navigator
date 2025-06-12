@@ -40,6 +40,17 @@ function HomeScreen() {
             </Link>
           )}
 
+          {/* Bearer Token Management button - shown if user is department admin or super admin */}
+          {(authStatus.is_department_admin || authStatus.is_super_admin) && (
+            <Link
+              className="button btn-blue"
+              data-testid="home-screen-bearer-token-management"
+              to="/admin/bearer-token-management"
+            >
+              Bearer Token Management
+            </Link>
+          )}
+
           {/* User Management button - shown only if user is super admin */}
           {authStatus.is_super_admin && (
             <Link

@@ -6,6 +6,7 @@ import UserScreen from './UserScreen.jsx';
 import HomeScreen from './HomeScreen.jsx';
 import AdminOverview from './AdminOverview.jsx';
 import UserManagementDashboard from './UserManagementDashboard.jsx';
+import BearerTokenDashboard from './BearerTokenDashboard.jsx';
 import translations from './translation-map';
 
 export const LanguageContext = createContext(translations['en']);
@@ -33,6 +34,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/manual-conversion" element={<UserScreen />} />
             <Route path="/admin" element={<AdminOverview />} />
             <Route path="/admin/user-management" element={<UserManagementDashboard />} />
+            <Route path="/admin/bearer-token-management" element={<BearerTokenDashboard />} />
           </Routes>
         </BrowserRouter>
       </LanguageProvider>

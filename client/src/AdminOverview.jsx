@@ -95,8 +95,8 @@ function AdminOverview() {
       setFiles(result.data.map(file => ({
         id: file.id,
         filename: file.filename,
-        department: 'Default Department',
-        time: new Date().toISOString(),
+        department: file.department?.name || 'Unknown',
+        time: new Date(file.time_created).toLocaleString() || new Date().toLocaleString(),
       })));
     });
   };
