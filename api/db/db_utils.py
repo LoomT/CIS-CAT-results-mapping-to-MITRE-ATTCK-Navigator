@@ -11,41 +11,58 @@ from datetime import datetime
 
 
 # TODO: Needs to be tested
-def extract_metadata(filename: str) -> Metadata:
+def extract_metadata(filename: str, bench_type: str) -> Metadata:
     """
-    Parse filename and return a Metadata instance.
+    Extracts metadata from a given filename.
+
+    This function analyzes the input filename and
+    extracts various metadata elements,
+    including hostname, benchmark type, time of creation, and result status.
+    The structure of the filename is expected to contain
+    certain delimiters and specific formatting.
+
     Expected format: HOSTNAME-BENCHMARK-TIMESTAMP-RESULT.json
     Example: LAP-TOP-Benchmark_2-20250605T132738Z-NonPassing.json
+
+    :param filename: Input filename to extract metadata from.
+    :param bench_type: Type of benchmark expected in the filename structure.
+    :return: An instance of `Metadata` containing details such as hostname,
+    benchmark, time_created, and result extracted from the filename.
+    :raises ValueError: If the filename structure does not match
+    what is expected.
     """
 
-    partlist = filename.split('-')
+    hostname_and_rest = filename.removesuffix('.json').split(f'-{bench_type}-')
+    if len(hostname_and_rest) != 2:
+        raise ValueError(f"Invalid filename format: {filename}")
 
-    # Should contain at least 4 parts: hostname, benchamark, time, result
-    # TODO: metadata should be included in arguments body
-    if len(partlist) < 4:
-        print(f"Invalid filename: {partlist}")
-        return Metadata(filename=filename)
-
-    hostname_str = "-".join(partlist[0:-3])
+    hostname_str = hostname_and_rest[0]
     try:
         hostname = get_hostname(hostname_str)
     except ValueError:
         hostname = None
 
-    time_str = partlist[-2]
+    time_and_result = hostname_and_rest[1].split('-')
+    if len(time_and_result) != 1 and len(time_and_result) != 2:
+        raise ValueError(f"Invalid filename format: {filename}")
+
+    time_str = time_and_result[0]
     try:
         time_created = time_converter(time_str)
     except ValueError:
         time_created = None
 
-    benchmark_str = partlist[-3]
+    benchmark_str = bench_type
     try:
         benchmark = get_benchmark(benchmark_str)
     except Exception as e:
         print(f"Error fetching benchmark: {e}")
         benchmark = None
 
-    result_str = partlist[-1].replace('.json', '')
+    if len(time_and_result) == 2:
+        result_str = time_and_result[1]
+    else:
+        result_str = "Passing"
     try:
         result = get_result(result_str)
     except Exception as e:
