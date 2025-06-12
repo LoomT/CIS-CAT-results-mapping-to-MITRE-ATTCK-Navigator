@@ -115,6 +115,8 @@ class DepartmentUser(BaseModel):
     """Association table for department-user relationships"""
     __tablename__ = "department_user"
 
+    __hidden_fields__ = {"users"}
+
     id: Mapped[int] = mapped_column(primary_key=True)
     department_id: Mapped[int] = mapped_column(
         sa.ForeignKey("department.id", ondelete="CASCADE"),

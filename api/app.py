@@ -360,7 +360,7 @@ def register_routes(app):
         # query Metadata objects from the database based on request arguments
         try:
             return get_metadata(g.get('current_user'),
-                                g.get('is_super_admin'),
+                                g.get('is_super_admin', False),
                                 request.args)
         except Exception as e:
             print(f"Failed fetching metadata: {e}")
@@ -379,7 +379,7 @@ def register_routes(app):
         # if no IDs, then return 400 Bad Request
         if not file_ids:
             file_ids = get_metadata(g.get('current_user'),
-                                    g.get('is_super_admin'),
+                                    g.get('is_super_admin', False),
                                     request.args, ids=True)
             if not file_ids:
                 return "No file ids were found " \

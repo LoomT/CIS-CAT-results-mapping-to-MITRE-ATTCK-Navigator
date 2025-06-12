@@ -257,9 +257,11 @@ def compute_authorized_subquery(user_handle: str,
 
     # The filters might be None because we do not assign files to departments
     stmt = select(Metadata)
-    if filters is not None:
+    if is_super_admin:
+        pass
+    elif filters is not None:
         stmt = stmt.where(filters)
-    elif not is_super_admin:
+    else:
         stmt = stmt.where(sql.false())
     return stmt.subquery()
 
