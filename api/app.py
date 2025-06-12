@@ -193,7 +193,7 @@ def register_routes(app):
         def decorated_function(*args, **kwargs):
             if not g.get('current_user'):
                 return {'message': 'Authentication required'}, 401
-            if not (g.get('is_super_admin') or g.get('is_department_admin')\
+            if not (g.get('is_super_admin') or g.get('is_department_admin')
                     or g.get('is_bearer_token')):
                 return {'message': 'Admin privileges required'}, 403
             return f(*args, **kwargs)
