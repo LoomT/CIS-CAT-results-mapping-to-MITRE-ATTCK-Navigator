@@ -1,8 +1,9 @@
 describe('HomeScreen tests', () => {
-  it('should navigate to User Overview when User button is clicked', () => {
-    // Visit the home page
+  beforeEach(() => {
     cy.visit('/');
+  });
 
+  it('should navigate to User Overview when User button is clicked', () => {
     // Find and click the User button using its id
     cy.get('[data-testid="home-screen-user-button"]').should('be.visible')
     cy.get('[data-testid="home-screen-user-button"]').click();

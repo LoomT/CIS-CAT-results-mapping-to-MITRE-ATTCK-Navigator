@@ -18,7 +18,7 @@ python_lint:
     - pip install flake8
   script:
     # fail fast on real errors but still print the full report
-    - flake8 api tests --count --statistics
+    - flake8 api tests navigator-config --count --statistics
   artifacts:
     when: always
     name: "flake8-report-${CI_JOB_ID}.txt"
