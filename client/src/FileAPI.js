@@ -207,21 +207,33 @@ export const handleVisualize = (uri) => {
 };
 
 /**
- * Get the SVG representing this uri
+ * Creates a fresh iframe with NavigatorAPI client
+ *
+ * Dirty workaround to get a fresh handle to the iframe window.
+ * There are a couple of issues with reusing the old one,
+ * specifically that navigation takes time. A lot of time.
+ * So when we modify the src the window will still point to the
+ * old window object. There's definitely a better solution than this
+ * but let's mark this as TODO.
  */
-export async function getSVG(uri, id) {
+function createNavigatorClient(uri, id) {
   const newIframe = document.createElement('iframe');
   newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
   newIframe.src = '/attack-navigator/index.html';
-  newIframe.id = id; // TODO @Qyn what IFrame to use when aggregating?
+  newIframe.id = id;
 
   let frame = document.getElementById(id);
   frame.parentNode.replaceChild(newIframe, frame);
 
   let targetWindow = newIframe.contentWindow;
+  return new NavigatorAPI(targetWindow, uri.toString());
+}
 
-  let client = new NavigatorAPI(targetWindow, uri.toString());
-
+/**
+ * Get the SVG representing this uri
+ */
+export async function getSVG(uri, id) {
+  const client = createNavigatorClient(uri, id);
   return await client.getSVG();
 }
 
@@ -229,24 +241,7 @@ export async function getSVG(uri, id) {
  * Handle SVG export & download
  */
 export async function handleSVGExport(uri, id) {
-  /**
-   * Dirty workaround to get a fresh handle to the iframe window
-   * There are a couple of issues with reusing the old one
-   * Specifically that navigation takes time. A lot of time
-   * So when we modify the src the window will still point to the
-   * old window object. Theres definitely a better solution than this
-   * But let's mark this as TODO */
-  const newIframe = document.createElement('iframe');
-  newIframe.sandbox = 'allow-scripts allow-same-origin allow-downloads';
-  newIframe.src = '/attack-navigator/index.html';
-  newIframe.id = id; // TODO @Qyn what IFrame to use when aggregating?
-
-  let frame = document.getElementById(id);
-  frame.parentNode.replaceChild(newIframe, frame);
-
-  let targetWindow = newIframe.contentWindow;
-
-  let client = new NavigatorAPI(targetWindow, uri.toString());
+  const client = createNavigatorClient(uri, id);
   return await client.downloadSVG();
 }
 
