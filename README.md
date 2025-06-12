@@ -32,7 +32,7 @@ Docker should be installed
 
 In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain and ensure that local SSL certificates are properly configured for secure access.
 
-In addition to setting up caddy, also change the `web.env` environment file to change `SUPER_ADMINS` and `TRUSTED_IPS`, where `SUPER_ADMINS` is matched against `X-Forwarded-User` case sensitive and `TRUSTED_IPS` is tested against the source IP a request came from. In order for an admin to be trusted both the IP and the `X-Forwarded-User` have to be trusted.
+In addition to setting up caddy, also change the `web.env` environment file to change `SUPER_ADMINS` and `TRUSTED_IPS`, where `SUPER_ADMINS` is matched against `X-Forwarded-User` case sensitive and `TRUSTED_IPS` is tested against the source IP a request came from. In order for an admin to be trusted both the IP and the `X-Forwarded-User` have to be trusted. This is only enabled when the `ENABLE_SSO` environment variable is `true`.
 
 Before building the container the attack navigator must be build to be used in full offline mode.
 
