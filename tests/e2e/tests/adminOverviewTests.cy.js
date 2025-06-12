@@ -24,6 +24,8 @@ describe('AdminOverview UI Tests (Frontend Only)', () => {
   });
 
   it('checkboxes toggle correctly', () => {
+    cy.get('[data-testid="admin-overview-search-button"]')
+      .should('contain.text', 'Search').and('not.be.disabled');
     cy.get('input[type="checkbox"]').each(($checkbox) => {
       cy.wrap($checkbox).check();
       cy.wrap($checkbox).should('be.checked');

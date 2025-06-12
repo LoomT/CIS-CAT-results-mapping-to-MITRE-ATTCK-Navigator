@@ -376,6 +376,7 @@ function AdminOverview() {
           </div>
           <button
             className="btn-blue"
+            data-testid="admin-overview-search-button"
             onClick={() => handleRefresh()}
             disabled={isSearching}
           >
