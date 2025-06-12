@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import Subquery, select, func, and_, or_, sql
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import aliased
+from werkzeug.datastructures import MultiDict
 from enum import Enum
 
 try:
@@ -23,7 +24,7 @@ class Filter_type(Enum):
 
 def get_metadata(user_handle: str,
                  is_super_admin: bool,
-                 args: dict,
+                 args: MultiDict[str, str],
                  ids: bool = False) -> dict | list[str]:
     """Converting from arguments in request.args to function arguments."""
     return execute_query(

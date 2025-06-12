@@ -88,6 +88,8 @@ class Benchmark(BaseModel):
 
 class Department(BaseModel):
     __tablename__ = "department"
+    __hidden_fields__ = {"users"}
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
 
@@ -114,8 +116,6 @@ class Hostname(BaseModel):
 class DepartmentUser(BaseModel):
     """Association table for department-user relationships"""
     __tablename__ = "department_user"
-
-    __hidden_fields__ = {"users"}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     department_id: Mapped[int] = mapped_column(
