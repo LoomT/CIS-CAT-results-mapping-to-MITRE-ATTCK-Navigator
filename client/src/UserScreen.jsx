@@ -6,6 +6,7 @@ import {
   constructDownloadURLFromFileIds,
   handleDownload,
   handleFileUpload,
+  handlePDFExport,
   handleSVGExport,
   handleVisualize,
 } from './FileAPI.js';
@@ -238,7 +239,17 @@ function UserScreen() {
               >
                 SVG
               </button>
-              <button className="popup-button">PNG</button>
+              <button
+                className="popup-button"
+                onClick={
+                  () => {
+                    const url = constructDownloadURLFromFileIds([currentFile.id]);
+                    if (url !== null) handlePDFExport([url], [currentFile.id]);
+                  }
+                }
+              >
+                PDF
+              </button>
               <button className="popup-cancel" onClick={handleClosePopup}>
                 {t.cancel}
               </button>

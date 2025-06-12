@@ -3,13 +3,16 @@ from datetime import datetime
 from sqlalchemy import Subquery, select, func, and_, or_, sql
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import aliased
+from werkzeug.datastructures import MultiDict
 from enum import Enum
 
 try:
-    from db.models import Metadata, Benchmark, Department, Result, Hostname
+    from db.models import Metadata, Benchmark, Department, Result, Hostname, \
+        DepartmentUser
     from db.db import db
 except ImportError:
-    from .models import Metadata, Benchmark, Department, Result, Hostname
+    from .models import Metadata, Benchmark, Department, Result, Hostname, \
+        DepartmentUser
     from .db import db
 
 
@@ -19,9 +22,14 @@ class Filter_type(Enum):
     OTHER = 3
 
 
-def get_metadata(args, ids: bool = False) -> dict | list[str]:
+def get_metadata(user_handle: str,
+                 is_super_admin: bool,
+                 args: MultiDict[str, str],
+                 ids: bool = False) -> dict | list[str]:
     """Converting from arguments in request.args to function arguments."""
     return execute_query(
+        user_handle,
+        is_super_admin,
         min_time=datetime.fromisoformat(args.get('min_time'))
         if args.get('min_time') else None,
         max_time=datetime.fromisoformat(args.get('max_time'))
@@ -96,11 +104,112 @@ def get_hostname(name: str) -> Hostname:
         hostname = db.session.execute(stmt).scalar_one_or_none()
     return hostname
 
+# Department and User Management Methods
 
-# TODO: Add department filter which comes from request token
-# Might need to swap to names to be able to create them on the spot
-def get_allowed_departments() -> list[int | None]:
-    return [None, 1, 2]  # Placeholder for actual department retrieval
+
+def get_department(department_id: int) -> Department | None:
+    """Retrieve a department by ID."""
+    return db.session.get(Department, department_id)
+
+
+def get_department_by_name(name: str) -> Department | None:
+    """Retrieve a department by name."""
+    stmt = select(Department).where(Department.name == name)
+    return db.session.execute(stmt).scalar_one_or_none()
+
+
+def create_department(name: str) -> Department:
+    """Create a new department."""
+    department = Department(name=name)
+    db.session.add(department)
+    db.session.commit()
+    return department
+
+
+def delete_department(department_id: int) -> bool:
+    """Delete a department and all its user assignments."""
+    department = get_department(department_id)
+    if department:
+        db.session.delete(department)
+        db.session.commit()
+        return True
+    return False
+
+
+def get_user_departments(user_handle: str) -> list[Department]:
+    """Return all Department rows linked to user_handle (may be empty)."""
+    stmt = (
+        select(Department)
+        .join(DepartmentUser, Department.id == DepartmentUser.department_id)
+        .where(DepartmentUser.user_handle == user_handle)
+        .order_by(Department.name)
+        .distinct()
+    )
+    return db.session.execute(stmt).scalars().all()
+
+
+def get_department_users(department_id: int) -> list[DepartmentUser]:
+    """Get all users in a department."""
+    stmt = select(DepartmentUser).where(
+        DepartmentUser.department_id == department_id
+    )
+    return db.session.execute(stmt).scalars().all()
+
+
+def add_user_to_department(department_id: int, user_handle: str) \
+      -> DepartmentUser:
+    """Add a user to a department."""
+    dept_user = DepartmentUser(
+        department_id=department_id,
+        user_handle=user_handle
+    )
+    db.session.add(dept_user)
+    db.session.commit()
+    return dept_user
+
+
+def remove_user_from_department(department_id: int, user_handle: str) -> bool:
+    """Remove a user from a department."""
+    stmt = select(DepartmentUser).where(
+        and_(
+            DepartmentUser.department_id == department_id,
+            DepartmentUser.user_handle == user_handle
+        )
+    )
+    dept_user = db.session.execute(stmt).scalar_one_or_none()
+    if dept_user:
+        db.session.delete(dept_user)
+        db.session.commit()
+        return True
+    return False
+
+
+def get_all_departments_with_access(user_handle: str,
+                                    is_super_admin: bool) -> list[Department]:
+    """Get all departments that a user has access to."""
+    if is_super_admin:
+        stmt = select(Department).order_by(Department.name)
+        return db.session.execute(stmt).scalars().all()
+
+    # Get user's department
+    return get_user_departments(user_handle)
+
+
+def get_all_users_with_departments() -> list[dict]:
+    """Get all users with their department assignments."""
+    stmt = select(DepartmentUser).join(Department)
+
+    dept_users = db.session.execute(stmt).scalars().all()
+
+    # Manually construct the response to avoid serialization issues
+    return [
+        {
+            'handle': du.user_handle,
+            'department_id': du.department_id,
+            'department_name': du.department.name if du.department else None
+        }
+        for du in dept_users
+    ]
 
 
 def compute_filter(column, options_list):
@@ -118,7 +227,8 @@ def compute_filter(column, options_list):
     # Add all other options (str or id)
     if options:
         filters.append(column.in_(options))
-    if filters:
+
+    if len(filters) > 0:
         return or_(*filters)
     return None
 
@@ -131,28 +241,35 @@ def compute_filter_minmax(column, min_value, max_value):
     if max_value:
         filters.append(column <= max_value)
 
-    if filters:
+    if len(filters) > 0:
         return and_(*filters)
     return None
 
 
-def compute_authorized_subquery() -> Subquery:
+def compute_authorized_subquery(user_handle: str,
+                                is_super_admin: bool) -> Subquery:
 
-    departments = get_allowed_departments()
+    departments = get_all_departments_with_access(user_handle, is_super_admin)
+    departments = list(map(lambda s: s.id, departments))
+
     filters = compute_filter(Metadata.department_id, departments)
 
-    # If no departments are available, make query return nothing
-    if departments == []:
-        filters.append(sql.false())
-
     # Start creating base query
+
+    # The filters might be None because we do not assign files to departments
     stmt = select(Metadata)
-    if filters is not None:
+    if is_super_admin:
+        pass
+    elif filters is not None:
         stmt = stmt.where(filters)
+    else:
+        stmt = stmt.where(sql.false())
     return stmt.subquery()
 
 
 def execute_query(
+    user_handle: str,
+    is_super_admin: bool,
     min_time: datetime | None = None,
     max_time: datetime | None = None,
     departments: list[int | str | None] = [],
@@ -181,7 +298,7 @@ def execute_query(
     """
 
     # Compute subquery of whats allowed
-    base_subquery = compute_authorized_subquery()
+    base_subquery = compute_authorized_subquery(user_handle, is_super_admin)
     mdt_alias = aliased(Metadata, base_subquery)
 
     # Time filters
@@ -230,7 +347,7 @@ def execute_query(
     ids_stmt = select(mdt_alias.id).select_from(mdt_alias)
     count_stmt = select(func.count()).select_from(mdt_alias)
 
-    if filters is not None:
+    if len(filters) > 0:
         data_stmt = data_stmt.where(and_(*filters))
         ids_stmt = ids_stmt.where(and_(*filters))
         count_stmt = count_stmt.where(and_(*filters))

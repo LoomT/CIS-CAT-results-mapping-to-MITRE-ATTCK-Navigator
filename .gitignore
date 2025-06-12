@@ -25,3 +25,5 @@ tests/e2e/videos
 
 # Caddy
 caddy/logs/
+caddy/certs/*
+!caddy/certs/.gitkeep

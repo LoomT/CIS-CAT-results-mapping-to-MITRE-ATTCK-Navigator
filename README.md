@@ -4,7 +4,6 @@
 
 ### Build attack navigator
 
-
 First make sure all the submodules are cloned as well `git submodule update --init`, then in the cloned submodule directory enter the `nav-app` folder and run `npm ci` to install dependencies  
 
 Then run `npm run build '--' --deploy-url /attack-navigator/ --base-href /attack-navigator/ --configuration production --aot=false --build-optimizer=false` to build the navigator
@@ -19,7 +18,6 @@ For the first time execute `npm install` to install dependencies
 
 Execute `npm run dev` to start the frontend for development
 
-
 ### Server
 
 In the api directory
@@ -32,7 +30,10 @@ Execute `python -m flask run` to start Flask server for development
 
 Docker should be installed
 
-In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain and ensure that local SSL certificates are properly configured for secure access.
+In case you need to change the domain used by the tool, make sure to update the `caddy/Caddyfile` accordingly. This includes modifying the domain entries to reflect the new domain.  
+In addition to changing the `Caddyfile` also add the certificates to `caddy/certs/private.key` and `caddy/certs/cert.crt`. To generate a sample certificate run `gen.sh` in `caddy/`.
+
+In addition to setting up caddy, also change the `web.env` environment file to change `SUPER_ADMINS` and `TRUSTED_IPS`, where `SUPER_ADMINS` is matched against `X-Forwarded-User` case sensitive and `TRUSTED_IPS` is tested against the source IP a request came from. In order for an admin to be trusted both the IP and the `X-Forwarded-User` have to be trusted. This is only enabled when the `ENABLE_SSO` environment variable is `true`.
 
 Before building the container the attack navigator must be build to be used in full offline mode.
 
@@ -52,6 +53,12 @@ On top of this a `.wrapper.env` must be present in the same directory as the wra
 POST_URL=http://localhost:5000/api/files
 POST_BEARER=TOKEN_sometoken_here
 ```
+
+### Dummy SSO server
+
+First make sure caddy is [downloaded](https://caddyserver.com/download), then in the SSO folder run `caddy run`. Depending on the setup, change the `UPSTREAM_PORT` environment variable (i.e `$env:UPSTREAM_PORT=5000`) to the server ip. By default it will use port `5173`.
+
+After setting up caddy it is possible to access the dummy SSO portal through port `3000` with a login at `:3000/login`
 
 ## Development
 
@@ -229,6 +236,193 @@ Accepts same query parameters as api/files to aggregate all files that are match
 - **Code**: `500 Internal Server Error`
     - When server encounters an unexpected error: `"Internal Server Error"`
 
+
+### List Departments
+- **URL**: `/api/admin/departments`
+- **Method**: `GET`
+- **Role Required**: Admin (Department Admin or Super Admin)
+- **Headers**:
+  - `X-Forwarded-User`: Authenticated user handle (required)
+  - Originating IP **must** be in `TRUSTED_IPS`
+
+#### Successful Response
+- **Code**: `200 OK`
+- **Content-Type**: `application/json`
+- **Response Body**:
+  ```json
+  {
+    "departments": [
+      { "id": 3, "name": "SOC" },
+      { "id": 7, "name": "Blue Team" }
+    ]
+  }
+  ```
+
+#### Error Responses
+- **Code**: `401 Unauthorized`
+  - Missing `X-Forwarded-User` header or untrusted IP
+- **Code**: `403 Forbidden`
+  - Caller is not an admin
+- **Code**: `500 Internal Server Error`
+  - Unexpected database error
+
+
+### Create Department
+- **URL**: `/api/admin/departments`
+- **Method**: `POST`
+- **Role Required**: **Super Admin**
+- **Content-Type**: `application/json`
+- **Request Body**:
+  - `name` *(string, required)* - Unique department name
+
+#### Successful Response
+- **Code**: `201 Created`
+- **Content-Type**: `application/json`
+- **Response Body**:
+  ```json
+  {
+    "department": { "id": 12, "name": "Forensics" }
+  }
+  ```
+
+#### Error Responses
+- **Code**: `400 Bad Request`
+  - Missing name or duplicate department name
+- **Code**: `401 Unauthorized` / `403 Forbidden`
+  - Not authenticated / not a Super Admin
+- **Code**: `500 Internal Server Error`
+  - Database failure
+
+
+### Delete Department
+- **URL**: `/api/admin/departments/<department_id>`
+- **Method**: `DELETE`
+- **Role Required**: **Super Admin**
+- **URL Parameters**:
+  - `department_id` - ID of the department to delete (integer)
+
+#### Successful Response
+- **Code**: `200 OK`
+- **Content-Type**: `application/json`
+- **Response Body**:
+  ```json
+  { "message": "Department deleted successfully" }
+  ```
+
+#### Error Responses
+- **Code**: `404 Not Found`
+  - Department does not exist
+- **Code**: `401 Unauthorized` / `403 Forbidden`
+  - Not authenticated / not a Super Admin
+- **Code**: `500 Internal Server Error`
+  - Database failure
+
+
+### List Users
+- **URL**: `/api/admin/users`
+- **Method**: `GET`
+- **Role Required**: Admin (Department Admin or Super Admin)
+
+#### Successful Response
+- **Code**: `200 OK`
+- **Content-Type**: `application/json`
+- **Response Body**:
+  ```json
+  {
+    "users": [
+      { "handle": "alice", "department_id": 3, "department_name": "SOC" },
+      { "handle": "bob",   "department_id": null }
+    ]
+  }
+  ```
+
+#### Error Responses
+- **Code**: `401 Unauthorized`
+  - Missing `X-Forwarded-User` header or untrusted IP
+- **Code**: `403 Forbidden`
+  - Caller is not an admin
+- **Code**: `500 Internal Server Error`
+  - Unexpected database error
+
+
+### Add User to Department
+- **URL**: `/api/admin/department-users`
+- **Method**: `POST`
+- **Role Required**: **Super Admin**
+- **Content-Type**: `application/json`
+- **Request Body**:
+  - `department_id` *(integer, required)*
+  - `user_handle` *(string, required)*
+
+#### Successful Response
+- **Code**: `201 Created`
+- **Content-Type**: `application/json`
+- **Response Body**:
+  ```json
+  { "message": "User added to department successfully" }
+  ```
+
+#### Error Responses
+- **Code**: `400 Bad Request`
+  - Missing/invalid body or user is already assigned to a department
+- **Code**: `404 Not Found`
+  - Department not found
+- **Code**: `401 Unauthorized` / `403 Forbidden`
+  - Not authenticated / not a Super Admin
+- **Code**: `500 Internal Server Error`
+  - Database failure
+
+
+### Remove User from Department
+- **URL**: `/api/admin/department-users`
+- **Method**: `DELETE`
+- **Role Required**: **Super Admin**
+- **Content-Type**: `application/json`
+- **Request Body**:
+  - `department_id` *(integer, required)*
+  - `user_handle` *(string, required)*
+
+#### Successful Response
+- **Code**: `200 OK`
+- **Content-Type**: `application/json`
+- **Response Body**:
+  ```json
+  { "message": "User removed from department successfully" }
+  ```
+
+#### Error Responses
+- **Code**: `404 Not Found`
+  - User not found in the specified department
+- **Code**: `400 Bad Request`
+  - Missing/invalid body
+- **Code**: `401 Unauthorized` / `403 Forbidden`
+  - Not authenticated / not a Super Admin
+- **Code**: `500 Internal Server Error`
+  - Database failure
+
+
+### Get Authentication Status
+- **URL**: `/api/auth/status`
+- **Method**: `GET`
+- **Role Required**: None
+- **Headers (optional)**:
+  - `X-Forwarded-User`: User handle (only evaluated if request originates from a `TRUSTED_IP`)
+
+#### Successful Response
+- **Code**: `200 OK`
+- **Content-Type**: `application/json`
+- **Response Body**:
+  ```json
+  {
+    "user": "alice",
+    "is_super_admin": true,
+    "is_department_admin": true
+  }
+  ```
+
+#### Error Responses
+- **Code**: `500 Internal Server Error`
+  - Unexpected server error
 
 ### Notes
 - All files are stored in a dedicated uploads directory
