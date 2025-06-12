@@ -141,7 +141,7 @@ export async function handleDownload(uri, filename) {
   }
   catch (error) {
     console.error('Error downloading file:', error);
-    if (error.name === 'AbortError') {
+    if (error instanceof DOMException && error.name === 'AbortError') {
       alert('Downloading was cancelled. Please try again.');
     }
     else if (error instanceof TypeError) {
@@ -178,8 +178,8 @@ export async function handleDownload(uri, filename) {
     file = await response.blob();
   }
   catch (error) {
-    if (error instanceof DOMException) {
-      console.log('Download was cancelled by the user.');
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      alert('Downloading was cancelled. Please try again.');
     }
     else {
       // Fallback for unknown errors
@@ -228,6 +228,15 @@ export async function handleDownload(uri, filename) {
  *
  * @async
  * @function
+ * @param {int} page - The page number for pagination, starting from 0.
+ * @param {int} pageSize - The number of items to return per page.
+ * @param {string} filename - The filename to be used as a search query. If empty, no filename parameter is added.
+ * @param {string[]} departments - An array of department names to filter by. Each department is added as a separate parameter.
+ * @param {string[]} benchmarks - An array of benchmark identifiers to filter by. Each benchmark is added as a separate parameter.
+ * @param {string[]} hostnames - An array of hostnames to filter by. Each hostname is added as a separate parameter.
+ * @param {string} dateFrom - The starting date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no minimum time parameter is added.
+ * @param {string} dateTo - The ending date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no maximum time parameter is added.
+ * @param {AbortSignal} signal - The signal object that allows you to abort a DOM request.
  * @returns {Promise<Object|null>} A promise that resolves to an object with file metadata if successful, or `null` if an error occurs.
  */
 export async function fetchFilesMetadata(
@@ -263,7 +272,7 @@ export async function fetchFilesMetadata(
     response = await fetch(url, { signal });
   }
   catch (error) {
-    if (error.name === 'AbortError') {
+    if (error instanceof DOMException && error.name === 'AbortError') {
       return null; // Abort fetch
     }
     console.error('Error refreshing files:', error);
@@ -287,9 +296,8 @@ export async function fetchFilesMetadata(
     result = await response.json();
   }
   catch (error) {
-    console.error('Error downloading file:', error);
-    if (error instanceof DOMException) {
-      console.log('Refresh was cancelled by the user.');
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return null;
     }
     else {
       // Fallback for unknown errors
@@ -394,7 +402,7 @@ export async function handleFileUpload(file) {
     data = await response.json();
   }
   catch (error) {
-    if (error instanceof DOMException) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
       console.log('Upload was cancelled by the user.');
     }
     else if (error instanceof SyntaxError) {
