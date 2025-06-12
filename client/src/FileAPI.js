@@ -255,10 +255,15 @@ export async function handlePDFExport(uris, ids) {
     let svgPromise = getSVG(uris[i], ids[i]);
     promises.push(svgPromise);
   }
-
-  // Wait for all SVGs to be retrieved and store the results
-  const svgElements = await Promise.all(promises);
-
+  let svgElements;
+  try {
+    // Wait for all SVGs to be retrieved and store the results
+    svgElements = await Promise.all(promises);
+  }
+  catch {
+    alert('Failed to retrieve all SVGs');
+    return;
+  }
   if (svgElements.length === 0) {
     throw new Error('No SVG elements retrieved');
   }
