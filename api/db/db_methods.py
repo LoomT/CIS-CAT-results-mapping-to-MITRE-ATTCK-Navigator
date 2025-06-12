@@ -202,9 +202,9 @@ def get_all_users_with_departments(is_super_admin: bool,
         stmt = select(DepartmentUser).where(
             DepartmentUser.department_id == user_dept_id
         ).join(Department)
-    
+
     dept_users = db.session.execute(stmt).scalars().all()
-    
+
     # Manually construct the response to avoid serialization issues
     return [
         {

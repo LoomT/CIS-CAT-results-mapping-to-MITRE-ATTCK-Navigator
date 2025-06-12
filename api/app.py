@@ -138,10 +138,10 @@ def register_routes(app):
         """
         try:
             departments = get_all_departments_with_access(
-                g.current_user, 
+                g.current_user,
                 g.is_super_admin
             )
-            
+
             return {
                 'departments': [
                     {
@@ -159,7 +159,6 @@ def register_routes(app):
     @require_super_admin
     def api_create_department():
         """Create a new department (super admin only)"""
-        
         data = request.get_json()
 
         if not data or not data.get('name'):
@@ -192,7 +191,6 @@ def register_routes(app):
     def api_delete_department(department_id):
         """Delete a department and all its user assignments
         (super admin only)"""
-        
         try:
             if delete_department(department_id):
                 return {'message': 'Department deleted successfully'}, 200
@@ -207,13 +205,11 @@ def register_routes(app):
     @require_admin
     def api_get_users():
         """Get all users and their department assignments"""
-        
         try:
             users = get_all_users_with_departments(
                 g.is_super_admin,
                 g.current_user
             )
-            
             return {'users': users}, 200
         except Exception as e:
             print(f"Error fetching users: {e}")
@@ -223,7 +219,6 @@ def register_routes(app):
     @require_super_admin
     def api_add_user_to_department():
         """Add a user to a department (super admin only)"""
-        
         data = request.get_json()
 
         if (
@@ -268,7 +263,6 @@ def register_routes(app):
     @require_super_admin
     def api_remove_user_from_department():
         """Remove a user from a department (super admin only)"""
-        
         data = request.get_json()
 
         if (
@@ -295,7 +289,7 @@ def register_routes(app):
                 }, 200
             else:
                 return {'message': 'User not found in department'}, 404
-                
+
         except ValueError:
             return {'message': 'Invalid department ID'}, 400
         except Exception as e:
