@@ -42,6 +42,8 @@ def create_app(config=None):
                 static_url_path='/')
 
     # Default configuration
+    app.config['ENABLE_SSO'] = os.getenv('ENABLE_SSO', 'False').strip() \
+        .lower() in {'1', 'true', 't', 'yes', 'y', 'on'}
     app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'uploads')
     app.config['SUPER_ADMINS'] = set()
 
@@ -95,28 +97,34 @@ def register_routes(app):
 
     @app.before_request
     def before_request():
-        # Get the client's IP address
-        # Check X-Forwarded-For header first for caddy
-        if request.headers.get('X-Forwarded-For'):
-            # X-Forwarded-For can contain multiple IPs, get the first one
-            client_ip = request.headers.get('X-Forwarded-For') \
-                .split(',')[0].strip()
-        else:
-            client_ip = request.remote_addr
 
-        is_trusted_ip = client_ip in TRUSTED_IPS
+        if app.config['ENABLE_SSO']:
+            # Get the client's IP address
+            # Check X-Forwarded-For header first for caddy
+            if request.headers.get('X-Forwarded-For'):
+                # X-Forwarded-For can contain multiple IPs, get the first one
+                client_ip = request.headers.get('X-Forwarded-For') \
+                    .split(',')[0].strip()
+            else:
+                client_ip = request.remote_addr
 
-        # Parse X-Forwarded-User header
-        user_handle = request.headers.get('X-Forwarded-User')
-        if is_trusted_ip and user_handle:
-            g.current_user = user_handle.strip()
-            g.is_super_admin = g.current_user in SUPER_ADMINS
-            g.is_department_admin = len(get_all_departments_with_access(
-                g.current_user, g.is_super_admin)) > 0
+            is_trusted_ip = client_ip in TRUSTED_IPS
+
+            # Parse X-Forwarded-User header
+            user_handle = request.headers.get('X-Forwarded-User')
+            if is_trusted_ip and user_handle:
+                g.current_user = user_handle.strip()
+                g.is_super_admin = g.current_user in SUPER_ADMINS
+                g.is_department_admin = len(get_all_departments_with_access(
+                    g.current_user, g.is_super_admin)) > 0
+            else:
+                g.current_user = None
+                g.is_super_admin = False
+                g.is_department_admin = False
         else:
-            g.current_user = None
-            g.is_super_admin = False
-            g.is_department_admin = False
+            g.current_user = "admin"
+            g.is_super_admin = True
+            g.is_department_admin = True
 
     def require_super_admin(f):
         """Decorator to require super admin privileges"""
@@ -220,14 +228,11 @@ def register_routes(app):
             return {'message': 'Error deleting department'}, 500
 
     @app.get('/api/admin/users')
-    @require_admin
+    @require_super_admin
     def api_get_users():
         """Get all users and their department assignments"""
         try:
-            users = get_all_users_with_departments(
-                g.is_super_admin,
-                g.current_user
-            )
+            users = get_all_users_with_departments()
             return {'users': users}, 200
         except Exception as e:
             print(f"Error fetching users: {e}")
@@ -467,10 +472,21 @@ def register_routes(app):
     # Have to specify each page manually since static_url_path at line 17
     # intercepts the requests if @app.route('/<path:path>') is used.
     @app.route('/')
-    @app.route('/admin', strict_slashes=False)  # trailing dash is optional
     @app.route('/manual-conversion', strict_slashes=False)
     def serve() -> Response:
         """Serve pages that don't need authentication"""
+        return app.send_static_file('index.html')
+
+    @app.route('/admin', strict_slashes=False)
+    @require_admin
+    def serve_admin() -> Response:
+        """Serve pages that need at least admin role"""
+        return app.send_static_file('index.html')
+
+    @app.route('/admin/user-management', strict_slashes=False)
+    @require_super_admin
+    def serve_super_admin() -> Response:
+        """Serve pages that need super admin role"""
         return app.send_static_file('index.html')
 
 

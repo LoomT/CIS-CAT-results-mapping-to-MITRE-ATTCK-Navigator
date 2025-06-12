@@ -189,8 +189,7 @@ def get_all_departments_with_access(user_handle: str,
     return get_user_departments(user_handle)
 
 
-def get_all_users_with_departments(is_super_admin: bool,
-                                   user_handle: str) -> list[dict]:
+def get_all_users_with_departments() -> list[dict]:
     """Get all users with their department assignments."""
     stmt = select(DepartmentUser).join(Department)
 
