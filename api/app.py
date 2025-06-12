@@ -79,11 +79,32 @@ def register_routes(app):
             if handle.strip()
         )
 
+    # Parse trusted IP addresses from environment variable
+    TRUSTED_IPS = set()
+    trusted_ips_env = os.getenv('TRUSTED_IPS', "")
+    if trusted_ips_env:
+        TRUSTED_IPS = set(
+            ip.strip()
+            for ip in trusted_ips_env.split(';')
+            if ip.strip()
+        )
+
     @app.before_request
     def before_request():
+        # Get the client's IP address
+        # Check X-Forwarded-For header first for caddy
+        if request.headers.get('X-Forwarded-For'):
+            # X-Forwarded-For can contain multiple IPs, get the first one
+            client_ip = request.headers.get('X-Forwarded-For') \
+                .split(',')[0].strip()
+        else:
+            client_ip = request.remote_addr
+
+        is_trusted_ip = client_ip in TRUSTED_IPS
+
         # Parse X-Forwarded-User header
         user_handle = request.headers.get('X-Forwarded-User')
-        if user_handle:
+        if is_trusted_ip and user_handle:
             g.current_user = user_handle.strip()
             g.is_super_admin = g.current_user in SUPER_ADMINS
             g.is_department_admin = get_user_department(g.current_user) \
