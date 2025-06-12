@@ -50,11 +50,13 @@ def test_insecure_filename(client):
 
 def test_valid_file_upload(client, uploads_folder):
     """Test if save_file successfully processes and stores a valid file."""
-    valid_json_content = {'key': 'value'}
+    # benchmark-title is required in the JSON body for parsing
+    valid_json_content = {'key': 'value', 'benchmark-title': 'BENCHMARK-TYPE'}
+    filename = 'HOST-NAME-BENCHMARK-TYPE-20250506T093226Z.json'
     data = {
         'file': (
             io.BytesIO(json.dumps(valid_json_content).encode('utf-8')),
-            'test.json'
+            filename
         ),
     }
     response = client.post('/api/files/', data=data,
@@ -62,9 +64,9 @@ def test_valid_file_upload(client, uploads_folder):
     assert response.status_code == 201
     response_data = json.loads(response.get_data(as_text=True))
     assert 'id' in response_data
-    assert response_data['filename'] == 'test.json'
+    assert response_data['filename'] == filename
     unique_id = response_data['id']
-    file_path = os.path.join(uploads_folder, unique_id, 'test.json')
+    file_path = os.path.join(uploads_folder, unique_id, filename)
     assert os.path.exists(file_path)
     with open(file_path, 'r', encoding='utf-8') as f:
         stored_content = json.load(f)
@@ -112,11 +114,13 @@ def test_unique_id_collision(client, uploads_folder, mocker):
 
     # Now make the request,
     # which should detect the collision and use the second UUID
-    valid_json_content = {'key': 'value'}
+    # benchmark-title is required in the JSON body for parsing
+    valid_json_content = {'key': 'value', 'benchmark-title': 'BENCHMARK-TYPE'}
+    filename = 'HOST-NAME-BENCHMARK-TYPE-20250506T093226Z.json'
     data = {
         'file': (
             io.BytesIO(json.dumps(valid_json_content).encode('utf-8')),
-            'test.json'
+            filename
         ),
     }
 
@@ -133,7 +137,7 @@ def test_unique_id_collision(client, uploads_folder, mocker):
     assert response_data['id'] == expected_id
 
     # Verify the file was saved with the second UUID
-    file_path = os.path.join(uploads_folder, expected_id, 'test.json')
+    file_path = os.path.join(uploads_folder, expected_id, filename)
     assert os.path.exists(file_path)
 
     # Verify the UUID generation was called twice

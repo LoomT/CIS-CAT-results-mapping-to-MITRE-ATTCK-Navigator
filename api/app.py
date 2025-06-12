@@ -435,9 +435,19 @@ def register_routes(app):
                 upload_folder, unique_id, filename
             )
 
+            try:
+                cis_data = json.load(file.stream)
+            except json.JSONDecodeError:
+                return "Invalid file format", 400
+
+            with open(file_path, 'w', encoding='utf-8') as F:
+                json.dump(cis_data, F, ensure_ascii=False, indent=2)
+
             # DATABASE PART #
             try:
-                metadata = extract_metadata(filename)
+                bench_type = (cis_data.get('benchmark-title')
+                              .replace(' ', '_'))
+                metadata = extract_metadata(filename, bench_type)
                 # Set remaining metadata fields
                 metadata.id = unique_id
                 metadata.ip_address = request.remote_addr
@@ -449,17 +459,9 @@ def register_routes(app):
             except Exception as e:
                 print(f"Error extracting metadata: {e}")
                 db.session.rollback()
-                return "Error saving file metadata", 500
+                raise e
 
             # END OF DATABASE PART #
-
-            try:
-                cis_data = json.load(file.stream)
-            except json.JSONDecodeError:
-                return "Invalid file format", 400
-
-            with open(file_path, 'w', encoding='utf-8') as F:
-                json.dump(cis_data, F, ensure_ascii=False, indent=2)
 
             # Send the id of the modified file back to the client
             # TODO: change return to return Metadata object
