@@ -20,7 +20,8 @@ def app():
         'TESTING': True,
         'UPLOAD_FOLDER': test_upload_dir,
         'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',  # In-memory database
-        'SQLALCHEMY_ECHO': False
+        'SQLALCHEMY_ECHO': False,
+        'ENABLE_SSO': False
     }
 
     app = create_app(config)

@@ -36,11 +36,12 @@ class BaseModel(db.Model):
 
         # Add related objects to the dictionary
         for rel in self.__mapper__.relationships:
-            related_obj = getattr(self, rel.key)
-            if related_obj is not None:
-                result_dict[rel.key] = related_obj.to_dict()
-            else:
-                result_dict[rel.key] = None
+            if rel.key not in hidden_fields:
+                related_obj = getattr(self, rel.key)
+                if related_obj is not None:
+                    result_dict[rel.key] = related_obj.to_dict()
+                else:
+                    result_dict[rel.key] = None
 
         return result_dict
 
@@ -88,8 +89,17 @@ class Benchmark(BaseModel):
 
 class Department(BaseModel):
     __tablename__ = "department"
+    __hidden_fields__ = {"users"}
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
+
+    # Relationship to department users
+    users: Mapped[list["DepartmentUser"]] = relationship(
+        "DepartmentUser",
+        back_populates="department",
+        cascade="all, delete-orphan"
+    )
 
 
 class Result(BaseModel):
@@ -102,3 +112,28 @@ class Hostname(BaseModel):
     __tablename__ = "hostname"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
+
+
+class DepartmentUser(BaseModel):
+    """Association table for department-user relationships"""
+    __tablename__ = "department_user"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    department_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("department.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+    user_handle: Mapped[str] = mapped_column(nullable=False, index=True)
+
+    # Relationship to department
+    department: Mapped["Department"] = relationship(
+        "Department",
+        back_populates="users"
+    )
+
+    # Ensure unique combination of department and user
+    __table_args__ = (
+        sa.UniqueConstraint('department_id', 'user_handle',
+                            name='_department_user_uc'),
+    )
