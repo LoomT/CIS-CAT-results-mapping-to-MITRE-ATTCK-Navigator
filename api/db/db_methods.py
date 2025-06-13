@@ -5,14 +5,15 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import aliased
 from werkzeug.datastructures import MultiDict
 from enum import Enum
+import uuid
 
 try:
     from db.models import Metadata, Benchmark, Department, Result, Hostname, \
-        DepartmentUser
+        DepartmentUser, BearerToken
     from db.db import db
 except ImportError:
     from .models import Metadata, Benchmark, Department, Result, Hostname, \
-        DepartmentUser
+        DepartmentUser, BearerToken
     from .db import db
 
 
@@ -497,3 +498,69 @@ def get_filters_data(subq, filters_data):
             }
 
     return filters_list
+
+
+def create_bearer_token(department_id: int,
+                        machine_name: str, created_by: str) -> BearerToken:
+    """Create a new bearer token for a department."""
+    token = BearerToken(
+        token=str(uuid.uuid4()),
+        machine_name=machine_name,
+        department_id=department_id,
+        created_by=created_by
+    )
+    db.session.add(token)
+    db.session.commit()
+    return token
+
+
+def get_bearer_tokens_for_departments(department_ids: list[int]) \
+        -> list[BearerToken]:
+    """Get all bearer tokens for the specified departments."""
+    stmt = (
+        select(BearerToken)
+        .where(
+            and_(
+                BearerToken.department_id.in_(department_ids),
+                BearerToken.is_active
+            )
+        )
+        .order_by(BearerToken.created_at.desc())
+    )
+    return db.session.execute(stmt).scalars().all()
+
+
+def get_bearer_token_by_token(token_str: str) -> BearerToken | None:
+    """Get a bearer token by its token string."""
+    stmt = select(BearerToken).where(
+        and_(
+            BearerToken.token == token_str,
+            BearerToken.is_active
+        )
+    )
+    return db.session.execute(stmt).scalar_one_or_none()
+
+
+def revoke_bearer_token(token_id: int) -> bool:
+    """Revoke a bearer token by setting is_active to False."""
+    token = db.session.get(BearerToken, token_id)
+    if token:
+        token.is_active = False
+        db.session.commit()
+        return True
+    return False
+
+
+def update_bearer_token_last_used(token: BearerToken) -> None:
+    """Update the last_used timestamp for a bearer token."""
+    token.last_used = func.now()
+    db.session.commit()
+
+
+def verify_bearer_token_access(token_id: int, user_departments: list[int])\
+                                -> bool:
+    """Verify if a user has access to manage a specific bearer token."""
+    token = db.session.get(BearerToken, token_id)
+    if not token:
+        return False
+    return token.department_id in user_departments
