@@ -86,7 +86,8 @@ def _assemble_techniques(
         total = data['total']
         passed = data['pass']
         frac = passed / total if total else 0
-        comment_text = "\n".join(data['comments']) if include_comments else ''
+        comment_text = "\n".join(data['comments']) if include_comments \
+            else f'{passed}/{total}'
         techniques.append({
             'techniqueID': tech_id,
             'score': round(frac, 2),
