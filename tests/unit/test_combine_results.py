@@ -86,3 +86,76 @@ def test_conversion_performance():
     _ = convert_cis_to_attack(cis)
     elapsed = time.perf_counter() - start
     assert elapsed <= 0.5, f"Conversion took {elapsed:.2f}s, exceeds 0.5s"
+
+
+def test_single_input_all_pass():
+    """
+    Single CIS input with all-pass => every score 1.0, no comments.
+    """
+    base = './tests/data'
+    cis_true = json.load(
+        open(f"{base}/cisinput-true.json", 'r', encoding='utf-8')
+    )
+    layer = combine_results([cis_true])
+    techs = layer.get('techniques', [])
+    assert techs, "No techniques generated"
+    assert all(t['score'] == 1.0 for t in techs)
+
+
+def test_layer_schema():
+    """
+    Output dict and techniques entries match expected schema.
+    """
+    base = './tests/data'
+    cis_true = json.load(
+        open(f"{base}/cisinput-true.json", 'r', encoding='utf-8')
+    )
+    layer = convert_cis_to_attack(cis_true)
+    keys = set(layer.keys())
+    assert keys == {'version', 'name', 'domain', 'description',
+                    'techniques'}
+    for t in layer['techniques']:
+        tkeys = set(t.keys())
+        assert tkeys == {'techniqueID', 'score', 'color',
+                         'comment'}
+
+
+def test_combine_idempotent():
+    """
+    combine_results twice yields identical output.
+    """
+    base = './tests/data'
+    cis_false = json.load(
+        open(f"{base}/cisinput-false.json", 'r', encoding='utf-8')
+    )
+    cis_true = json.load(
+        open(f"{base}/cisinput-true.json", 'r', encoding='utf-8')
+    )
+    inp = [cis_false, cis_true]
+    out1 = combine_results(inp)
+    out2 = combine_results(inp)
+    assert out1 == out2, "combine_results is not idempotent"
+
+
+def test_ordering_invariance():
+    """
+    Shuffling input rules does not change sorted techniques.
+    """
+    path = (
+        "tests/data/host-CIS_input-20250101T000000Z-"
+        "NonPassing.json"
+    )
+    cis = json.load(open(path, 'r', encoding='utf-8'))
+    # shuffle rules
+    import random
+    rules = cis.get('rules', [])[:]
+    random.shuffle(rules)
+    cis_shuf = dict(cis)
+    cis_shuf['rules'] = rules
+    out_orig = convert_cis_to_attack(cis)
+    out_shuf = convert_cis_to_attack(cis_shuf)
+    ids1 = sorted(t['techniqueID']
+                  for t in out_orig['techniques'])
+    ids2 = sorted(t['techniqueID']
+                  for t in out_shuf['techniques'])
+    assert ids1 == ids2, "Ordering affects output IDs"
