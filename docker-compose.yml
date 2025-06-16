@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
+      args:
+        - WEB_PORT=${WEB_PORT}
     networks:
       - app-network
     env_file: "web.env"
@@ -27,6 +27,7 @@ services:
       - app-network
     depends_on:
       - web
+    env_file: "web.env"
 
 networks:
   app-network:

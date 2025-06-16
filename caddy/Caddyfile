@@ -10,7 +10,7 @@
 localhost:443, cis-cat.local:443 {
 	tls /etc/caddy/certs/cert.crt /etc/caddy/certs/private.key
 
-	reverse_proxy web:5000
+	reverse_proxy web:{$WEB_PORT}
 
 	# Caddy will automatically generate and renew certificates
 	# using its internal CA for the domains

@@ -49,7 +49,7 @@ ENV FLASK_STATIC_FOLDER=static
 # This way we don't have to rebuild the API when we only change the frontend
 COPY --from=build-step /app/dist ./static
 
-EXPOSE 5000
+ARG WEB_PORT
+ENV WEB_PORT=${WEB_PORT}
 
-#CMD ["flask", "run", "--no-debugger", "--host=0.0.0.0"]
-CMD ["gunicorn", "-b", ":5000", "app:app"]
+CMD ["sh", "-c", "gunicorn -b :${WEB_PORT} app:app"]
