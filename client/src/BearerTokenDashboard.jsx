@@ -165,7 +165,7 @@ function BearerTokenDashboard() {
 
       <div className="content-area">
         {/* Token Management Section */}
-        <div className="card admin-side-section">
+        <div className="card admin-side-section padded">
           <h2>Create New Token</h2>
 
           {/* Department Selection */}
