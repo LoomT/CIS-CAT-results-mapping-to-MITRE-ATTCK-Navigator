@@ -7,8 +7,8 @@ aggregation and visualization in the MITRE ATT&CK framework using MITRE ATT&CK N
 
 - Python 3.12
 - npm 11.4
-- Docker
-- docker-compose
+- Docker 28.2
+- docker-compose v2.36
 
 For the first time execute `python -m venv .venv` then `source .venv/bin/activate` (linux) 
 or `.venv\Scripts\activate` (Windows) to create a virtual Python environment.
@@ -20,7 +20,7 @@ or `.venv\Scripts\activate` (Windows) to create a virtual Python environment.
 
 First make sure the ATT&CK Navigator submodule is cloned as well `git submodule update --init`.
 
-*Optionally* for the ATT&CK Navigator to work offline from the root project directory install 
+For the ATT&CK Navigator to work offline from the root project directory install 
 `pip install -r navigator-config/requirements.txt` and run `python navigator-config/update.py` 
 to download all the files required to run it fully offline (this may take a while).
 
@@ -33,7 +33,7 @@ In addition to changing the `Caddyfile` also add the certificates to
 `caddy/certs/private.key` and `caddy/certs/cert.crt` or change the path in the `caddy/Caddyfile`
 if the certificates are already in a different location.
 
-To generate a sample certificate run `gen.sh` in `caddy/`.
+To generate a sample certificate run `gen.sh` in `caddy/` directory.
 
 ### X-Forwarded-User setup
 
@@ -42,7 +42,8 @@ In addition to setting up caddy, also modify the `web.env` environment file to c
 (case-sensitive) and `TRUSTED_IPS` is tested against the source IP a request came from. 
 In order for an admin to be trusted both the IP and the `X-Forwarded-User` have to be trusted. 
 This is only enabled when the `ENABLE_SSO` environment variable is `true`.
-If `ENABLE_SSO` is false, all users will have super admin privileges.
+
+If `ENABLE_SSO` is false, all users will have super admin privileges by default.
 
 ### Docker Compose
 
@@ -82,7 +83,7 @@ In the same directory run `npm run build '--' --deploy-url /attack-navigator/
 --base-href /attack-navigator/ --configuration production --aot=false --build-optimizer=false` 
 to build the navigator (this may take a while).
 
-*Optionally* for the ATT&CK Navigator to work offline from the **root project directory** install 
+*Optionally* for the ATT&CK Navigator to work offline from the root project directory install 
 `pip install -r navigator-config/requirements.txt` and run `python navigator-config/update.py` 
 to download all the files required to run it fully offline (this may take a while).
 
