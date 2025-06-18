@@ -5,6 +5,9 @@ services:
       dockerfile: Dockerfile
       args:
         - WEB_PORT=${WEB_PORT}
+    volumes:
+      - cis_files:/app/uploads # persist the uploaded files directory
+      - sqlite_file:/app/instance # persist the SQLite database file
     networks:
       - app-network
     env_file: "web.env"
@@ -34,5 +37,7 @@ networks:
     driver: bridge
 
 volumes:
+  cis_files:
+  sqlite_file:
   caddy_data:
   caddy_config:

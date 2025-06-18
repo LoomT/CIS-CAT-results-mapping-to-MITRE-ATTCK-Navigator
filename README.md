@@ -142,20 +142,16 @@ After setting up caddy it is possible to access the dummy SSO portal through por
 with a login at `:3000/login`. The entered username will be attached as `X-Forwarded-User`
 to all requests allowing to simulate using the client as a super admin, department admin or regular user.
 
-If used together with the docker setup, the `web` service in `docker-compose.yml`
-should expose the `WEB_PORT` with `ports`:
+If used together with the docker-compose setup, the `web` service in `docker-compose.yml`
+should expose the `WEB_PORT` by adding `ports`:
 ```dockerfile
 web:
-  build:
-    context: .
-    dockerfile: Dockerfile
-    args:
-      - WEB_PORT=${WEB_PORT}
-  networks:
-    - app-network
+  build: ...
+  volumes: ...
+  networks: ...
   ports:
     - "5000:5000"
-  env_file: "web.env"
+  env_file: ...
 ```
 
 ## Running Automated Tests
