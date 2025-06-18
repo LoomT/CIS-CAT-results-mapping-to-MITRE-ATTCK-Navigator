@@ -14,7 +14,7 @@ import 'svg2pdf.js';
  * @param {Array<String>} fileIds - An array of file ids.
  * @returns {URL|null} A URL object pointing to the constructed download endpoint or null if no files are provided.
  */
-export function constructDownloadURL(fileIds) {
+export function constructDownloadURLFromFileIds(fileIds) {
   const uri = new URL(location.href);
   if (fileIds.length === 0) {
     console.error('No files selected!');
@@ -32,6 +32,83 @@ export function constructDownloadURL(fileIds) {
   }
   console.log('constructed URL for fetching files: ' + uri.toString());
   return uri;
+}
+
+/**
+ * Constructs a download URL based on the provided query parameters.
+ *
+ * @param {string} filename - The name of the file to download.
+ * @param {Array<string>} departments - List of department names to filter the data.
+ * @param {Array<string>} benchmarks - List of benchmarks to filter the data.
+ * @param {Array<string>} hostnames - List of hostnames to filter the data.
+ * @param {string} dateFrom - The start date for the data query in ISO format.
+ * @param {string} dateTo - The end date for the data query in ISO format.
+ * @return {URL} A URL object representing the constructed download URL.
+ */
+export function constructDownloadURLFromQueryParams(
+  filename,
+  departments,
+  benchmarks,
+  hostnames,
+  dateFrom,
+  dateTo,
+) {
+  const url = new URL(location.href);
+  url.pathname = '/api/files/aggregate';
+  const queryParams = constructQueryParams(
+    filename,
+    departments,
+    benchmarks,
+    hostnames,
+    dateFrom,
+    dateTo,
+  );
+  queryParams.forEach((value, key) => url.searchParams.append(key, value));
+  console.log('constructed URL for fetching files: ' + url.toString());
+  return url;
+}
+
+/**
+ * Constructs query parameters based on the given inputs and returns them as a URLSearchParams object.
+ *
+ * @param {string} filename - The filename to be used as a search query. If empty, no filename parameter is added.
+ * @param {string[]} departments - An array of department names to filter by. Each department is added as a separate parameter.
+ * @param {string[]} benchmarks - An array of benchmark identifiers to filter by. Each benchmark is added as a separate parameter.
+ * @param {string[]} hostnames - An array of hostnames to filter by. Each hostname is added as a separate parameter.
+ * @param {string} dateFrom - The starting date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no minimum time parameter is added.
+ * @param {string} dateTo - The ending date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no maximum time parameter is added.
+ * @return {URLSearchParams} A URLSearchParams object containing the constructed query parameters.
+ */
+function constructQueryParams(
+  filename = '',
+  departments = [],
+  benchmarks = [],
+  hostnames = [],
+  dateFrom = '',
+  dateTo = '',
+) {
+  const queryParams = new URLSearchParams();
+  if (filename.length > 0) {
+    queryParams.append('search', filename);
+  }
+  if (departments.length > 0) {
+    departments.forEach(department => queryParams.append('department', department));
+  }
+  if (benchmarks.length > 0) {
+    benchmarks.forEach(benchmark => queryParams.append('benchmark', benchmark));
+  }
+  if (hostnames.length > 0) {
+    hostnames.forEach(hostname => queryParams.append('hostname', hostname));
+  }
+  if (dateFrom.length > 0) {
+    dateFrom = dateFrom.concat(':00Z');
+    queryParams.append('min_time', dateFrom);
+  }
+  if (dateTo.length > 0) {
+    dateTo = dateTo.concat(':00Z');
+    queryParams.append('max_time', dateTo);
+  }
+  return queryParams;
 }
 
 /**
@@ -62,7 +139,7 @@ export async function handleDownload(uri, filename) {
   }
   catch (error) {
     console.error('Error downloading file:', error);
-    if (error.name === 'AbortError') {
+    if (error instanceof DOMException && error.name === 'AbortError') {
       alert('Downloading was cancelled. Please try again.');
     }
     else if (error instanceof TypeError) {
@@ -99,8 +176,8 @@ export async function handleDownload(uri, filename) {
     file = await response.blob();
   }
   catch (error) {
-    if (error instanceof DOMException) {
-      console.log('Download was cancelled by the user.');
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      alert('Downloading was cancelled. Please try again.');
     }
     else {
       // Fallback for unknown errors
@@ -134,6 +211,90 @@ export async function handleDownload(uri, filename) {
 }
 
 /**
+ * Asynchronously fetches ids for files from the server.
+ *
+ * This function makes a `GET` request to the `/api/files/` endpoint to retrieve all ids of files.
+ *
+ * If the fetch operation succeeds and the response can be properly decoded, it logs the retrieved file ids and returns them.
+ * Otherwise, it displays appropriate error messages to the user and logs the errors to the console.
+ *
+ * @async
+ * @function
+ * @param {string} filename - The filename to be used as a search query. If empty, no filename parameter is added.
+ * @param {string[]} departments - An array of department names to filter by. Each department is added as a separate parameter.
+ * @param {string[]} benchmarks - An array of benchmark identifiers to filter by. Each benchmark is added as a separate parameter.
+ * @param {string[]} hostnames - An array of hostnames to filter by. Each hostname is added as a separate parameter.
+ * @param {string} dateFrom - The starting date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no minimum time parameter is added.
+ * @param {string} dateTo - The ending date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no maximum time parameter is added.
+ * @returns {Promise<Object|null>} A promise that resolves to an object with file id list if successful, or `null` if an error occurs.
+ */
+export async function fetchFilesIDs(
+  filename = '',
+  departments = [],
+  benchmarks = [],
+  hostnames = [],
+  dateFrom = '',
+  dateTo = '',
+) {
+  let response;
+  try {
+    const queryParams = constructQueryParams(
+      filename,
+      departments,
+      benchmarks,
+      hostnames,
+      dateFrom,
+      dateTo,
+    );
+
+    const url = new URL(location.href);
+    url.pathname = '/api/files';
+    queryParams.forEach((value, key) => url.searchParams.append(key, value));
+    console.log('fetching files ids from: ' + url.toString());
+    response = await fetch(url);
+  }
+  catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return null; // Abort fetch
+    }
+    console.error('Error refreshing files:', error);
+    if (error instanceof TypeError) {
+      alert('Network error occurred. Please check your internet connection and try again.');
+    }
+    else {
+      // Fallback for unknown errors
+      alert('Failed to refresh files. Please try again.');
+    }
+    return null;
+  }
+  if (!response.ok) {
+    // Only 500 is possible for this endpoint at the moment
+    console.error('Error fetching files:', response);
+    alert('Server error occurred while refreshing the files. Please try again later.');
+    return null;
+  }
+  let ids;
+  try {
+    ids = (await response.json()).ids;
+  }
+  catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return null;
+    }
+    else {
+      // Fallback for unknown errors
+      console.error('Error accessing or decoding response body:', error);
+      alert('Error accessing or decoding response body. Please try again.');
+    }
+    return null;
+  }
+
+  console.log(ids);
+
+  return ids;
+}
+
+/**
  * Asynchronously fetches metadata for files from the server.
  *
  * This function makes a `GET` request to the `/api/files/` endpoint to retrieve metadata for files.
@@ -149,48 +310,84 @@ export async function handleDownload(uri, filename) {
  *
  * @async
  * @function
- * @returns {Promise<Object[]|void>} A promise that resolves to an array of file metadata objects if successful, or `void` if an error occurs.
+ * @param {int} page - The page number for pagination, starting from 0.
+ * @param {int} pageSize - The number of items to return per page.
+ * @param {string} filename - The filename to be used as a search query. If empty, no filename parameter is added.
+ * @param {string[]} departments - An array of department names to filter by. Each department is added as a separate parameter.
+ * @param {string[]} benchmarks - An array of benchmark identifiers to filter by. Each benchmark is added as a separate parameter.
+ * @param {string[]} hostnames - An array of hostnames to filter by. Each hostname is added as a separate parameter.
+ * @param {string} dateFrom - The starting date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no minimum time parameter is added.
+ * @param {string} dateTo - The ending date and time for the filter in 'YYYY-MM-DDTHH:MM:SS' format. If empty, no maximum time parameter is added.
+ * @param {AbortSignal} signal - The signal object that allows you to abort a DOM request.
+ * @returns {Promise<Object|null>} A promise that resolves to an object with file metadata if successful, or `null` if an error occurs.
  */
-export async function fetchFilesMetadata() {
+export async function fetchFilesMetadata(
+  page = 0,
+  pageSize = 20,
+  filename = '',
+  departments = [],
+  benchmarks = [],
+  hostnames = [],
+  dateFrom = '',
+  dateTo = '',
+  signal = null,
+) {
   let response;
   try {
-    response = await fetch('/api/files/');
+    const queryParams = constructQueryParams(
+      filename,
+      departments,
+      benchmarks,
+      hostnames,
+      dateFrom,
+      dateTo,
+    );
+
+    // Add pagination parameters
+    queryParams.append('page', page.toString());
+    queryParams.append('page_size', pageSize.toString());
+
+    const url = new URL(location.href);
+    url.pathname = '/api/files';
+    queryParams.forEach((value, key) => url.searchParams.append(key, value));
+    url.searchParams.append('verbose', 'true');
+    console.log('fetching files metadata from: ' + url.toString());
+    response = await fetch(url, { signal });
   }
   catch (error) {
-    console.error('Error refreshing files:', error);
-    if (error.name === 'AbortError') {
-      alert('Refresh was cancelled. Please try again.');
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return null; // Abort fetch
     }
-    else if (error instanceof TypeError) {
+    console.error('Error refreshing files:', error);
+    if (error instanceof TypeError) {
       alert('Network error occurred. Please check your internet connection and try again.');
     }
     else {
       // Fallback for unknown errors
       alert('Failed to refresh files. Please try again.');
     }
-    return;
+    return null;
   }
   if (!response.ok) {
     // Only 500 is possible for this endpoint at the moment
     console.error('Error fetching files:', response);
     alert('Server error occurred while refreshing the files. Please try again later.');
-    return;
+    return null;
   }
   let result;
   try {
     result = await response.json();
   }
   catch (error) {
-    console.error('Error downloading file:', error);
-    if (error instanceof DOMException) {
-      console.log('Refresh was cancelled by the user.');
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return null;
     }
     else {
       // Fallback for unknown errors
       console.error('Error accessing or decoding response body:', error);
       alert('Error accessing or decoding response body. Please try again.');
     }
-    return;
+    return null;
   }
 
   console.log(result);
@@ -355,7 +552,7 @@ export async function handleFileUpload(file) {
     data = await response.json();
   }
   catch (error) {
-    if (error instanceof DOMException) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
       console.log('Upload was cancelled by the user.');
     }
     else if (error instanceof SyntaxError) {

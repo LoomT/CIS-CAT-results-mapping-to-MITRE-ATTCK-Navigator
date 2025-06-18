@@ -25,7 +25,7 @@ function HomeScreen() {
 
   return (
     <div className="small-panel">
-      <div className="card">
+      <div className="card padded">
         <h2>{t.chooseScreen}</h2>
         {/* Buttons for role selection - shown based on permissions */}
         <div className="button-container">

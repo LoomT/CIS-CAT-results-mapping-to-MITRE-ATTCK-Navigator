@@ -232,7 +232,7 @@ function UserManagementDashboard() {
 
       <div className="content-area">
         {/* Department Management Section */}
-        <div className="card admin-side-section">
+        <div className="card admin-side-section padded">
           <h2>Department Management</h2>
 
           {/* Create New Department */}
@@ -287,7 +287,7 @@ function UserManagementDashboard() {
         </div>
 
         {/* Department Users Cards */}
-        <div className="card file-table-section">
+        <div className="card file-table-section padded">
           <h2>Current Department Assignments</h2>
 
           {departments.length === 0

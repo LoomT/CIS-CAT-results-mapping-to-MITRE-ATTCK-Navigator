@@ -15,6 +15,7 @@ import { useContext, useState } from 'react';
  * @param onDownload callback to trigger the download
  * @param showCheckbox whether the textbox should be shown or not (true for admin, false for user)
  * @param onCheckboxChange callback to trigger when the checkbox is changed
+ * @param isAllFilesChecked boolean indicating if all files in the table are checked (used for "Select All" functionality)
  * @returns {JSX.Element} the rendered file table entry component
  * @constructor FileTableEntry
  */
@@ -28,6 +29,7 @@ const FileTableEntry = ({
   onDownload,
   showCheckbox,
   onCheckboxChange,
+  isAllFilesChecked,
 }) => {
   const t = useContext(LanguageContext);
   const [isChecked, setIsChecked] = useState(false);
@@ -38,11 +40,12 @@ const FileTableEntry = ({
         <td>
           <input
             type="checkbox"
-            checked={isChecked}
+            checked={isAllFilesChecked ? true : isChecked}
             onChange={() => {
               setIsChecked(!isChecked);
               onCheckboxChange(isChecked, fileId);
             }}
+            disabled={isAllFilesChecked}
           />
         </td>
       )}
