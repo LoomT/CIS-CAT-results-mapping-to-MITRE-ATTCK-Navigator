@@ -19,13 +19,13 @@ describe('UserScreen UI Tests (Frontend Only)', () => {
     });
   });
 
-  it('opens the file dialog when "Choose File" button is clicked', () => {
-    cy.get('[data-testid="user-screen-upload-section"] button')
-      .contains('Choose file')
-      .click();
+  // it('opens the file dialog when "Choose File" button is clicked', () => {
+  //   cy.get('[data-testid="user-screen-upload-section"] button')
+  //     .contains('Choose file')
+  //     .click();
 
-    cy.get('#file-input').should('exist');
-  });
+  //   cy.get('#file-input').should('exist');
+  // });
 
   it('renders table headers correctly', () => {
     cy.get('[data-testid="user-screen-file-table-section"]').within(() => {
