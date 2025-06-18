@@ -186,7 +186,7 @@ def register_routes(app):
     def require_auth(f):
         """
         Decorator to require admin privileges
-        (super admin or department admin)
+        (super admin or department admin) or bearer token authentication
         """
 
         @wraps(f)
@@ -590,21 +590,10 @@ def register_routes(app):
             while os.path.exists(os.path.join(upload_folder, unique_id)):
                 unique_id = str(uuid.uuid4())
 
-            # Create a unique directory
-            os.makedirs(os.path.join(upload_folder, unique_id))
-
-            # Process the file (modify as needed)
-            file_path = os.path.join(
-                upload_folder, unique_id, filename
-            )
-
             try:
                 cis_data = json.load(file.stream)
             except json.JSONDecodeError:
                 return "Invalid file format", 400
-
-            with open(file_path, 'w', encoding='utf-8') as F:
-                json.dump(cis_data, F, ensure_ascii=False, indent=2)
 
             # DATABASE PART #
             try:
@@ -628,17 +617,29 @@ def register_routes(app):
                     department_ids = [dept.id for dept in departments]
 
                     if department_id not in department_ids:
-                        shutil.rmtree(os.path.join(upload_folder, unique_id))
                         return {
                             'message': 'You do not have access '
                             'to this department'
                         }, 403
-                    print(metadata)
+
                     metadata.department_id = department_id
                 else:
                     return {
                         'message': 'No department supplied'
                     }, 403
+
+                # Only when everything has finished we create the file
+                # Its removed on Exception by the upper handler
+                # Create a unique directory
+                os.makedirs(os.path.join(upload_folder, unique_id))
+
+                file_path = os.path.join(
+                    upload_folder, unique_id, filename
+                )
+
+                with open(file_path, 'w', encoding='utf-8') as F:
+                    json.dump(cis_data, F, ensure_ascii=False, indent=2)
+
                 db.session.add(metadata)
                 db.session.commit()
                 db.session.refresh(metadata)
