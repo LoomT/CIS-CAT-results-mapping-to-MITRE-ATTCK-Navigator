@@ -507,7 +507,7 @@ def register_routes(app):
 
     @app.get('/api/files', strict_slashes=False)
     @require_admin
-    def get_files_metadata() -> tuple[str, int] | dict:
+    def get_files_metadata() -> tuple[str | dict, int]:
         """
         Endpoint for retrieving a list of all stored files' Metadata.
         Endpoint supports filtering by various parameters
@@ -515,13 +515,29 @@ def register_routes(app):
         Supports pagination with page and page_size parameters.
         page is the page number to retrieve, starting from 0, and
         page_size is the number of items per page, default is 20.
+
+        If the `verbose` query parameter is set to true, then the response
+        will return full file metadata instead of only the ids.
         """
 
         # query Metadata objects from the database based on request arguments
         try:
-            return get_metadata(g.get('current_user'),
-                                g.get('is_super_admin', False),
-                                request.args)
+            if request.args.get('verbose', 'false') == 'true':
+                return get_metadata(
+                    g.get('current_user'),
+                    g.get('is_super_admin', False),
+                    request.args,
+                    False
+                ), 200
+            else:
+                ids = get_metadata(
+                        g.get('current_user'),
+                        g.get('is_super_admin', False),
+                        request.args,
+                        True
+                )
+                return {'ids': ids}, 200
+
         except Exception as e:
             print(f"Failed fetching metadata: {e}")
             return "Internal server error", 500

@@ -3,7 +3,14 @@ import Select from 'react-select';
 import './globalstyle.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import { LanguageContext } from './main.jsx';
-import { constructDownloadURL, handleDownload, handleFileUpload, handlePDFExport, handleSVGExport, handleVisualize } from './FileAPI.js';
+import {
+  constructDownloadURLFromFileIds,
+  handleDownload,
+  handleFileUpload,
+  handlePDFExport,
+  handleSVGExport,
+  handleVisualize,
+} from './FileAPI.js';
 
 /**
  * UserScreen Component
@@ -180,7 +187,7 @@ function UserScreen() {
       {/* Side-by-side Content Area */}
       <div className="content-area">
         {/* Upload Section */}
-        <div className="card upload-section" data-testid="user-screen-upload-section">
+        <div className="card upload-section padded" data-testid="user-screen-upload-section">
           <div className="section-header">
             <h2>{t.uploadFile}</h2>
             <p>{t.dragAndDrop}</p>
@@ -261,10 +268,6 @@ function UserScreen() {
 
         {/* File Table Section */}
         <div className="card file-table-section" data-testid="user-screen-file-table-section">
-          <div className="section-header">
-            <h2>{t.filesList}</h2>
-            <p>{t.fileTableDesc}</p>
-          </div>
           <table>
             <thead>
               <tr>
@@ -288,13 +291,13 @@ function UserScreen() {
                   }
                   onVisualize={
                     () => {
-                      const url = constructDownloadURL([file.id]);
+                      const url = constructDownloadURLFromFileIds([file.id]);
                       if (url !== null) handleVisualize(url);
                     }
                   }
                   onDownload={
                     () => {
-                      const url = constructDownloadURL([file.id]);
+                      const url = constructDownloadURLFromFileIds([file.id]);
                       if (url !== null) handleDownload(url, file.filename);
                     }
                   }
@@ -316,7 +319,7 @@ function UserScreen() {
                 className="popup-button"
                 onClick={
                   () => {
-                    const url = constructDownloadURL([currentFile.id]);
+                    const url = constructDownloadURLFromFileIds([currentFile.id]);
                     if (url !== null) handleSVGExport(url, currentFile.id);
                   }
                 }
@@ -327,7 +330,7 @@ function UserScreen() {
                 className="popup-button"
                 onClick={
                   () => {
-                    const url = constructDownloadURL([currentFile.id]);
+                    const url = constructDownloadURLFromFileIds([currentFile.id]);
                     if (url !== null) handlePDFExport([url], [currentFile.id]);
                   }
                 }

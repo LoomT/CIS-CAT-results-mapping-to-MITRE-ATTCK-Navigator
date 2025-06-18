@@ -31,7 +31,7 @@ def _load_mapping_dicts(filename: str, sheet_name: str):
 
 
 _SAFEGUARD_MAP, _CONTROL_MAP = _load_mapping_dicts(EX_MAP, SHEET_NAME)
-print("Mappings loaded in memmory", file=sys.stderr, flush=True)
+print("Mappings loaded in memory", file=sys.stderr, flush=True)
 
 
 def gradient_color(fraction: float) -> str:
@@ -104,7 +104,7 @@ def generate_techniques(
     Aggregate CIS rule results into ATT&CK techniques,
     summarizing each test as "rule-id : Pass/Fail".
     Uses pre-loaded mapping dictionaries for lookups.
-    include_comments toggles whether comments are included.
+    Sub-techniques now also contribute to their parent technique.
     """
     aggregator: dict[str, dict] = {}
     raw_entries: list[tuple[str, bool, str]] = []
@@ -134,6 +134,10 @@ def generate_techniques(
         # If no safeguard match, try CIS Control exact match
         if not matched_techs:
             matched_techs.update(_CONTROL_MAP.get(high, []))
+
+        # Ensure sub-techniques contribute to their parent technique
+        parents = {t.split('.')[0] for t in matched_techs if '.' in t}
+        matched_techs.update(parents)
 
         if not matched_techs:
             continue

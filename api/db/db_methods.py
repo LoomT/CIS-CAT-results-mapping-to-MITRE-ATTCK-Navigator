@@ -448,20 +448,12 @@ def get_filters_data(subq, filters_data):
 
     for (label, model, cur_filter, role) in filters_data:
 
-        # Standart filter for
+        # Standard filter for
         if role == Filter_type.STANDARD:
             cur_filter_list = exclude_filter(cur_filter, all_filters)
             stmt = select(model.name, model.id, func.count()) \
-                .select_from(subq).join(model, full=True).group_by(model.id)
-            # TODO: Fix it using full outer join to only need 1 SQL
-            # For now, it is merged in python for simplicity
+                .select_from(subq).outerjoin(model).group_by(model.id)
 
-            # UPDATE: So full outer join does exist, it just does not work?
-            # Will solve it tmr to return zeroes as well.
-            # I think I need to do one more subquery,
-            # So where clause is before full outer join
-
-            # Temp? Solution:
             rows_all = db.session.execute(stmt).all()
 
             if cur_filter_list:
