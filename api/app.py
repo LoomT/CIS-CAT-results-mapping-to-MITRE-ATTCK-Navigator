@@ -39,11 +39,10 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
 
 
-load_dotenv()
-
-
 def create_app(config=None):
     """Application factory pattern"""
+    load_dotenv()
+
     app = Flask(__name__, static_folder=os.getenv('FLASK_STATIC_FOLDER'),
                 static_url_path='/')
 
@@ -98,9 +97,6 @@ def register_routes(app):
     upload_folder = app.config['UPLOAD_FOLDER']
     db = app.db
 
-    SUPER_ADMINS = app.config['SUPER_ADMINS']
-    TRUSTED_IPS = app.config['TRUSTED_IPS']
-
     @app.before_request
     def before_request():
         auth_header = request.headers.get('Authorization')
@@ -132,13 +128,13 @@ def register_routes(app):
             else:
                 client_ip = request.remote_addr
 
-            is_trusted_ip = client_ip in TRUSTED_IPS
+            is_trusted_ip = client_ip in app.config['TRUSTED_IPS']
 
             # Parse X-Forwarded-User header
             user_handle = request.headers.get('X-Forwarded-User')
             if is_trusted_ip and user_handle:
                 g.current_user = user_handle.strip()
-                g.is_super_admin = g.current_user in SUPER_ADMINS
+                g.is_super_admin = g.current_user in app.config['SUPER_ADMINS']
                 g.is_department_admin = len(get_all_departments_with_access(
                     g.current_user, g.is_super_admin)) > 0
                 g.is_bearer_token = False
@@ -719,10 +715,3 @@ def register_error_handlers(app):
         # TODO LOG server caused errors
         print(error)
         return 'Internal Server Error', 500
-
-
-app = create_app()
-
-
-if __name__ == '__main__':
-    app.run()

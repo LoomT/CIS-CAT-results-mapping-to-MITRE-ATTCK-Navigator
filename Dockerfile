@@ -49,7 +49,10 @@ ENV FLASK_STATIC_FOLDER=static
 # This way we don't have to rebuild the API when we only change the frontend
 COPY --from=build-step /app/dist ./static
 
-EXPOSE 5000
+# Get the port and worker thread number arguments
+# from docker compose or default to 5000 and 2 respectively
+ARG WEB_PORT=5000
+ARG WORKER_THREADS=2
 
-#CMD ["flask", "run", "--no-debugger", "--host=0.0.0.0"]
-CMD ["gunicorn", "-b", ":5000", "app:app"]
+CMD ["sh", "-c", "gunicorn -w ${WORKER_THREADS} -b :${WEB_PORT} 'app:create_app()'"]
+#CMD ["sh", "-c", "python -m flask run"]

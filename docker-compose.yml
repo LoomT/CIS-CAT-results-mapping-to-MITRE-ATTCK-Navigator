@@ -3,8 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
+      args:
+        - WEB_PORT=${WEB_PORT}
+        - WORKER_THREADS=${WORKER_THREADS}
+    volumes:
+      - cis_files:/app/uploads # persist the uploaded files directory
+      - sqlite_file:/app/instance # persist the SQLite database file
     networks:
       - app-network
     env_file: "web.env"
@@ -27,11 +31,14 @@ services:
       - app-network
     depends_on:
       - web
+    env_file: "web.env"
 
 networks:
   app-network:
     driver: bridge
 
 volumes:
+  cis_files:
+  sqlite_file:
   caddy_data:
   caddy_config:
