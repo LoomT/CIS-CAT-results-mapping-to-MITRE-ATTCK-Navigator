@@ -181,7 +181,7 @@ function UserScreen() {
     <div className="full-panel" data-testid="user-screen">
       {/* Top Center Title */}
       <div className="user-title" data-testid="user-screen-page-title">
-        {t.userOverview}
+        Manual Upload
       </div>
 
       {/* Side-by-side Content Area */}

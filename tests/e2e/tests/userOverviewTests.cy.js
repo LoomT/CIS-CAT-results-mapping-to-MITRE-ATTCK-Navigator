@@ -1,6 +1,6 @@
 describe('UserScreen UI Tests (Frontend Only)', () => {
   beforeEach(() => {
-    cy.visit('/manual-conversion');
+    cy.visit('/manual-upload');
   });
 
   it('renders the user screen title and layout sections', () => {

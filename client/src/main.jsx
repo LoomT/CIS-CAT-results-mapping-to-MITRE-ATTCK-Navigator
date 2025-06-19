@@ -31,7 +31,7 @@ createRoot(document.getElementById('root')).render(
         <BrowserRouter>
           <Routes>
             <Route index element={<HomeScreen />} />
-            <Route path="/manual-conversion" element={<UserScreen />} />
+            <Route path="/manual-upload" element={<UserScreen />} />
             <Route path="/admin" element={<AdminOverview />} />
             <Route path="/admin/user-management" element={<UserManagementDashboard />} />
             <Route path="/admin/bearer-token-management" element={<BearerTokenDashboard />} />

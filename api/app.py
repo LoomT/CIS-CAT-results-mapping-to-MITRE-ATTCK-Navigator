@@ -678,7 +678,7 @@ def register_routes(app):
     # Have to specify each page manually since static_url_path at line 17
     # intercepts the requests if @app.route('/<path:path>') is used.
     @app.route('/')
-    @app.route('/manual-conversion', strict_slashes=False)
+    @app.route('/manual-upload', strict_slashes=False)
     def serve() -> Response:
         """Serve pages that don't need authentication"""
         return app.send_static_file('index.html')

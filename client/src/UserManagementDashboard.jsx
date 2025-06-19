@@ -20,7 +20,6 @@ function UserManagementDashboard() {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [newDepartmentName, setNewDepartmentName] = useState('');
   const [newUserHandle, setNewUserHandle] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const t = useContext(LanguageContext);
@@ -221,7 +220,7 @@ function UserManagementDashboard() {
       data-testid="user-management-dashboard"
     >
       {/* Top Title */}
-      <div className="user-title">User Management Dashboard</div>
+      <div className="user-title">Department and User Management Dashboard</div>
 
       {/* Message Display */}
       {message.text && (
@@ -244,7 +243,7 @@ function UserManagementDashboard() {
                 placeholder="Department name..."
                 value={newDepartmentName}
                 onChange={e => setNewDepartmentName(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && createDepartment()}
+                onKeyDown={e => e.key === 'Enter' && createDepartment()}
               />
               <button
                 className="btn-blue"
@@ -273,7 +272,7 @@ function UserManagementDashboard() {
                 placeholder="User handle..."
                 value={newUserHandle}
                 onChange={e => setNewUserHandle(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && addUserToDepartment()}
+                onKeyDown={e => e.key === 'Enter' && addUserToDepartment()}
               />
               <button
                 className="btn-green"

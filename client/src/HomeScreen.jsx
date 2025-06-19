@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import './globalstyle.css';
 import { Link } from 'react-router-dom';
 import { LanguageContext, AuthContext } from './main.jsx';
@@ -36,7 +36,7 @@ function HomeScreen() {
               data-testid="home-screen-admin-button"
               to="/admin"
             >
-              Admin
+              Department Reports
             </Link>
           )}
 
@@ -58,17 +58,18 @@ function HomeScreen() {
               data-testid="home-screen-admin-user-management"
               to="/admin/user-management"
             >
-              User Management
+              Department and User Management
             </Link>
           )}
 
-          {/* User/Manual Conversion button - always shown for all users */}
+          {/* User/Manual Upload button - always shown for all users */}
           <Link
             className="button btn-blue"
             data-testid="home-screen-user-button"
-            to="/manual-conversion"
+            to="/manual-upload"
           >
-            {t.user}
+            Manual
+            Upload
           </Link>
         </div>
       </div>

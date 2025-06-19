@@ -293,7 +293,7 @@ function AdminOverview() {
   return (
     <div className="full-panel">
       {/* Top Title */}
-      <div className="user-title">{t.adminOverview}</div>
+      <div className="user-title">Department Report Overview</div>
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
