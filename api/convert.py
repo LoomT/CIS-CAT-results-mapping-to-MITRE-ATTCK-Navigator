@@ -34,7 +34,7 @@ _SAFEGUARD_MAP, _CONTROL_MAP = _load_mapping_dicts(EX_MAP, SHEET_NAME)
 print("Mappings loaded in memory", file=sys.stderr, flush=True)
 
 
-def score_to_hex(score: float) -> str:
+def gradient_color(score: float) -> str:
     s = max(0.0, min(1.0, score))
     # override at top end
     if s == 1.0:
