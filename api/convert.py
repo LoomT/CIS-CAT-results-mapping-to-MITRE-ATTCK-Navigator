@@ -34,21 +34,23 @@ _SAFEGUARD_MAP, _CONTROL_MAP = _load_mapping_dicts(EX_MAP, SHEET_NAME)
 print("Mappings loaded in memory", file=sys.stderr, flush=True)
 
 
-def gradient_color(fraction: float) -> str:
-    """
-    Compute an orange-to-green gradient color for a given fraction [0,1].
-    """
-    if fraction <= 0.5:
-        ratio = fraction / 0.5
-        r = 255
-        g = int(153 * ratio)
-        b = 51
-    else:
-        ratio = (fraction - 0.5) / 0.5
-        r = int(255 - 204 * ratio)
-        g = int(153 + 51 * ratio)
-        b = 51
-    return f"#{r:02x}{g:02x}{b:02x}"
+def score_to_hex(score: float) -> str:
+    s = max(0.0, min(1.0, score))
+    # override at top end
+    if s == 1.0:
+        return "#2f7532"
+
+    t4 = s ** 4
+
+    r1, g1, b1 = 0xCC, 0x00, 0x00  # #CC0000
+    r2, g2, b2 = 0x0B, 0xDA, 0x51  # #0bda51
+
+    # interpolate
+    r = int(r1 + (r2 - r1) * t4)
+    g = int(g1 + (g2 - g1) * t4)
+    b = int(b1 + (b2 - b1) * t4)
+
+    return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
 
 def _accumulate_entries(
