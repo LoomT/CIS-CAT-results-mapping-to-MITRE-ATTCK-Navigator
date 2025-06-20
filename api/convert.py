@@ -40,7 +40,7 @@ def gradient_color(score: float) -> str:
     if s == 1.0:
         return "#2f7532"
 
-    t4 = s ** 4
+    t4 = s ** 2
 
     r1, g1, b1 = 0xCC, 0x00, 0x00  # #CC0000
     r2, g2, b2 = 0x0B, 0xDA, 0x51  # #0bda51
