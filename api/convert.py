@@ -35,20 +35,25 @@ print("Mappings loaded in memory", file=sys.stderr, flush=True)
 
 
 def gradient_color(score: float) -> str:
-    s = max(0.0, min(1.0, score))
-    # override at top end
+    s = max(0.0, min(1.0, score**2))
+
     if s == 1.0:
-        return "#2f7532"
+        return "#3bb143"  # hardcoded for score 1.0
+    # define key colors
+    r1, g1, b1 = 0xCC, 0x00, 0x00      # #CC0000 (red)
+    r_mid, g_mid, b_mid = 0xFF, 0xD7, 0x00  # #FFD700 (golden yellow)
+    r2, g2, b2 = 0x0B, 0xDA, 0x51      # #0bda51 (green)
 
-    t3 = s ** 3
-
-    r1, g1, b1 = 0xCC, 0x00, 0x00  # #CC0000
-    r2, g2, b2 = 0x0B, 0xDA, 0x51  # #0bda51
-
-    # interpolate
-    r = int(r1 + (r2 - r1) * t3)
-    g = int(g1 + (g2 - g1) * t3)
-    b = int(b1 + (b2 - b1) * t3)
+    if s <= 0.5:
+        t = s / 0.5
+        r = int(r1 + (r_mid - r1) * t)
+        g = int(g1 + (g_mid - g1) * t)
+        b = int(b1 + (b_mid - b1) * t)
+    else:
+        t = (s - 0.5) / 0.5
+        r = int(r_mid + (r2 - r_mid) * t)
+        g = int(g_mid + (g2 - g_mid) * t)
+        b = int(b_mid + (b2 - b_mid) * t)
 
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
