@@ -40,15 +40,15 @@ def gradient_color(score: float) -> str:
     if s == 1.0:
         return "#2f7532"
 
-    t4 = s ** 2
+    t3 = s ** 3
 
     r1, g1, b1 = 0xCC, 0x00, 0x00  # #CC0000
     r2, g2, b2 = 0x0B, 0xDA, 0x51  # #0bda51
 
     # interpolate
-    r = int(r1 + (r2 - r1) * t4)
-    g = int(g1 + (g2 - g1) * t4)
-    b = int(b1 + (b2 - b1) * t4)
+    r = int(r1 + (r2 - r1) * t3)
+    g = int(g1 + (g2 - g1) * t3)
+    b = int(b1 + (b2 - b1) * t3)
 
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
