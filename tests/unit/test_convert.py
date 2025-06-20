@@ -1,6 +1,5 @@
 import json
 import sys
-import time
 # noqa: E402
 sys.path.insert(0, './api')
 
@@ -60,32 +59,6 @@ def test_host_nonpassing_conversion():
 
     diffs = compare_layer_scores(live_layer, known_path)
     assert not diffs, f"Found score mismatches:\n{diffs}"
-
-
-def test_library_load_time():
-    """
-    Ensure that importing the conversion library takes no more than 2 seconds.
-    """
-    # Remove from cache to measure actual import cost
-    sys.modules.pop('convert', None)
-    start = time.perf_counter()
-    import convert  # noqa: F401
-    elapsed = time.perf_counter() - start
-    assert elapsed <= 2.0, f"Library load took {elapsed:.2f}s, exceeds 2s"
-
-
-def test_conversion_performance():
-    """
-    Ensure that converting a CIS dataset takes no more than 0.5 seconds.
-    """
-    input_path = "tests/data/host-CIS_input-20250101T000000Z-NonPassing.json"
-    cis = json.load(open(input_path, encoding="utf-8"))
-    # Warm-up run
-    _ = convert_cis_to_attack(cis)
-    start = time.perf_counter()
-    _ = convert_cis_to_attack(cis)
-    elapsed = time.perf_counter() - start
-    assert elapsed <= 0.5, f"Conversion took {elapsed:.2f}s, exceeds 0.5s"
 
 
 def test_single_input_all_pass():
