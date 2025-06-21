@@ -125,7 +125,7 @@ function UserScreen() {
         id: data.id,
         filename: data.filename,
         department: departmentName,
-        time: new Date().toISOString(),
+        time: new Date().toLocaleString(),
       }, ...prevFiles]);
 
       // Clear any error message on successful upload

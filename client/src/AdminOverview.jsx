@@ -189,7 +189,7 @@ function AdminOverview() {
       id: file.id,
       filename: file.filename,
       department: file.department ? file.department.name : 'None',
-      time: file.time_created ? file.time_created.replace('T', ' ') : null,
+      time: file.time_created ? new Date(file.time_created).toLocaleString() : null,
     })));
 
     // lock in the active search parameters

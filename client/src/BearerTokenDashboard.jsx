@@ -143,7 +143,7 @@ function BearerTokenDashboard() {
   }));
 
   const filteredTokens = selectedDepartment
-    ? tokens.filter(token => token.department_id === selectedDepartment.value)
+    ? tokens.filter(token => token.department.id === selectedDepartment.value)
     : tokens;
 
   const formatDate = (dateString) => {
@@ -241,7 +241,7 @@ function BearerTokenDashboard() {
                     {filteredTokens.map(token => (
                       <tr key={token.id}>
                         <td>{token.machine_name}</td>
-                        <td>{token.department_name}</td>
+                        <td><div className="department-badge">{token.department.name}</div></td>
                         <td>{formatDate(token.created_at)}</td>
                         <td>{formatDate(token.last_used)}</td>
                         <td>{token.created_by}</td>
