@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 from sqlalchemy.sql import func
 
 import sqlalchemy as sa
@@ -31,6 +31,12 @@ class BaseModel(db.Model):
 
             value = getattr(self, column.name)
             if isinstance(value, datetime.datetime):
+                if (
+                    hasattr(self, "__utc_timestamp_fields__") and
+                    column.name in self.__utc_timestamp_fields__
+                ):
+                    value = value.replace(tzinfo=datetime.timezone.utc)
+
                 value = value.isoformat()
             result_dict[column.name] = value
 
@@ -38,7 +44,7 @@ class BaseModel(db.Model):
         for rel in self.__mapper__.relationships:
             if rel.key not in hidden_fields:
                 related_obj = getattr(self, rel.key)
-                if related_obj is not None:
+                if related_obj is not None and hasattr(related_obj, "to_dict"):
                     result_dict[rel.key] = related_obj.to_dict()
                 else:
                     result_dict[rel.key] = None
@@ -62,23 +68,29 @@ class Metadata(BaseModel):
         sa.DateTime, index=True, default=func.now()
     )
 
-    hostname_id: Mapped[int | None] =\
-        mapped_column(sa.ForeignKey("hostname.id"), nullable=True, index=True)
+    hostname_id: Mapped[int | None] = mapped_column(
+        sa.ForeignKey("hostname.id"), nullable=True, index=True
+    )
     hostname: Mapped[Hostname | None] = relationship("Hostname")
 
-    benchmark_id: Mapped[int | None] =\
-        mapped_column(sa.ForeignKey("benchmark.id"), nullable=True, index=True)
+    benchmark_id: Mapped[int | None] = mapped_column(
+        sa.ForeignKey("benchmark.id"), nullable=True, index=True
+    )
     benchmark: Mapped[Benchmark | None] = relationship("Benchmark")
 
-    result_id: Mapped[int | None] =\
-        mapped_column(sa.ForeignKey("result.id"),
-                      nullable=True, index=True)
+    result_id: Mapped[int | None] = mapped_column(
+        sa.ForeignKey("result.id"), nullable=True, index=True
+    )
     result: Mapped[Result | None] = relationship("Result")
 
-    department_id: Mapped[int | None] =\
-        mapped_column(sa.ForeignKey("department.id"),
-                      nullable=True, index=True)
-    department: Mapped[Department | None] = relationship("Department")
+    department_id: Mapped[int | None] = mapped_column(
+        sa.ForeignKey("department.id", ondelete="SET NULL"),
+        nullable=True, index=True,
+    )
+    department: Mapped[Department | None] = relationship(
+        "Department",
+        backref=backref("metadata")
+    )
 
 
 class Benchmark(BaseModel):
@@ -89,7 +101,7 @@ class Benchmark(BaseModel):
 
 class Department(BaseModel):
     __tablename__ = "department"
-    __hidden_fields__ = {"users"}
+    __hidden_fields__ = {"users", "metadata", "bearer_token"}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
@@ -143,6 +155,7 @@ class BearerToken(BaseModel):
     """Model representing bearer tokens for automated uploads."""
     __tablename__ = "bearer_token"
     __hidden_fields__ = {"token"}  # Hide token from default serialization
+    __utc_timestamp_fields__ = {"created_at", "last_used"}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     token: Mapped[str] = mapped_column(
@@ -152,9 +165,9 @@ class BearerToken(BaseModel):
         index=True
     )
     machine_name: Mapped[str] = mapped_column(nullable=False)
-    department_id: Mapped[int] = mapped_column(
-        sa.ForeignKey("department.id", ondelete="CASCADE"),
-        nullable=False,
+    department_id: Mapped[int | None] = mapped_column(
+        sa.ForeignKey("department.id", ondelete="SET NULL"),
+        nullable=True,
         index=True
     )
     created_at: Mapped[datetime.datetime] = mapped_column(
@@ -172,7 +185,8 @@ class BearerToken(BaseModel):
     created_by: Mapped[str] = mapped_column(nullable=False)
 
     # Relationship to department
-    department: Mapped["Department"] = relationship("Department")
+    department: Mapped["Department"] = relationship(
+        "Department", backref=backref("bearer_token"))
 
     def to_dict_with_token(self):
         """Special method to include token in response (use carefully)"""
