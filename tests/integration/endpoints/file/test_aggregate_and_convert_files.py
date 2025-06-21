@@ -126,9 +126,7 @@ def test_aggregate_empty_database_with_explicit_ids(client, uploads_folder):
 def test_aggregate_file_read_error(client, bootstrap_full, mocker):
     """Test handling of file read errors"""
     # Mock open to raise an exception
-    mock_open = mocker.patch(
-        'builtins.open', side_effect=IOError("File read error")
-    )
+    mocker.patch('builtins.open', side_effect=IOError("File read error"))
 
     response = client.get('/api/files/aggregate?id=file_id1')
 
@@ -267,7 +265,6 @@ def test_aggregate_large_number_of_files(
             file_ids.append(file_id)
 
             # Create file on disk
-            import os
             dest_dir = os.path.join(upload_folder, file_id)
             os.makedirs(dest_dir, exist_ok=True)
             dest_path = os.path.join(dest_dir, f'test_file_{i}.json')

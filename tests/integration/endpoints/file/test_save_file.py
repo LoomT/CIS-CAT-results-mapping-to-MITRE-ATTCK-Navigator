@@ -654,7 +654,7 @@ def test_bearer_token_timestamp_recording(client, app, uploads_folder,
 
     assert token.last_used is None
 
-    response = client.post(f'/api/files/', data=data, headers=headers,
+    response = client.post('/api/files/', data=data, headers=headers,
                            content_type='multipart/form-data')
 
     after_upload = datetime.now(timezone.utc)

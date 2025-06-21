@@ -165,8 +165,9 @@ def test_create_department_very_long_name(client):
     data = {'name': long_name}
 
     response = client.post('/api/admin/departments', json=data)
-    # This may succeed or fail depending on database constraints
-    # Most databases have reasonable limits on varchar fields
+
+    # Should succeed unless there is a database constraint
+    assert response.status_code == 201
 
 
 def test_create_department_unicode_name(client, app):
