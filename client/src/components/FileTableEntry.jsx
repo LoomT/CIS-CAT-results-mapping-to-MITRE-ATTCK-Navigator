@@ -1,5 +1,6 @@
 import downloadIcon from '../assets/download.png';
 import visualIcon from '../assets/investigate.png';
+import exportIcon from '../assets/export.svg';
 import { LanguageContext } from '../main.jsx';
 import { useContext, useState } from 'react';
 
@@ -55,7 +56,7 @@ const FileTableEntry = ({
       <td>
         <div className="button-container">
           <button className="btn-purple" onClick={onExport}>
-            <img src={visualIcon} alt="export" className="icon" />
+            <img src={exportIcon} alt="export" className="icon" />
             {t.export}
           </button>
           <button className="btn-blue" onClick={onVisualize}>

@@ -13,7 +13,6 @@ const translations = {
     runBenchmark: 'Run Benchmark',
     filesList: 'Files List',
     userOverview: 'User Overview',
-    adminLogin: 'Admin Login',
     adminOverview: 'Admin Overview',
     fileTableDesc: 'View all uploaded files and available actions. Each file can be downloaded as its raw JSON, or visualised\n'
       + '              as a PNG or SVG.',

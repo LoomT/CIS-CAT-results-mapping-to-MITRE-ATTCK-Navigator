@@ -1,12 +1,12 @@
 describe('UserScreen UI Tests (Frontend Only)', () => {
   beforeEach(() => {
-    cy.visit('/manual-conversion');
+    cy.visit('/manual-upload');
   });
 
   it('renders the user screen title and layout sections', () => {
     cy.get('[data-testid="user-screen-page-title"]')
       .should('be.visible')
-      .and('contain.text', 'User Overview');
+      .and('contain.text', 'Manual Upload');
 
     cy.get('[data-testid="user-screen-upload-section"]').should('be.visible');
     cy.get('[data-testid="user-screen-file-table-section"]').should('be.visible');

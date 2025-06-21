@@ -1,5 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import Select from 'react-select';
+import downloadIcon from './assets/download.png';
+import visualIcon from './assets/investigate.png';
+import exportIcon from './assets/export.svg';
 import './globalstyle.css';
 import FileTableEntry from './components/FileTableEntry.jsx';
 import { LanguageContext } from './main.jsx';
@@ -31,9 +34,10 @@ const debounce = (func, wait) => {
  * AdminOverview Component
  * ---------------------
  * Provides the main interface for admins. Includes:
- * - A search section with (currently nonfunctional) toggle for the departments and a search bar
- * - A list of files with actions for visualization and download, and a checkbox to select multiple rows (currently not functional)
- * - A popup for choosing visualization formats (SVG or PNG).
+ * - A search and filter section
+ * - A list of files with actions for export, visualization and download, and a checkbox to select multiple rows
+ * - A popup for choosing export formats (SVG or PDF)
+ * - Aggregation menu
  */
 function AdminOverview() {
   const [showExportPopup, setShowExportPopup] = useState(false);
@@ -293,7 +297,7 @@ function AdminOverview() {
   return (
     <div className="full-panel">
       {/* Top Title */}
-      <div className="user-title">{t.adminOverview}</div>
+      <div className="user-title">Department Report Overview</div>
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
@@ -404,9 +408,18 @@ function AdminOverview() {
                 <>
                   <p>No files selected</p>
                   <div className="button-container">
-                    <button className="btn-purple" disabled={true}>Export</button>
-                    <button className="btn-blue" disabled={true}>Visualize</button>
-                    <button className="btn-green" disabled={true}>Download</button>
+                    <button className="btn-purple" disabled={true}>
+                      <img src={exportIcon} alt="export" className="icon" />
+                      Export
+                    </button>
+                    <button className="btn-blue" disabled={true}>
+                      <img src={visualIcon} alt="visualize" className="icon" />
+                      Visualize
+                    </button>
+                    <button className="btn-green" disabled={true}>
+                      <img src={downloadIcon} alt="download" className="icon" />
+                      Download
+                    </button>
                   </div>
                 </>
               )
@@ -420,6 +433,7 @@ function AdminOverview() {
                         () => handleExportClick(null, true)
                       }
                     >
+                      <img src={exportIcon} alt="export" className="icon" />
                       Export
                     </button>
                     <button
@@ -431,6 +445,7 @@ function AdminOverview() {
                         }
                       }
                     >
+                      <img src={visualIcon} alt="visualize" className="icon" />
                       Visualize
                     </button>
                     <button
@@ -442,6 +457,7 @@ function AdminOverview() {
                         }
                       }
                     >
+                      <img src={downloadIcon} alt="download" className="icon" />
                       Download
                     </button>
                   </div>
