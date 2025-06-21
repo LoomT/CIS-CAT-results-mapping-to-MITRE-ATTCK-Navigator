@@ -1,9 +1,6 @@
 import json
-import sys
-# noqa: E402
-sys.path.insert(0, './api')
 
-from convert import combine_results, convert_cis_to_attack  # noqa: E402
+from api.convert import combine_results, convert_cis_to_attack
 
 
 def compare_layer_scores(live_layer: dict, known_path: str):
@@ -35,8 +32,13 @@ def test_all_entries_fail():
     and assert every technique ends up failing.
     """
     base = './tests/data'
-    cis_fail = json.load(open(f"{base}/cisinput-false.json", encoding="utf-8"))
-    cis_pass = json.load(open(f"{base}/cisinput-true.json", encoding="utf-8"))
+    cis_fail = json.load(open(
+            f"{base}/false-cis_input2-20250101T000000Z-NonPassing.json",
+            encoding="utf-8"
+    ))
+    cis_pass = json.load(open(
+        f"{base}/true-cis_input-20250101T000000Z.json", encoding="utf-8"
+    ))
 
     layer = combine_results([cis_fail, cis_pass])
     techniques = layer.get('techniques', [])
@@ -51,7 +53,7 @@ def test_host_nonpassing_conversion():
     Convert the non‑passing host CIS input and compare scores
     against the known output.
     """
-    input_path = "tests/data/host-CIS_input-20250101T000000Z-NonPassing.json"
+    input_path = "tests/data/host-cis_input-20250101T000000Z-NonPassing.json"
     known_path = "tests/data/host-MITRE-20250101T000000Z-NonPassing.json"
 
     cis = json.load(open(input_path, encoding="utf-8"))
@@ -66,9 +68,9 @@ def test_single_input_all_pass():
     Single CIS input with all-pass => every score 1.0, no comments.
     """
     base = './tests/data'
-    cis_true = json.load(
-        open(f"{base}/cisinput-true.json", 'r', encoding='utf-8')
-    )
+    cis_true = json.load(open(
+        f"{base}/true-cis_input-20250101T000000Z.json", 'r', encoding='utf-8'
+    ))
     layer = combine_results([cis_true])
     techs = layer.get('techniques', [])
     assert techs, "No techniques generated"
@@ -80,9 +82,9 @@ def test_layer_schema():
     Output dict and techniques entries match expected schema.
     """
     base = './tests/data'
-    cis_true = json.load(
-        open(f"{base}/cisinput-true.json", 'r', encoding='utf-8')
-    )
+    cis_true = json.load(open(
+        f"{base}/true-cis_input-20250101T000000Z.json", 'r', encoding='utf-8'
+    ))
     layer = convert_cis_to_attack(cis_true)
     keys = set(layer.keys())
     assert keys == {'version', 'name', 'domain', 'description',
@@ -98,12 +100,14 @@ def test_combine_idempotent():
     combine_results twice yields identical output.
     """
     base = './tests/data'
-    cis_false = json.load(
-        open(f"{base}/cisinput-false.json", 'r', encoding='utf-8')
-    )
-    cis_true = json.load(
-        open(f"{base}/cisinput-true.json", 'r', encoding='utf-8')
-    )
+    cis_false = json.load(open(
+        f"{base}/false-cis_input2-20250101T000000Z-NonPassing.json",
+        'r',
+        encoding='utf-8'
+    ))
+    cis_true = json.load(open(
+        f"{base}/true-cis_input-20250101T000000Z.json", 'r', encoding='utf-8'
+    ))
     inp = [cis_false, cis_true]
     out1 = combine_results(inp)
     out2 = combine_results(inp)
@@ -114,10 +118,7 @@ def test_ordering_invariance():
     """
     Shuffling input rules does not change sorted techniques.
     """
-    path = (
-        "tests/data/host-CIS_input-20250101T000000Z-"
-        "NonPassing.json"
-    )
+    path = "tests/data/host-cis_input-20250101T000000Z-NonPassing.json"
     cis = json.load(open(path, 'r', encoding='utf-8'))
     # shuffle rules
     import random

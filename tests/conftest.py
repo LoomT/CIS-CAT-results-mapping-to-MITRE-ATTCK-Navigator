@@ -1,15 +1,17 @@
 import os
 import shutil
 import tempfile
+from datetime import datetime, timezone
 
 import pytest
 from api.app import create_app
-from api.db.models import Metadata
+from api.db.models import Metadata, BearerToken, Department, DepartmentUser, \
+    Benchmark, Hostname, Result
 
 UPLOAD_FOLDER = 'uploads'
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def app():
     """Create application for testing"""
     # Create a temporary directory for test uploads
@@ -36,7 +38,7 @@ def app():
 
 
 # scope="session" means it creates one instance for the entire test run
-@pytest.fixture(scope="session")
+@pytest.fixture
 def client(app):
     return app.test_client()
 
@@ -63,7 +65,7 @@ def uploads_folder(app):
 
 
 @pytest.fixture
-def uploads_folder_with_files(app):
+def bootstrap_full(app, bootstrap_tokens_and_users):
     # Clean up before the test just in case and create the uploads folder
     upload_folder = app.config['UPLOAD_FOLDER']
 
@@ -71,33 +73,55 @@ def uploads_folder_with_files(app):
         shutil.rmtree(upload_folder)
     os.makedirs(upload_folder, exist_ok=True)
 
-    # Test data files
-    test_files = [
-        ('tests/data/host-CIS_input-20250101T000000Z-NonPassing.json',
-         'file_id1',
-         'file1.json'),
-        ('tests/data/cisinput-true.json', 'file_id2', 'file2.json'),
-        ('tests/data/cisinput-false.json', 'file_id3', 'file3.json')
-    ]
-
     with app.app_context():
-        for src_file, file_id, dest_filename in test_files:
+        passing = Result(name='Passing')
+        non_passing = Result(name='NonPassing')
+        host_host = Hostname(name='host')
+        host_true = Hostname(name='true')
+        host_false = Hostname(name='false')
+        bench1 = Benchmark(name='cis_input')
+        bench2 = Benchmark(name='cis_input2')
+        app.db.session.add_all([passing, non_passing, host_host, host_true,
+                                host_false, bench1, bench2])
+
+        # Test data files
+        test_files = [
+            ('host-cis_input-20250101T000000Z-NonPassing.json',
+             'file_id1', bootstrap_tokens_and_users['dept1'].id,
+             host_host, bench1, '20250101T000000Z', non_passing),
+            ('true-cis_input-20250101T000000Z.json',
+             'file_id2', bootstrap_tokens_and_users['dept1'].id,
+             host_true, bench1, '20250101T000000Z', passing),
+            ('false-cis_input2-20250101T000000Z-NonPassing.json',
+             'file_id3', bootstrap_tokens_and_users['dept2'].id,
+             host_false, bench2, '20250101T000000Z', non_passing),
+        ]
+
+        for file_name, file_id, dept_id, \
+                hostname, bench_type, time, result_type in test_files:
+
+            file_path = os.path.join('tests', 'data', file_name)
             # Verify source file exists
-            assert os.path.exists(src_file), \
-                   f"Test data file {src_file} not found"
+            assert os.path.exists(file_path), \
+                   f"Test data file {file_path} not found"
 
             # Create destination directory
             dest_dir = os.path.join(upload_folder, file_id)
             os.makedirs(dest_dir, exist_ok=True)
 
             # Copy file
-            dest_path = os.path.join(dest_dir, dest_filename)
-            shutil.copyfile(src_file, dest_path)
+            dest_path = os.path.join(dest_dir, file_name)
+            shutil.copyfile(file_path, dest_path)
 
             # Create database entry
             metadata = Metadata(
                 id=file_id,
-                filename=dest_filename,
+                filename=file_name,
+                department_id=dept_id,
+                hostname=hostname,
+                benchmark=bench_type,
+                result=result_type,
+                time_created=datetime.fromisoformat(time),
                 # Add other required fields as needed
             )
 
@@ -105,13 +129,7 @@ def uploads_folder_with_files(app):
 
         app.db.session.commit()
 
-    yield upload_folder
-
-    # Cleanup
-    with app.app_context():
-        # Clear database
-        app.db.session.query(Metadata).delete()
-        app.db.session.commit()
+    yield bootstrap_tokens_and_users
 
     if os.path.exists(upload_folder):
         shutil.rmtree(upload_folder)
@@ -123,3 +141,129 @@ def test_data(file_name: str):
     assert os.path.exists(data_file)
     with open(data_file, 'r') as fs:
         yield fs.read()
+
+
+@pytest.fixture
+def bootstrap_department(app):
+    """Set up a department"""
+    with app.app_context():
+        # Create additional department for access control tests
+        dept = Department(name="dept")
+        app.db.session.add(dept)
+        app.db.session.commit()
+        yield dept
+
+
+@pytest.fixture
+def bootstrap_bearer_tokens(app):
+    """Set up bearer tokens for testing"""
+
+    with app.app_context():
+        # Create additional department for access control tests
+        bearer_token_dept1 = Department(name="bearer_token_dept1")
+        bearer_token_dept2 = Department(name="bearer_token_dept2")
+        app.db.session.add(bearer_token_dept1)
+        app.db.session.add(bearer_token_dept2)
+        app.db.session.commit()
+
+        # Create bearer tokens
+        tokens = []
+
+        # Token for the test department
+        token1 = BearerToken(
+            token="test-token-1",
+            machine_name="machine1",
+            department_id=bearer_token_dept1.id,
+            created_by="admin",
+            is_active=True,
+            created_at=datetime.now(timezone.utc),
+            last_used=datetime.now(timezone.utc)
+        )
+        tokens.append(token1)
+
+        # Another token for the test department
+        token2 = BearerToken(
+            token="test-token-2",
+            machine_name="machine2",
+            department_id=bearer_token_dept1.id,
+            created_by="admin",
+            is_active=False,
+            created_at=datetime.now(timezone.utc),
+            last_used=None
+        )
+        tokens.append(token2)
+
+        # Token for second department
+        token3 = BearerToken(
+            token="test-token-3",
+            machine_name="machine3",
+            department_id=bearer_token_dept2.id,
+            created_by="other_admin",
+            is_active=True,
+            created_at=datetime.now(timezone.utc),
+            last_used=None
+        )
+        tokens.append(token3)
+
+        for token in tokens:
+            app.db.session.add(token)
+
+        app.db.session.commit()
+
+        yield {
+            'token1': token1,
+            'token2': token2,
+            'token3': token3,
+            'dept1': bearer_token_dept1,
+            'dept2': bearer_token_dept2
+        }
+
+        # Cleanup
+        for token in tokens:
+            app.db.session.delete(token)
+        app.db.session.delete(bearer_token_dept1)
+        app.db.session.delete(bearer_token_dept2)
+        app.db.session.commit()
+
+
+@pytest.fixture
+def bootstrap_tokens_and_users(app, bootstrap_bearer_tokens):
+    """Set up bearer tokens and users for testing"""
+    dept1_admin = DepartmentUser(
+        department_id=bootstrap_bearer_tokens['dept1'].id,
+        user_handle="dept1_admin"
+    )
+    dept2_admin = DepartmentUser(
+        department_id=bootstrap_bearer_tokens['dept2'].id,
+        user_handle="dept2_admin"
+    )
+    app.db.session.add(dept1_admin)
+    app.db.session.add(dept2_admin)
+    app.db.session.commit()
+
+    yield {
+        'dept1_admin': dept1_admin,
+        'dept2_admin': dept2_admin
+    } | bootstrap_bearer_tokens
+
+    app.db.session.delete(dept1_admin)
+    app.db.session.delete(dept2_admin)
+    app.db.session.commit()
+
+
+def enable_authentication(
+        client,
+        super_admins=None,
+        trusted_ips=None,
+):
+    """Enable authentication for the client"""
+
+    if super_admins is None:
+        super_admins = {'super_admin'}
+    if trusted_ips is None:
+        trusted_ips = {'127.0.0.1'}
+
+    with client.application.app_context():
+        client.application.config['ENABLE_SSO'] = True
+        client.application.config['SUPER_ADMINS'] = super_admins
+        client.application.config['TRUSTED_IPS'] = trusted_ips
