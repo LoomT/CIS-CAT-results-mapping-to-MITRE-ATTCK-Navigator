@@ -1,6 +1,6 @@
 import React, { createContext, StrictMode, useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import './index.css';
 import UserScreen from './UserScreen.jsx';
 import HomeScreen from './HomeScreen.jsx';
@@ -29,6 +29,7 @@ createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <LanguageProvider>
         <BrowserRouter>
+          <TitleUpdater />
           <Routes>
             <Route index element={<HomeScreen />} />
             <Route path="/manual-upload" element={<UserScreen />} />
@@ -157,4 +158,23 @@ function UserDisplay() {
       </div>
     </div>
   );
+}
+
+function TitleUpdater() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const titles = {
+      '/manual-conversion': 'Manual Conversion',
+      '/admin': 'Admin Overview',
+      '/admin/user-management': 'User Management',
+      '/admin/bearer-token-management': 'Token Management',
+      '/manual-upload': 'Manual Upload',
+    };
+
+    const path = location.pathname;
+    document.title = titles[path] || 'CIS-CAT Results Mapper to MITTRE ATT\&CK Navigator';
+  }, [location.pathname]);
+
+  return null;
 }
