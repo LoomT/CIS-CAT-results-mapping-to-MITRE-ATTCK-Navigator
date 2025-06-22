@@ -122,7 +122,6 @@ def bootstrap_full(app, bootstrap_tokens_and_users):
                 benchmark=bench_type,
                 result=result_type,
                 time_created=datetime.fromisoformat(time),
-                # Add other required fields as needed
             )
 
             app.db.session.add(metadata)

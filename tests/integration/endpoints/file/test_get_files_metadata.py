@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 import pytest
 from tests.conftest import enable_authentication
 
@@ -397,17 +399,59 @@ def test_get_files_metadata_large_dataset_simulation(
     assert len(data['ids']) >= 50
 
 
-def test_get_files_metadata_time_filtering(client, bootstrap_full):
-    """Test time-based filtering if supported"""
-    # Test with time parameters (these may or may not be implemented)
+@pytest.mark.parametrize("start,end,expected", [
+    ('20250101T000000Z', None, {'new', 'file_id1', 'file_id2', 'file_id3'}),
+    ('20250102T000000Z', None, {'new'}),
+    ('20230101T052502Z', None,
+     {'less_old', 'new', 'file_id1', 'file_id2', 'file_id3'}),
+    ('20221001T000000Z', '20251231T000000Z',
+     {'old', 'less_old', 'new', 'file_id1', 'file_id2', 'file_id3'}),
+    ('20250101T000000Z', '20250930T000000Z',
+     {'file_id1', 'file_id2', 'file_id3'}),
+    (None, '20250101T000000Z',
+     {'old', 'less_old', 'file_id1', 'file_id2', 'file_id3'}),
+    (None, '20240101T000000Z', {'old', 'less_old'}),
+    (None, '20230101T000000Z', set()),
+    (None, '20230101T060000Z', {'old', 'less_old'}),
+    (None, '20230101T052501Z', {'old'}),
+    ('20230101T052501Z', '20230101T052501Z', {'old'}),
+    ('20230101T052502Z', '20230101T052503Z', {'less_old'}),
+])
+def test_get_files_metadata_time_filtering(
+        client, app, bootstrap_full, start, end, expected
+):
+    """Test time-based filtering"""
+    with app.app_context():
+        from api.db.models import Metadata
+        metadata1 = Metadata(
+            id='old',
+            filename='20230101T052501Z',
+            time_created=datetime.fromisoformat('20230101T052501Z'),
+        )
+        metadata2 = Metadata(
+            id='new',
+            filename='20251001T020202Z',
+            time_created=datetime.fromisoformat('20251001T020202Z'),
+        )
+        metadata3 = Metadata(
+            id='less_old',
+            filename='20230101T052502Z',
+            time_created=datetime.fromisoformat('20230101T052502Z'),
+        )
+        app.db.session.add_all([metadata1, metadata2, metadata3])
+        app.db.session.commit()
+
+    url = '/api/files?verbose=true'
+    start_param = f'&min_time={start}' if start else ''
+    end_param = f'&max_time={end}' if end else ''
     response = client.get(
-        '/api/files?verbose=true&start_time=2025-01-01&end_time=2025-12-31'
+        url + start_param + end_param,
     )
 
-    # Should not error even if filtering isn't implemented
     assert response.status_code == 200
     data = response.get_json()
     assert 'data' in data
+    assert set(file['id'] for file in data['data']) == expected
 
 
 def test_get_files_metadata_invalid_page_parameters(client, bootstrap_full):
