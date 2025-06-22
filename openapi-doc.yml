@@ -198,10 +198,8 @@ components:
           type: string
         department_id:
           type: integer
-          nullable: true
         department_name:
           type: string
-          nullable: true
 
     UserListResponse:
       type: object
@@ -243,9 +241,10 @@ components:
           format: date-time
           description: Token creation timestamp
         last_used:
-          type: string
+          type:
+            - string
+            - 'null'
           format: date-time
-          nullable: true
           description: Last time token was used
         created_by:
           type: string
