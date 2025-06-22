@@ -668,6 +668,7 @@ def register_routes(app):
         return app.send_static_file('index.html')
 
     @app.route('/admin', strict_slashes=False)
+    @app.route('/admin/bearer-token-management', strict_slashes=False)
     @require_admin
     def serve_admin() -> Response:
         """Serve pages that need at least admin role"""
