@@ -167,11 +167,10 @@ function TitleUpdater() {
   useEffect(() => {
     const titles = {
       '/': t.titleMapper,
-      '/manual-conversion': t.titleManualConversion,
+      '/manual-upload': t.titleFileUpload,
       '/admin': t.titleAdminOverview,
       '/admin/user-management': t.titleUserManagement,
       '/admin/bearer-token-management': t.titleTokenManagement,
-      '/manual-upload': t.titleFileUpload,
     };
 
     const path = location.pathname;
