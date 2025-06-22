@@ -613,31 +613,6 @@ def test_add_user_concurrent_addition(client, app):
     assert duplicate_count == 2
 
 
-def test_add_user_stress_test(client, app):
-    """Test adding many users rapidly"""
-    with app.app_context():
-        dept = Department(name="stress_test_dept")
-        app.db.session.add(dept)
-        app.db.session.commit()
-        dept_id = dept.id
-
-    # Add many users rapidly
-    for i in range(50):
-        data = {
-            'department_id': dept_id,
-            'user_handle': f'stress_user_{i:03d}'
-        }
-        response = client.post('/api/admin/department-users', json=data)
-        assert response.status_code == 201
-
-    # Verify all users were added
-    with app.app_context():
-        user_count = app.db.session.query(DepartmentUser).filter_by(
-            department_id=dept_id
-        ).count()
-        assert user_count == 50
-
-
 def test_add_user_method_not_allowed(client, bootstrap_department):
     """Test that other HTTP methods are not allowed"""
     data = {

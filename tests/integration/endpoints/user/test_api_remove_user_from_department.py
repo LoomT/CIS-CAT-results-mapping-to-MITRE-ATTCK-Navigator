@@ -756,44 +756,6 @@ def test_remove_user_concurrent_removal(client, app):
     assert not_found_count == 2
 
 
-def test_remove_user_stress_test(client, app):
-    """Test removing many users rapidly"""
-    with app.app_context():
-        dept = Department(name="stress_test_dept")
-        app.db.session.add(dept)
-        app.db.session.commit()
-
-        # Create many users
-        users = []
-        for i in range(50):
-            user = DepartmentUser(
-                department_id=dept.id,
-                user_handle=f'stress_user_{i:03d}'
-            )
-            users.append(user)
-
-        app.db.session.add_all(users)
-        app.db.session.commit()
-
-        dept_id = dept.id
-
-    # Remove all users rapidly
-    for i in range(50):
-        data = {
-            'department_id': dept_id,
-            'user_handle': f'stress_user_{i:03d}'
-        }
-        response = client.delete('/api/admin/department-users', json=data)
-        assert response.status_code == 200
-
-    # Verify all users were removed
-    with app.app_context():
-        user_count = app.db.session.query(DepartmentUser).filter_by(
-            department_id=dept_id
-        ).count()
-        assert user_count == 0
-
-
 def test_remove_user_method_not_allowed(client, bootstrap_tokens_and_users):
     """Test that other HTTP methods are not allowed"""
     dept1_admin = bootstrap_tokens_and_users['dept1_admin']

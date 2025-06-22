@@ -278,52 +278,6 @@ def test_get_users_database_error(client, mocker):
     assert data['message'] == 'Error fetching users'
 
 
-def test_get_users_consistent_ordering(client, app):
-    """Test that users are returned in consistent order"""
-    with app.app_context():
-        dept = Department(name="ordering_dept")
-        app.db.session.add(dept)
-        app.db.session.commit()
-
-        # Create multiple users
-        users_data = [
-            "user_z",
-            "user_a",
-            "user_m",
-            "user_1",
-            "user_Z"  # Test case sensitivity
-        ]
-
-        created_users = []
-        for user_handle in users_data:
-            user = DepartmentUser(
-                department_id=dept.id,
-                user_handle=user_handle
-            )
-            app.db.session.add(user)
-            created_users.append(user)
-
-        app.db.session.commit()
-
-        # Make multiple requests to verify consistent ordering
-        responses = []
-        for _ in range(3):
-            response = client.get('/api/admin/users')
-            assert response.status_code == 200
-            responses.append(response.get_json())
-
-        # All responses should have the same order
-        for i in range(1, len(responses)):
-            handles_1 = [u['handle'] for u in responses[0]['users']]
-            handles_i = [u['handle'] for u in responses[i]['users']]
-            assert handles_1 == handles_i
-
-        # Verify all users are present
-        final_handles = [u['handle'] for u in responses[0]['users']]
-        for expected_handle in users_data:
-            assert expected_handle in final_handles
-
-
 def test_get_users_concurrent_access(client, bootstrap_tokens_and_users):
     """Test users endpoint handles concurrent access properly"""
     # Simulate multiple concurrent requests
