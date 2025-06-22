@@ -162,7 +162,7 @@ function UserDisplay() {
 
 function TitleUpdater() {
   const location = useLocation();
-  const t = useContext(LanguageContext)
+  const t = useContext(LanguageContext);
 
   useEffect(() => {
     const titles = {
