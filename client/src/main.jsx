@@ -175,7 +175,7 @@ function TitleUpdater() {
     };
 
     const path = location.pathname;
-    document.title = titles[path] || titles[0];
+    document.title = titles[path] || 'CIS-CAT Results Mapper to MITTRE ATT\&CK Navigator';
   }, [location.pathname, t]);
 
   return null;
