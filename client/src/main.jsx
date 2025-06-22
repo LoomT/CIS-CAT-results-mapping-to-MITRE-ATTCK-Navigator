@@ -168,9 +168,9 @@ function TitleUpdater() {
     const titles = {
       '/': t.titleMapper,
       '/manual-upload': t.titleFileUpload,
-      '/admin': t.titleAdminOverview,
-      '/admin/user-management': t.titleUserManagement,
-      '/admin/bearer-token-management': t.titleTokenManagement,
+      '/admin': t.titleDepartmentReports,
+      '/admin/user-management': t.titleUserDepartmentManagement,
+      '/admin/bearer-token-management': t.titleBearerTokenManagement,
     };
 
     const path = location.pathname;
