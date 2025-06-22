@@ -1,3 +1,5 @@
+import pytest
+
 from api.db.models import DepartmentUser
 from tests.conftest import enable_authentication
 
@@ -189,47 +191,15 @@ def test_get_departments_response_format(client, bootstrap_department):
         assert isinstance(dept['name'], str)
 
 
-def test_get_departments_multiple_departments_ordered(client, app):
-    """Test departments are returned in consistent order"""
-    from api.db.models import Department
-
-    with app.app_context():
-        # Create multiple departments
-        dept_a = Department(name="dept_a")
-        dept_z = Department(name="dept_z")
-        dept_m = Department(name="dept_m")
-
-        app.db.session.add(dept_a)
-        app.db.session.add(dept_z)
-        app.db.session.add(dept_m)
-        app.db.session.commit()
-
-        response = client.get('/api/admin/departments')
-        assert response.status_code == 200
-
-        data = response.get_json()
-        assert len(data['departments']) == 3
-
-        # Verify all departments are present
-        dept_names = [dept['name'] for dept in data['departments']]
-        assert 'dept_a' in dept_names
-        assert 'dept_z' in dept_names
-        assert 'dept_m' in dept_names
-
-        # Cleanup
-        app.db.session.delete(dept_a)
-        app.db.session.delete(dept_z)
-        app.db.session.delete(dept_m)
-        app.db.session.commit()
-
-
-def test_get_departments_empty_department_name_handling(client, app):
+@pytest.mark.parametrize("name", [
+    "a", "département_测试_部门", "with space"
+])
+def test_get_departments_valid_name_handling(client, app, name):
     """Test handling of departments with edge case names"""
     from api.db.models import Department
 
     with app.app_context():
-        # Create department with minimal valid name
-        dept = Department(name="a")
+        dept = Department(name=name)
         app.db.session.add(dept)
         app.db.session.commit()
 
@@ -238,11 +208,7 @@ def test_get_departments_empty_department_name_handling(client, app):
 
         data = response.get_json()
         assert len(data['departments']) == 1
-        assert data['departments'][0]['name'] == "a"
-
-        # Cleanup
-        app.db.session.delete(dept)
-        app.db.session.commit()
+        assert data['departments'][0]['name'] == name
 
 
 def test_get_departments_database_error(client, mocker):

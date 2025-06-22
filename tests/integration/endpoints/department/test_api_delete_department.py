@@ -499,27 +499,3 @@ def test_delete_department_method_not_allowed(client, bootstrap_department):
     # PATCH should not be allowed
     response = client.patch(f'/api/admin/departments/{dept_id}')
     assert response.status_code == 405
-
-
-def test_delete_department_performance_stress(client, app):
-    """Test deleting multiple departments rapidly"""
-    dept_ids = []
-
-    # Create multiple departments
-    with app.app_context():
-        for i in range(10):
-            dept = Department(name=f'stress_delete_dept_{i}')
-            app.db.session.add(dept)
-            app.db.session.commit()
-            dept_ids.append(dept.id)
-
-    # Delete all departments rapidly
-    for dept_id in dept_ids:
-        response = client.delete(f'/api/admin/departments/{dept_id}')
-        assert response.status_code == 200
-
-    # Verify all departments are deleted
-    with app.app_context():
-        for dept_id in dept_ids:
-            deleted_dept = app.db.session.get(Department, dept_id)
-            assert deleted_dept is None

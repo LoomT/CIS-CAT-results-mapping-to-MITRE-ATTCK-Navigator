@@ -180,6 +180,20 @@ def test_create_department_unicode_name(client, app):
     response_data = response.get_json()
     assert response_data['department']['name'] == 'département_测试_部门'
 
+    dep_id = response_data['department']['id']
+    # Verify department in database has correct unicode name
+    with app.app_context():
+        created_dept = app.db.session.get(Department, dep_id)
+        assert created_dept is not None
+        assert created_dept.name == 'département_测试_部门'
+
+        # Additional verification: ensure the name matches exactly
+        # and unicode characters are preserved
+        stored_name = created_dept.name
+        expected_name = 'département_测试_部门'
+        assert stored_name == expected_name
+        assert len(stored_name) == len(expected_name)
+
 
 def test_create_department_unauthenticated(client):
     """Test department creation without authentication when SSO enabled"""
