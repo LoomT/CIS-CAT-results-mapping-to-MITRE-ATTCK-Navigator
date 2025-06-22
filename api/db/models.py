@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 import sqlalchemy as sa
