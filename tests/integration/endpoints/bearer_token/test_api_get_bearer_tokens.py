@@ -56,12 +56,12 @@ def test_get_bearer_tokens_token_formatting(
         assert 'created_at' in token_data
         created_at = token_data['created_at']
         # Should be ISO format string
-        datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+        datetime.fromisoformat(created_at)
 
         # last_used can be null or ISO format
         if token_data['last_used'] is not None:
             last_used = token_data['last_used']
-            datetime.fromisoformat(last_used.replace('Z', '+00:00'))
+            datetime.fromisoformat(last_used)
 
 
 def test_get_bearer_tokens_unauthenticated(client):

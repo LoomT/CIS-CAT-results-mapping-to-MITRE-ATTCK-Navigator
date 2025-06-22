@@ -89,7 +89,7 @@ class Metadata(BaseModel):
     )
     department: Mapped[Department | None] = relationship(
         "Department",
-        backref=backref("metadata")
+        back_populates="file_metadata"
     )
 
 
@@ -101,16 +101,27 @@ class Benchmark(BaseModel):
 
 class Department(BaseModel):
     __tablename__ = "department"
-    __hidden_fields__ = {"users", "metadata", "bearer_token"}
+    __hidden_fields__ = {"users", "file_metadata", "tokens"}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
 
     # Relationship to department users
-    users: Mapped[list["DepartmentUser"]] = relationship(
+    users: Mapped[list[DepartmentUser]] = relationship(
         "DepartmentUser",
         back_populates="department",
         cascade="all, delete-orphan"
+    )
+
+    # metadata is reserved
+    file_metadata: Mapped[list[Metadata]] = relationship(
+        "Metadata",
+        back_populates="department",
+    )
+
+    tokens: Mapped[list[BearerToken]] = relationship(
+        "BearerToken",
+        back_populates="department",
     )
 
 
@@ -186,7 +197,8 @@ class BearerToken(BaseModel):
 
     # Relationship to department
     department: Mapped["Department"] = relationship(
-        "Department", backref=backref("bearer_token"))
+        "Department", back_populates="tokens"
+    )
 
     def to_dict_with_token(self):
         """Special method to include token in response (use carefully)"""
