@@ -37,6 +37,12 @@ const translations = {
     onlyLatestFiles: 'Only show latest files per host',
     dateRange: 'Search within date range',
     benchmarkTypes: 'Select benchmark types',
+    titleManualConversion: 'Manual Conversion',
+    titleAdminOverview: 'Admin Overview',
+    titleUserManagement: 'User Management',
+    titleTokenManagement: 'Token Management',
+    titleFileUpload: 'File Upload',
+    titleMapper: 'CIS-CAT Results Mapper to MITTRE ATT\&CK Navigator',
   },
   nl: {
     adminToken: 'Voer admin token in',
@@ -76,6 +82,12 @@ const translations = {
     onlyLatestFiles: 'Toon alleen meest recente bestanden per host',
     dateRange: 'Zoek binnen 2 data',
     benchmarkTypes: 'Selecteer benchmark typen',
+    titleManualConversion: 'Not translated',
+    titleAdminOverview: 'Not translated',
+    titleUserManagement: 'Not translated',
+    titleTokenManagement: 'Not translated',
+    titleFileUpload: 'Not translated',
+    titleMapper: 'Not translated',
   },
 };
 

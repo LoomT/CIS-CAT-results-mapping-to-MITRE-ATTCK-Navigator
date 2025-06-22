@@ -1,4 +1,4 @@
-import React, { createContext, StrictMode, useState, useEffect } from 'react';
+import React, { createContext, StrictMode, useState, useEffect, useContext } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import './index.css';
@@ -162,19 +162,21 @@ function UserDisplay() {
 
 function TitleUpdater() {
   const location = useLocation();
+  const t = useContext(LanguageContext)
 
   useEffect(() => {
     const titles = {
-      '/manual-conversion': 'Manual Conversion',
-      '/admin': 'Admin Overview',
-      '/admin/user-management': 'User Management',
-      '/admin/bearer-token-management': 'Token Management',
-      '/manual-upload': 'Manual Upload',
+      '/': t.titleMapper,
+      '/manual-conversion': t.titleManualConversion,
+      '/admin': t.titleAdminOverview,
+      '/admin/user-management': t.titleUserManagement,
+      '/admin/bearer-token-management': t.titleTokenManagement,
+      '/manual-upload': t.titleFileUpload,
     };
 
     const path = location.pathname;
-    document.title = titles[path] || 'CIS-CAT Results Mapper to MITTRE ATT\&CK Navigator';
-  }, [location.pathname]);
+    document.title = titles[path] || titles[0];
+  }, [location.pathname, t]);
 
   return null;
 }
