@@ -243,10 +243,6 @@ def test_get_departments_special_characters_in_name(client, app):
         assert len(data['departments']) == 1
         assert data['departments'][0]['name'] == "dept-with_special.chars@123"
 
-        # Cleanup
-        app.db.session.delete(dept)
-        app.db.session.commit()
-
 
 def test_get_departments_concurrent_access(client, bootstrap_tokens_and_users):
     """Test departments endpoint handles concurrent access properly"""

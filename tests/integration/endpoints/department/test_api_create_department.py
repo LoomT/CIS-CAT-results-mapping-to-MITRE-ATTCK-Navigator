@@ -123,10 +123,6 @@ def test_create_department_case_insensitive_duplicate(client, app):
             response_data = response.get_json()
             assert response_data['message'] == 'Department name already exists'
 
-        # Cleanup
-        app.db.session.delete(dept)
-        app.db.session.commit()
-
 
 def test_create_department_name_with_spaces(client, app):
     """Test creating department with spaces in name"""

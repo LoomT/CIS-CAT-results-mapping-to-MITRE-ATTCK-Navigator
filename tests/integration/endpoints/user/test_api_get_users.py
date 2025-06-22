@@ -121,15 +121,6 @@ def test_get_users_multiple_departments_per_user(client, app):
         assert len(single_user_deps) == 1
         assert single_user_deps[0][1] == 'multi_dept1'
 
-        # Cleanup
-        app.db.session.delete(user1)
-        app.db.session.delete(user2)
-        app.db.session.delete(user3)
-        app.db.session.delete(dept1)
-        app.db.session.delete(dept2)
-        app.db.session.delete(dept3)
-        app.db.session.commit()
-
 
 def test_get_users_super_admin_only_access(client, bootstrap_tokens_and_users):
     """Test that only super admin can access users endpoint"""
@@ -248,11 +239,6 @@ def test_get_users_special_characters_in_handle(client, app):
         assert data['users'][0][
                    'handle'] == "user.with-special_chars@domain.com"
 
-        # Cleanup
-        app.db.session.delete(user)
-        app.db.session.delete(dept)
-        app.db.session.commit()
-
 
 def test_get_users_empty_user_handle(client, app):
     """Test handling of edge case user handles"""
@@ -275,11 +261,6 @@ def test_get_users_empty_user_handle(client, app):
         data = response.get_json()
         assert len(data['users']) == 1
         assert data['users'][0]['handle'] == "a"
-
-        # Cleanup
-        app.db.session.delete(user)
-        app.db.session.delete(dept)
-        app.db.session.commit()
 
 
 def test_get_users_database_error(client, mocker):
@@ -342,12 +323,6 @@ def test_get_users_consistent_ordering(client, app):
         for expected_handle in users_data:
             assert expected_handle in final_handles
 
-        # Cleanup
-        for user in created_users:
-            app.db.session.delete(user)
-        app.db.session.delete(dept)
-        app.db.session.commit()
-
 
 def test_get_users_concurrent_access(client, bootstrap_tokens_and_users):
     """Test users endpoint handles concurrent access properly"""
@@ -401,13 +376,6 @@ def test_get_users_large_dataset_simulation(client, app):
             assert 'department_id' in user
             assert 'department_name' in user
 
-        # Cleanup
-        for user in users:
-            app.db.session.delete(user)
-        for dept in departments:
-            app.db.session.delete(dept)
-        app.db.session.commit()
-
 
 def test_get_users_orphaned_department_reference(client, app):
     """Test handling of users with invalid department references"""
@@ -432,17 +400,6 @@ def test_get_users_orphaned_department_reference(client, app):
         # Response should still be successful but user might not be included
         # or might have null department info depending on implementation
         assert response.status_code == 200
-
-        # Cleanup remaining user if it exists
-        try:
-            remaining_user = app.db.session.query(DepartmentUser).filter_by(
-                user_handle="orphaned_user"
-            ).first()
-            if remaining_user:
-                app.db.session.delete(remaining_user)
-                app.db.session.commit()
-        except Exception:
-            pass
 
 
 def test_get_users_method_not_allowed(client):
@@ -512,13 +469,6 @@ def test_get_users_case_sensitivity(client, app):
         assert 'testuser' in handles
         assert 'TESTUSER' in handles
 
-        # Cleanup
-        app.db.session.delete(user1)
-        app.db.session.delete(user2)
-        app.db.session.delete(user3)
-        app.db.session.delete(dept)
-        app.db.session.commit()
-
 
 def test_get_users_performance_stress(client, app):
     """Test users endpoint performance under stress"""
@@ -546,9 +496,3 @@ def test_get_users_performance_stress(client, app):
             assert response.status_code == 200
             data = response.get_json()
             assert len(data['users']) == 100
-
-        # Cleanup
-        for user in users:
-            app.db.session.delete(user)
-        app.db.session.delete(dept)
-        app.db.session.commit()

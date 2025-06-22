@@ -218,13 +218,6 @@ def bootstrap_bearer_tokens(app):
             'dept2': bearer_token_dept2
         }
 
-        # Cleanup
-        for token in tokens:
-            app.db.session.delete(token)
-        app.db.session.delete(bearer_token_dept1)
-        app.db.session.delete(bearer_token_dept2)
-        app.db.session.commit()
-
 
 @pytest.fixture
 def bootstrap_tokens_and_users(app, bootstrap_bearer_tokens):
@@ -245,10 +238,6 @@ def bootstrap_tokens_and_users(app, bootstrap_bearer_tokens):
         'dept1_admin': dept1_admin,
         'dept2_admin': dept2_admin
     } | bootstrap_bearer_tokens
-
-    app.db.session.delete(dept1_admin)
-    app.db.session.delete(dept2_admin)
-    app.db.session.commit()
 
 
 def enable_authentication(
