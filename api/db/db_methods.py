@@ -131,6 +131,14 @@ def delete_department(department_id: int) -> bool:
     """Delete a department and all its user assignments."""
     department = get_department(department_id)
     if department:
+        stmt = (
+            select(BearerToken)
+            .where(BearerToken.department_id == department_id)
+        )
+        tokens = db.session.execute(stmt).scalars().all()
+        for token in tokens:
+            token.is_active = False
+
         db.session.delete(department)
         db.session.commit()
         return True

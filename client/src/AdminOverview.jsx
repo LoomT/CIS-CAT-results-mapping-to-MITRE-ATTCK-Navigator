@@ -189,7 +189,7 @@ function AdminOverview() {
       id: file.id,
       filename: file.filename,
       department: file.department ? file.department.name : 'None',
-      time: file.time_created ? file.time_created.replace('T', ' ') : null,
+      time: file.time_created ? new Date(file.time_created).toLocaleString() : null,
     })));
 
     // lock in the active search parameters
@@ -282,9 +282,9 @@ function AdminOverview() {
     else if (isAllFilesChecked) {
       return constructDownloadURLFromQueryParams(
         activeSearchText,
-        activeDepts.map(dept => dept.value),
-        activeBenchTypes.map(bench => bench.value),
-        activeHosts.map(host => host.value),
+        activeDepts,
+        activeBenchTypes,
+        activeHosts,
         activeDateFrom,
         activeDateTo,
       );

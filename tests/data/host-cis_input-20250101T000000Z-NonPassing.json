@@ -1,6 +1,6 @@
 {
     "benchmark-id": "xccdf_org.cisecurity.benchmarks_benchmark_3.0.0_CIS_Microsoft_Windows_10_Enterprise_Benchmark",
-    "benchmark-title": "CIS Microsoft Windows 10 Enterprise Benchmark",
+    "benchmark-title": "cis input",
     "benchmark-version": "3.0.0",
     "profile-id": "xccdf_org.cisecurity.benchmarks_profile_Level_1_L1_-_CorporateEnterprise_Environment_general_use",
     "profile-title": "Level 1 (L1) - Corporate/Enterprise Environment (general use)",

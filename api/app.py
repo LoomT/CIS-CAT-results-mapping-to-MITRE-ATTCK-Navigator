@@ -7,7 +7,7 @@ from functools import wraps
 
 try:
     from convert import convert_cis_to_attack, combine_results
-    from utils import find_file, ClientException
+    from utils import find_file, ClientException, validate_user_json
     from db.db import initialize_db
     from db.db_methods import get_metadata, get_user_departments, \
         get_all_departments_with_access, get_department_by_name, \
@@ -20,7 +20,7 @@ try:
     from db.db_utils import extract_metadata
 except ImportError:
     from .convert import convert_cis_to_attack, combine_results
-    from .utils import find_file, ClientException
+    from .utils import find_file, ClientException, validate_user_json
     from .db.db import initialize_db
     from .db.db_methods import get_metadata, get_user_departments, \
         get_all_departments_with_access, get_department_by_name, \
@@ -71,6 +71,11 @@ def create_app(config=None):
             for ip in trusted_ips_env.split(';')
             if ip.strip()
         )
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        os.getenv('DATABASE_URL', 'sqlite:///:memory:')
+    )
+    app.config["SQLALCHEMY_ECHO"] = False
 
     # Apply any additional configuration
     if config:
@@ -132,14 +137,15 @@ def register_routes(app):
 
             # Parse X-Forwarded-User header
             user_handle = request.headers.get('X-Forwarded-User')
-            if is_trusted_ip and user_handle:
+            if user_handle:
                 g.current_user = user_handle.strip()
+
+            if is_trusted_ip and user_handle:
                 g.is_super_admin = g.current_user in app.config['SUPER_ADMINS']
                 g.is_department_admin = len(get_all_departments_with_access(
                     g.current_user, g.is_super_admin)) > 0
                 g.is_bearer_token = False
             else:
-                g.current_user = None
                 g.is_super_admin = False
                 g.is_department_admin = False
                 g.is_bearer_token = False
@@ -196,7 +202,7 @@ def register_routes(app):
 
         return decorated_function
 
-    @app.get('/api/admin/bearer-tokens')
+    @app.get('/api/admin/bearer-tokens', strict_slashes=False)
     @require_admin
     def api_get_bearer_tokens():
         """Get all bearer tokens for departments the user has access to."""
@@ -213,18 +219,8 @@ def register_routes(app):
 
             return {
                 'tokens': [
-                    {
-                        'id': token.id,
-                        'machine_name': token.machine_name,
-                        'department_id': token.department_id,
-                        'department_name': token.department.name,
-                        'created_at': token.created_at.isoformat(),
-                        'last_used': token.last_used.isoformat()
-                        if token.last_used else None,
-                        'created_by': token.created_by,
-                        'is_active': token.is_active
-                    }
-                    for token in tokens
+                    # the token field is hidden by default
+                    token.to_dict() for token in tokens
                 ],
                 'departments': [
                     {
@@ -238,7 +234,7 @@ def register_routes(app):
             print(f"Error fetching bearer tokens: {e}")
             return {'message': 'Error fetching bearer tokens'}, 500
 
-    @app.post('/api/admin/bearer-tokens')
+    @app.post('/api/admin/bearer-tokens', strict_slashes=False)
     @require_admin
     def api_create_bearer_token():
         """Create a new bearer token for a department."""
@@ -311,7 +307,7 @@ def register_routes(app):
             db.session.rollback()
             return {'message': 'Error revoking bearer token'}, 500
 
-    @app.get('/api/admin/departments')
+    @app.get('/api/admin/departments', strict_slashes=False)
     @require_admin
     def api_get_departments():
         """
@@ -337,13 +333,13 @@ def register_routes(app):
             print(f"Error fetching departments: {e}")
             return {'message': 'Error fetching departments'}, 500
 
-    @app.post('/api/admin/departments')
+    @app.post('/api/admin/departments', strict_slashes=False)
     @require_super_admin
     def api_create_department():
         """Create a new department (super admin only)"""
         data = request.get_json()
 
-        if not data or not data.get('name'):
+        if not data or not data.get('name') or not data.get('name').strip():
             return {'message': 'Department name is required'}, 400
 
         dept_name = data['name'].strip()
@@ -383,7 +379,7 @@ def register_routes(app):
             db.session.rollback()
             return {'message': 'Error deleting department'}, 500
 
-    @app.get('/api/admin/users')
+    @app.get('/api/admin/users', strict_slashes=False)
     @require_super_admin
     def api_get_users():
         """Get all users and their department assignments"""
@@ -394,22 +390,16 @@ def register_routes(app):
             print(f"Error fetching users: {e}")
             return {'message': 'Error fetching users'}, 500
 
-    @app.post('/api/admin/department-users')
+    @app.post('/api/admin/department-users', strict_slashes=False)
     @require_super_admin
     def api_add_user_to_department():
         """Add a user to a department (super admin only)"""
         data = request.get_json()
 
-        if (
-            not data
-            or not data.get('department_id')
-            or not data.get('user_handle')
-        ):
-            return {'message':
-                    'Department ID and user handle are required'}, 400
+        validate_user_json(data)
 
         try:
-            dept_id = int(data['department_id'])
+            dept_id = data['department_id']
             user_handle = data['user_handle'].strip()
 
             # Validate department exists
@@ -436,19 +426,13 @@ def register_routes(app):
             db.session.rollback()
             return {'message': 'Error adding user to department'}, 500
 
-    @app.delete('/api/admin/department-users')
+    @app.delete('/api/admin/department-users', strict_slashes=False)
     @require_super_admin
     def api_remove_user_from_department():
         """Remove a user from a department (super admin only)"""
         data = request.get_json()
 
-        if (
-            not data
-            or not data.get('department_id')
-            or not data.get('user_handle')
-        ):
-            return {'message':
-                    'Department ID and user handle are required'}, 400
+        validate_user_json(data)
 
         try:
             dept_id = int(data['department_id'])
@@ -518,7 +502,7 @@ def register_routes(app):
 
         # query Metadata objects from the database based on request arguments
         try:
-            if request.args.get('verbose', 'false') == 'true':
+            if request.args.get('verbose', 'false').lower() == 'true':
                 return get_metadata(
                     g.get('current_user'),
                     g.get('is_super_admin', False),
@@ -538,8 +522,8 @@ def register_routes(app):
             print(f"Failed fetching metadata: {e}")
             return "Internal server error", 500
 
-    @app.get('/api/files/aggregate')
-    def aggregate_and_convert_files() -> tuple[str, int] | Response:
+    @app.get('/api/files/aggregate', strict_slashes=False)
+    def aggregate_and_convert_files() -> tuple[dict, int] | Response:
         """
         Endpoint for combining and retrieving multiple files
         by their unique ids. Can also be queryed with the same parameters
@@ -554,8 +538,9 @@ def register_routes(app):
                                     g.get('is_super_admin', False),
                                     request.args, ids=True)
             if not file_ids:
-                return "No file ids were found " \
-                       "matching the query constraints", 404
+                return {
+                    'message': "No file ids were found matching the query"
+                }, 404
 
         cis_data_list = []
 
@@ -575,7 +560,7 @@ def register_routes(app):
             download_name='converted_aggregated_results.json'
         )
 
-    @app.post('/api/files/')
+    @app.post('/api/files', strict_slashes=False)
     @require_auth
     def save_file() -> tuple[str, int] | tuple[dict[str, str], int]:
         """Endpoint for uploading, converting and storing the converted file.
@@ -583,11 +568,11 @@ def register_routes(app):
         unique_id = str(uuid.uuid4())
         try:
             if 'file' not in request.files:
-                return "No file part", 400
+                return {'message': "No file part"}, 400
 
             file = request.files['file']
             if file.filename == '':
-                return "No selected file", 400
+                return {'message': "No selected file"}, 400
 
             department_id = request.args.get('department_id', type=int)
 
@@ -596,7 +581,7 @@ def register_routes(app):
 
             # Secure filename might become empty
             if filename == '':
-                return "Invalid filename", 400
+                return {'message': "Invalid filename"}, 400
 
             # Avoid collisions with existing files
             while os.path.exists(os.path.join(upload_folder, unique_id)):
@@ -605,7 +590,7 @@ def register_routes(app):
             try:
                 cis_data = json.load(file.stream)
             except json.JSONDecodeError:
-                return "Invalid file format", 400
+                return {'message': "Invalid file format"}, 400
 
             # DATABASE PART #
             try:
@@ -663,7 +648,6 @@ def register_routes(app):
             # END OF DATABASE PART #
 
             # Send the id of the modified file back to the client
-            # TODO: change return to return Metadata object
             return {
                 'id': unique_id,
                 'filename': filename,
@@ -684,6 +668,7 @@ def register_routes(app):
         return app.send_static_file('index.html')
 
     @app.route('/admin', strict_slashes=False)
+    @app.route('/admin/bearer-token-management', strict_slashes=False)
     @require_admin
     def serve_admin() -> Response:
         """Serve pages that need at least admin role"""
@@ -707,11 +692,11 @@ def register_error_handlers(app):
         return error.to_response()
 
     @app.errorhandler(Exception)
-    def handle_server_error(error) -> tuple[str, int] | HTTPException:
+    def handle_server_error(error) -> tuple[dict, int] | HTTPException:
         """Handle all other errors."""
         if isinstance(error, HTTPException):
             # Return HTTP errors as is like 404 Not Found
             return error
         # TODO LOG server caused errors
         print(error)
-        return 'Internal Server Error', 500
+        return {'message': 'Internal Server Error'}, 500
