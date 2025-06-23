@@ -1,0 +1,836 @@
+openapi: 3.1.1
+info:
+  title: CIS-CAT Results API
+  description: |
+    An enterprise solution for automating and centralizing CIS-CAT Assessor report storage,
+    aggregation and visualization in the MITRE ATT&CK framework using MITRE ATT&CK Navigator.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api
+    description: Local API server
+
+components:
+  securitySchemes:
+    XForwardedUser:
+      type: apiKey
+      in: header
+      name: X-Forwarded-User
+      description: Authenticated user handle (required for admin endpoints)
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token for File Upload API access
+
+  schemas:
+    FileUploadResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the file
+        filename:
+          type: string
+          description: Name of the converted file
+
+    FileMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique file identifier
+        filename:
+          type: string
+          description: Original filename
+        time_created:
+          type: string
+          format: date-time
+          description: File creation timestamp
+        benchmark:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        department:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        hostname:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        result:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+
+    FileListVerboseResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileMetadata'
+        filters:
+          type: object
+          properties:
+            benchmark:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  count:
+                    type: integer
+            department:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  count:
+                    type: integer
+            hostname:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  count:
+                    type: integer
+            result:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  count:
+                    type: integer
+            time:
+              type: object
+              properties:
+                global_max_value:
+                  type: string
+                global_min_value:
+                  type: string
+                local_max_value:
+                  type: string
+                local_min_value:
+                  type: string
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              description: "Current page of results, starts at 0"
+            page_size:
+              type: integer
+            total_count:
+              type: integer
+              description: "Total number of files available"
+
+    FileListSimpleResponse:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          description: List of file IDs
+
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    DepartmentListResponse:
+      type: object
+      properties:
+        departments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Department'
+
+    DepartmentCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Unique department name
+      required:
+        - name
+
+    DepartmentCreateResponse:
+      type: object
+      properties:
+        department:
+          $ref: '#/components/schemas/Department'
+
+    User:
+      type: object
+      properties:
+        handle:
+          type: string
+        department_id:
+          type: integer
+        department_name:
+          type: string
+
+    UserListResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+    UserDepartmentRequest:
+      type: object
+      properties:
+        department_id:
+          type: integer
+        user_handle:
+          type: string
+      required:
+        - department_id
+        - user_handle
+
+    BearerToken:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Token ID
+        machine_name:
+          type: string
+          description: Machine name for the token
+        department:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        created_at:
+          type: string
+          format: date-time
+          description: Token creation timestamp
+        last_used:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: Last time token was used
+        created_by:
+          type: string
+          description: User who created the token
+        is_active:
+          type: boolean
+          description: Whether token is active
+
+    BearerTokensResponse:
+      type: object
+      properties:
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/BearerToken'
+        departments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Department'
+
+    BearerTokenCreateRequest:
+      type: object
+      properties:
+        department_id:
+          type: integer
+          description: Department ID
+        machine_name:
+          type: string
+          description: Machine name for the token
+      required:
+        - department_id
+        - machine_name
+
+    BearerTokenCreateResponse:
+      properties:
+        token:
+          allOf:
+            - $ref: "#/components/schemas/BearerToken"
+            - type: object
+              properties:
+                token:
+                  type: string
+                  description: The actual bearer token (shown only once)
+
+    AuthStatusResponse:
+      type: object
+      properties:
+        user:
+          type: string
+        is_super_admin:
+          type: boolean
+        is_department_admin:
+          type: boolean
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+paths:
+  /files:
+    post:
+      summary: Upload File
+      description: Upload a file to be processed and stored. Requires either bearer token authentication or XForwardedUser and department id in query
+      security:
+        - BearerAuth: []
+        - XForwardedUser: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to be uploaded (should have original generated filename to be parsed correctly)
+              required:
+                - file
+      parameters:
+        - name: department_id
+          in: query
+          schema:
+            type: integer
+          description: Department ID to associate with the uploaded file if uploading through UI, must have valid XForwardedUser authentication in that case
+      responses:
+        '201':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      summary: List File Metadata or IDs
+      description: Retrieve file metadata or just file IDs based on query parameters
+      security:
+        - XForwardedUser: []
+      parameters:
+        - name: verbose
+          in: query
+          schema:
+            type: boolean
+          description: If true, returns full metadata; otherwise returns list of file IDs
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Filter files whose filenames contain the search string
+        - name: hostname
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          description: Hostname ID(s) to limit results to
+        - name: benchmark
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          description: Benchmark type ID(s) to limit results to
+        - name: result
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          description: Result type ID(s) to limit results to
+        - name: department
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          description: Department ID(s) to limit results to
+        - name: min_time
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Lower bound of report's creation date-time in ISO 8601 format
+        - name: max_time
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Upper bound of report's creation date-time in ISO 8601 format
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Page index of results, starts at 0. Does not have effect if verbose is false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 20
+          description: Page size of results. Does not have effect if verbose is false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/FileListVerboseResponse'
+                  - $ref: '#/components/schemas/FileListSimpleResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /files/{file_id}:
+    get:
+      summary: Download File
+      description: Download a file by its unique identifier
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier of the file
+      responses:
+        '200':
+          description: File content
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: 'attachment; filename=<filename>'
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+
+  /files/aggregate:
+    get:
+      summary: Aggregate Files
+      description: Aggregate all files matching the specified criteria. If not using file ids, will use other query parameters. Using file ids will bypass authorization.
+      security:
+        - XForwardedUser: []
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          description: Will only use files by these ids if present. If empty, will use the other query parameters to aggregate, similar to GET /files
+        - name: search
+          in: query
+          schema:
+            type: string
+          style: form
+        - name: hostname
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+        - name: benchmark
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+        - name: result
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+        - name: department
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+        - name: min_time
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: max_time
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Aggregated file content
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              example: 'attachment; filename=converted_aggregated_results.json'
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Aggregated and converted file content as JSON
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/departments:
+    get:
+      summary: List Departments
+      description: Retrieve all departments (Admin access required)
+      security:
+        - XForwardedUser: []
+      responses:
+        '200':
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create Department
+      description: Create a new department (Super Admin access required)
+      security:
+        - XForwardedUser: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentCreateRequest'
+      responses:
+        '201':
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentCreateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/departments/{department_id}:
+    delete:
+      summary: Delete Department
+      description: Delete a department by ID (Super Admin access required)
+      security:
+        - XForwardedUser: []
+      parameters:
+        - name: department_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the department to delete
+      responses:
+        '200':
+          description: Department deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/users:
+    get:
+      summary: List Users
+      description: Retrieve all users with their department assignments (Admin access required)
+      security:
+        - XForwardedUser: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/department-users:
+    post:
+      summary: Add User to Department
+      description: Add a user to a department (Super Admin access required)
+      security:
+        - XForwardedUser: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDepartmentRequest'
+      responses:
+        '201':
+          description: User added to department successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Remove User from Department
+      description: Remove a user from a department (Super Admin access required)
+      security:
+        - XForwardedUser: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDepartmentRequest'
+      responses:
+        '200':
+          description: User removed from department successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/bearer-tokens:
+    get:
+      summary: Get bearer tokens
+      description: Retrieve bearer tokens for accessible departments
+      security:
+        - XForwardedUser: [ ]
+      responses:
+        '200':
+          description: Bearer tokens retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BearerTokensResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create bearer token
+      description: Create a new bearer token for a department
+      security:
+        - XForwardedUser: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BearerTokenCreateRequest'
+      responses:
+        '201':
+          description: Bearer token created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BearerTokenCreateResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/bearer-tokens/{token_id}:
+    delete:
+      summary: Revoke bearer token
+      description: Revoke/deactivate a bearer token
+      security:
+        - XForwardedUser: [ ]
+      parameters:
+        - name: token_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Token ID
+      responses:
+        '200':
+          description: Bearer token revoked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/status:
+    get:
+      summary: Get Authentication Status
+      description: Get the current user's authentication status and permissions
+      security:
+        - XForwardedUser: []
+        - {}
+      responses:
+        '200':
+          description: Authentication status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthStatusResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
