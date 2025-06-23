@@ -282,9 +282,9 @@ function AdminOverview() {
     else if (isAllFilesChecked) {
       return constructDownloadURLFromQueryParams(
         activeSearchText,
-        activeDepts.map(dept => dept.value),
-        activeBenchTypes.map(bench => bench.value),
-        activeHosts.map(host => host.value),
+        activeDepts,
+        activeBenchTypes,
+        activeHosts,
         activeDateFrom,
         activeDateTo,
       );
