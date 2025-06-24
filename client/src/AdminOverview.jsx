@@ -236,9 +236,9 @@ function AdminOverview() {
       nextPage,
       pageSize,
       activeSearchText,
-      activeDepts.map(dept => dept.value),
-      activeBenchTypes.map(bench => bench.value),
-      activeHosts.map(host => host.value),
+      activeDepts,
+      activeBenchTypes,
+      activeHosts,
       activeDateFrom,
       activeDateTo,
       loadMoreAbortController.current.signal,
@@ -583,9 +583,9 @@ function AdminOverview() {
                             // TODO not loaded in files will not have an iframe for them to be loaded in
                             fetchFilesIDs(
                               activeSearchText,
-                              activeDepts.map(dept => dept.value),
-                              activeBenchTypes.map(bench => bench.value),
-                              activeHosts.map(host => host.value),
+                              activeDepts,
+                              activeBenchTypes,
+                              activeHosts,
                               activeDateFrom,
                               activeDateTo,
                             ).then((filesToDownload) => {
