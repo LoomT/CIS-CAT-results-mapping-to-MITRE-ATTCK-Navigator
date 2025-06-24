@@ -69,6 +69,7 @@ function AdminOverview() {
   const loadMoreAbortController = useRef(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isSearching, setIsSearching] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
 
   const t = useContext(LanguageContext);
 
@@ -236,9 +237,9 @@ function AdminOverview() {
       nextPage,
       pageSize,
       activeSearchText,
-      activeDepts.map(dept => dept.value),
-      activeBenchTypes.map(bench => bench.value),
-      activeHosts.map(host => host.value),
+      activeDepts,
+      activeBenchTypes,
+      activeHosts,
       activeDateFrom,
       activeDateTo,
       loadMoreAbortController.current.signal,
@@ -407,7 +408,6 @@ function AdminOverview() {
                 )}
           </button>
 
-          {/* TODO: There must be a smarter way */}
           <p>{t.showNFiles(totalNumberOfFiles)}</p>
           <h2>{t.aggregation}</h2>
           <iframe id="aggregateFrame"></iframe>
@@ -544,85 +544,133 @@ function AdminOverview() {
         </div>
       </div>
 
-      {/* Visualisation popup */}
+      {/* Export popup */}
+      {/* TODO extract this popup element so it can be reused in here and UserScreen.jsx */}
       {showExportPopup && (
         <div className="popup-overlay">
           <div className="popup">
-            <h3 className="popup-heading">{t.exportChooseAFormatToVisualize}</h3>
-            <div className="popup-buttons">
-              <button
-                className="popup-button"
-                onClick={
-                  exportAggregate
-                    ? () => {
-                        const url = constructAggregateDownloadURL();
-                        if (url !== null) handleSVGExport(url, 'aggregateFrame');
-                      }
-                    : () => {
-                        const url = constructDownloadURLFromFileIds([exportFile.id]);
-                        if (url !== null) handleSVGExport(url, exportFile.id);
-                      }
-                }
-              >
-                SVG
-              </button>
-
-              {exportAggregate
-                ? (
-                    <>
+            {isExporting
+              ? (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <h3 className="popup-heading">Export in Progress</h3>
+                    <div className="loading-dots">
+                      <span className="dot">.</span>
+                      <span className="dot">.</span>
+                      <span className="dot">.</span>
+                    </div>
+                  </div>
+                )
+              : (
+                  <>
+                    <h3 className="popup-heading">{t.chooseFormat}</h3>
+                    <div className="button-container">
                       <button
                         className="popup-button"
-                        onClick={() => {
-                          const url = constructAggregateDownloadURL();
-                          if (url !== null) handlePDFExport([url], ['aggregateFrame']);
-                        }}
+                        disabled={isExporting}
+                        onClick={
+                          exportAggregate
+                            ? () => {
+                                const url = constructAggregateDownloadURL();
+                                if (url !== null) {
+                                  setIsExporting(true);
+                                  handleSVGExport(url, 'aggregateFrame')
+                                    .finally(() => setIsExporting(false));
+                                }
+                              }
+                            : () => {
+                                const url = constructDownloadURLFromFileIds([exportFile.id]);
+                                if (url !== null) {
+                                  setIsExporting(true);
+                                  handleSVGExport(url, exportFile.id)
+                                    .finally(() => setIsExporting(false));
+                                }
+                              }
+                        }
                       >
-                        {t.exportAgrregatePDF}
+                        SVG
                       </button>
-                      <button
-                        className="popup-button"
-                        disabled={isAllFilesChecked && hasMoreFiles} // TODO not loaded in files will not have an iframe for them to be loaded in
-                        onClick={() => {
-                          if (!isAllFilesChecked) {
-                            const uris = selectedFiles.map(fileId => constructDownloadURLFromFileIds([fileId]));
-                            if (uris.every(url => url !== null)) handlePDFExport(uris, selectedFiles);
-                          }
-                          else {
-                            // TODO not loaded in files will not have an iframe for them to be loaded in
-                            fetchFilesIDs(
-                              activeSearchText,
-                              activeDepts.map(dept => dept.value),
-                              activeBenchTypes.map(bench => bench.value),
-                              activeHosts.map(host => host.value),
-                              activeDateFrom,
-                              activeDateTo,
-                            ).then((filesToDownload) => {
-                              const uris = filesToDownload.map(fileId => constructDownloadURLFromFileIds([fileId]));
-                              if (uris.every(url => url !== null)) handlePDFExport(uris, filesToDownload);
-                            });
-                          }
-                        }}
-                      >
-                        {t.exportAllPDF}
-                      </button>
-                    </>
-                  )
-                : (
-                    <button
-                      className="popup-button"
-                      onClick={() => {
-                        const url = constructDownloadURLFromFileIds([exportFile.id]);
-                        if (url !== null) handlePDFExport([url], [exportFile.id]);
-                      }}
-                    >
-                      PDF
-                    </button>
-                  )}
 
-              <button className="popup-cancel" onClick={handlePopupClose}>
-                {t.cancel}
-              </button>
-            </div>
+                      {exportAggregate
+                        ? (
+                            <>
+                              <button
+                                className="popup-button"
+                                disabled={isExporting}
+                                onClick={() => {
+                                  const url = constructAggregateDownloadURL();
+                                  if (url !== null) {
+                                    setIsExporting(true);
+                                    handlePDFExport([url], ['aggregateFrame'])
+                                      .finally(() => setIsExporting(false));
+                                  }
+                                }}
+                              >
+                                {t.exportAgrregatePDF}
+                              </button>
+                              <button
+                                className="popup-button"
+                                disabled={(isAllFilesChecked && hasMoreFiles) || isExporting} // TODO not loaded in files will not have an iframe for them to be loaded in
+                                onClick={() => {
+                                  if (!isAllFilesChecked) {
+                                    const uris = selectedFiles.map(fileId => constructDownloadURLFromFileIds([fileId]));
+                                    if (uris.every(url => url !== null)) {
+                                      setIsExporting(true);
+                                      handlePDFExport(uris, selectedFiles)
+                                        .finally(() => setIsExporting(false));
+                                    }
+                                  }
+                                  else {
+                                    setIsExporting(true);
+                                    // TODO not loaded in files will not have an iframe for them to be loaded in
+                                    fetchFilesIDs(
+                                      activeSearchText,
+                                      activeDepts,
+                                      activeBenchTypes,
+                                      activeHosts,
+                                      activeDateFrom,
+                                      activeDateTo,
+                                    ).then((filesToDownload) => {
+                                      const uris = filesToDownload.map(fileId => constructDownloadURLFromFileIds([fileId]));
+                                      if (uris.every(url => url !== null)) {
+                                        handlePDFExport(uris, filesToDownload)
+                                          .finally(() => {
+                                            setIsExporting(false);
+                                          });
+                                      }
+                                      else {
+                                        setIsExporting(false);
+                                      }
+                                    }, () => setIsExporting(false));
+                                  }
+                                }}
+                              >
+                                {t.exportAllPDF}
+                              </button>
+                            </>
+                          )
+                        : (
+                            <button
+                              className="popup-button"
+                              disabled={isExporting}
+                              onClick={() => {
+                                const url = constructDownloadURLFromFileIds([exportFile.id]);
+                                if (url !== null) {
+                                  setIsExporting(true);
+                                  handlePDFExport([url], [exportFile.id])
+                                    .finally(() => setIsExporting(false));
+                                }
+                              }}
+                            >
+                              PDF
+                            </button>
+                          )}
+
+                      <button className="popup-cancel" onClick={handlePopupClose}>
+                        {t.cancel}
+                      </button>
+                    </div>
+                  </>
+                )}
           </div>
         </div>
       )}

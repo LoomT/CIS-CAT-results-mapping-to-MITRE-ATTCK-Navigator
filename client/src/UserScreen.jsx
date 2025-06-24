@@ -30,6 +30,7 @@ function UserScreen() {
   const [departments, setDepartments] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
 
   const t = useContext(LanguageContext);
 
@@ -314,34 +315,57 @@ function UserScreen() {
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup">
-            <h3 className="popup-heading">{t.chooseFormat}</h3>
-            <div className="popup-buttons">
-              <button
-                className="popup-button"
-                onClick={
-                  () => {
-                    const url = constructDownloadURLFromFileIds([currentFile.id]);
-                    if (url !== null) handleSVGExport(url, currentFile.id);
-                  }
-                }
-              >
-                SVG
-              </button>
-              <button
-                className="popup-button"
-                onClick={
-                  () => {
-                    const url = constructDownloadURLFromFileIds([currentFile.id]);
-                    if (url !== null) handlePDFExport([url], [currentFile.id]);
-                  }
-                }
-              >
-                PDF
-              </button>
-              <button className="popup-cancel" onClick={handleClosePopup}>
-                {t.cancel}
-              </button>
-            </div>
+            {isExporting
+              ? (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <h3 className="popup-heading">Export in Progress</h3>
+                    <div className="loading-dots">
+                      <span className="dot">.</span>
+                      <span className="dot">.</span>
+                      <span className="dot">.</span>
+                    </div>
+                  </div>
+                )
+              : (
+                  <>
+                    <h3 className="popup-heading">{t.chooseFormat}</h3>
+                    <div className="button-container">
+                      <button
+                        className="popup-button"
+                        onClick={
+                          () => {
+                            const url = constructDownloadURLFromFileIds([currentFile.id]);
+                            if (url !== null) {
+                              setIsExporting(true);
+                              handleSVGExport(url, currentFile.id)
+                                .finally(() => setIsExporting(false));
+                            }
+                          }
+                        }
+                      >
+                        SVG
+                      </button>
+                      <button
+                        className="popup-button"
+                        onClick={
+                          () => {
+                            const url = constructDownloadURLFromFileIds([currentFile.id]);
+                            if (url !== null) {
+                              setIsExporting(true);
+                              handlePDFExport([url], [currentFile.id])
+                                .finally(() => setIsExporting(false));
+                            }
+                          }
+                        }
+                      >
+                        PDF
+                      </button>
+                      <button className="popup-cancel" onClick={handleClosePopup}>
+                        {t.cancel}
+                      </button>
+                    </div>
+                  </>
+                )}
           </div>
         </div>
       )}
