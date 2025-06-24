@@ -644,7 +644,7 @@ input[type="checkbox"]:disabled:checked::after {
   padding: 30px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  width: 320px;
+  width: auto;
   text-align: center;
   font-family: 'Roboto', sans-serif;
 }
@@ -670,33 +670,24 @@ input[type="checkbox"]:disabled:checked::after {
 .popup-button {
   background-color: #ffe0b2;
   color: #e65100;
-  border: none;
   padding: 10px 20px;
   border-radius: 10px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: border 0.3s ease;
-}
-
-.popup-button:hover {
-  border: 2px solid #e65100;
+  transition: 0.3s ease;
 }
 
 .popup-cancel {
   background-color: transparent;
   color: #e65100;
-  border: 2px solid #e65100;
+  border-color: #e65100;
   padding: 10px 20px;
   border-radius: 10px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: border-width 0.3s ease;
-}
-
-.popup-cancel:hover {
-  border-width: 3px;
+  transition: 0.3s ease;
 }
 
 /** =======================================
