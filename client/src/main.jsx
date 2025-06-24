@@ -140,7 +140,7 @@ function UserDisplay() {
   if (authStatus.loading) {
     return (
       <div className="user-display loading">
-        <span></span>
+        <span>{t.loading}</span>
       </div>
     );
   }
