@@ -408,7 +408,7 @@ function AdminOverview() {
           </button>
 
           {/* TODO: There must be a smarter way */}
-          <p>{t.showing + ' ' + totalNumberOfFiles + ' ' + t.files}</p>
+          <p>{t.showNFiles(totalNumberOfFiles)}</p>
           <h2>{t.aggregation}</h2>
           <iframe id="aggregateFrame"></iframe>
           {files.length === 0 || (selectedFiles.length === 0 && !isAllFilesChecked)

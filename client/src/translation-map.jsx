@@ -55,8 +55,7 @@ const translations = {
     searchByHost: 'Filter by host',
     searchByDateRange: 'Search within date range',
     searchByBenchmark: 'Filter by Benchmark',
-    showing: 'Showing',
-    files: 'files',
+    showNFiles: n => (n !== 1 ? `Showing ${n} files` : `Showing ${n} file`),
 
     aggregation: 'Aggregation',
     noFilesSelected: 'No Files Selected',
@@ -201,8 +200,7 @@ const translations = {
     searchByHost: 'TBT: Filter by host',
     searchByDateRange: 'TBT: Search within date range',
     searchByBenchmark: 'TBT: Filter by Benchmark',
-    showing: 'TBT: Showing',
-    files: 'TBT: files',
+    showNFiles: n => (n !== 1 ? `TBT: Showing ${n} files` : `TBT: Showing ${n} file`),
 
     aggregation: 'TBT: Aggregation',
     noFilesSelected: 'TBT: No Files Selected',
