@@ -203,7 +203,7 @@ const translations = {
     searchByHost: 'Filter op host',
     searchByDateRange: 'Zoeken binnen datumbereik',
     searchByBenchmark: 'Filter op benchmark',
-    showNFiles: n => (n !== 1 ? `${n} bestanden weergegeven` : `${n} bestanden weergegeven`),
+    showNFiles: n => (n !== 1 ? `${n} bestanden weergegeven` : `${n} bestand weergegeven`),
     exportInProgress: 'Bezig met exporteren',
 
     aggregation: 'Aggregatie',
