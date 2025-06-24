@@ -179,7 +179,7 @@ const translations = {
     remove: 'Verwijderen',
     name: 'Naam',
     date: 'Datum',
-    create: 'TBT: Create', // TODO: Translate
+    create: 'Aanmaken',
 
     // Labels for landing screen
     homePickScreen: 'Kies een pagina',
@@ -203,8 +203,8 @@ const translations = {
     searchByHost: 'Filter op host',
     searchByDateRange: 'Zoeken binnen datumbereik',
     searchByBenchmark: 'Filter op benchmark',
-    showNFiles: n => (n !== 1 ? `Weergegeven ${n} bestanden` : `Weergegeven ${n} bestanden`), // TODO: Check
-    exportInProgress: 'TBT: Export in Progress', // TODO: Translate
+    showNFiles: n => (n !== 1 ? `${n} bestanden weergegeven` : `${n} bestanden weergegeven`),
+    exportInProgress: 'Bezig met exporteren',
 
     aggregation: 'Aggregatie',
     noFilesSelected: 'Geen bestanden geselecteerd',
@@ -289,7 +289,7 @@ const translations = {
     deleteDep: 'Afdeling verwijderen',
     noUsersAtDep: 'Geen gebruikers aan deze afdeling gekoppeld',
     removeUserFromDep: 'Gebruiker uit afdeling verwijderen',
-    usersAssigned: num => (num !== 1 ? `${num} gebruikers gekoppeld` : `${num} gebruiker gekoppeld`), // TODO: Check
+    usersAssigned: num => (num !== 1 ? `${num} gebruikers gekoppeld` : `${num} gebruiker gekoppeld`),
   },
 };
 
