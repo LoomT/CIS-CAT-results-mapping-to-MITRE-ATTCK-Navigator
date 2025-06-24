@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import Select from 'react-select';
 import { LanguageContext } from './main.jsx';
 
-
 /**
  * BearerTokenDashboard Component
  * -----------------------------
@@ -25,7 +24,6 @@ function BearerTokenDashboard() {
   const [showTokenPopup, setShowTokenPopup] = useState(false);
 
   const t = useContext(LanguageContext);
-  
 
   useEffect(() => {
     fetchTokens();
@@ -281,12 +279,14 @@ function BearerTokenDashboard() {
               </p>
               <div className="token-info">
                 <p>
-                  <strong>{t.machine}:</strong>
+                  <strong>
+                    {t.machine + ':'}
+                  </strong>
                   {' '}
                   {newlyCreatedToken.machine_name}
                 </p>
                 <p>
-                  <strong>{t.department}:</strong>
+                  <strong>{t.department + ':'}</strong>
                   {' '}
                   {departments.find(d => d.id === newlyCreatedToken.department.id)?.name}
                 </p>

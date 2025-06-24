@@ -78,7 +78,7 @@ const translations = {
     selectNoDepartment: 'Please select a department',
     failedToLoadDepartments: 'Failed to load departments',
 
-    //Token Management
+    // Token Management
     tokenFailedFetch: 'Failed to fetch bearer tokens',
     errorFetchingTokens: 'Error fetching bearer tokens',
     machineNameEmpty: 'Machine name cannot be empty',
@@ -108,7 +108,7 @@ const translations = {
     tokenCreated: 'Bearer Token Created',
     displayMsg: 'This token will only be shown once. Please copy it now.',
 
-    //User management Dashboard
+    // User management Dashboard
     depFailedFetch: 'Failed to fetch departments',
     errorFetchingDep: 'Error fetching departments',
     usersFailedFetch: 'Failed to fetch users',
@@ -140,7 +140,7 @@ const translations = {
     deleteDep: 'Delete Department',
     noUsersAtDep: 'No users assigned to this department',
     removeUserFromDep: 'Remove user from department',
-    //user(s), idk how its in dutch
+    // user(s), idk how its in dutch
     userSingular: 'user',
     userPlural: 'users',
     assigned: 'assigned',
@@ -223,7 +223,7 @@ const translations = {
     selectDepartmentPlaceholder: 'TBT: Select a department',
     selectNoDepartment: 'TBT: Please select a department',
 
-    //Token Management
+    // Token Management
     tokenFailedFetch: 'TBT: Failed to fetch bearer tokens',
     errorFetchingTokens: 'TBT: Error fetching bearer tokens',
     machineNameEmpty: 'TBT: Machine name cannot be empty',
@@ -253,7 +253,7 @@ const translations = {
     tokenCreated: 'TBT: Bearer Token Created',
     displayMsg: 'TBT: This token will only be shown once. Please copy it now.',
 
-    //User management Dashboard
+    // User management Dashboard
     depFailedFetch: 'TBT: Failed to fetch departments',
     errorFetchingDep: 'TBT: Error fetching departments',
     usersFailedFetch: 'TBT: Failed to fetch users',
@@ -285,7 +285,7 @@ const translations = {
     deleteDep: 'TBT: Delete Department',
     noUsersAtDep: 'TBT: No users assigned to this department',
     removeUserFromDep: 'TBT: Remove user from department',
-    //user(s), idk how its in dutch
+    // user(s), idk how its in dutch
     userSingular: 'TBT: user',
     userPlural: 'TBT: users',
     assigned: 'TBT: assigned',
@@ -296,39 +296,39 @@ export default translations;
 
 // TODO: Old dutch translations
 // Some might still be useful, but i am not sure how much they are context dependant
-    // delete: 'Verwijder',
-    // select: 'Selecteren',
-    // filterFiles: 'Filter bestanden',
-    // searchFiles: 'Zoek op bestandsnaam',
-    // export: 'Exporteren',
-    // visualize: 'Visualiseer',
-    // download: 'Downloaden',
-    // uploadFile: 'Bestand Uploaden',
-    // runBenchmark: 'Benchmark Uitvoeren',
-    // filesList: 'Bestandenlijst',
-    // userOverview: 'Gebruikersoverzicht',
-    // adminOverview: 'Beheerdersoverzicht',
-    // fileTableDesc: 'Bekijk alle geuploade bestanden en beschikbare acties. Elk bestand kan gedownload worden als JSON, of gevisualiseerd als PNG of SVG',
-    // dragAndDrop: 'Sleep uw bestand hier of klik op de onderstaande knop om uw JSON-bestand te uploaden.',
-    // dragAndDropShort: 'Sleep uw bestand hier',
-    // adminLogin: 'Admin Login',
-    // orr: 'of',
-    // back: '← Terug',
-    // cancel: 'Annuleer',
-    // uploading: 'Aan het uploaden...',
-    // chooseFormat: 'Kies een formaat om te visualiseren',
-    // name: 'Naam',
-    // department: 'Afdeling',
-    // chooseFile: 'Kies bestand',
-    // date: 'Datum',
-    // actions: 'Acties',
-    // yes: 'Ja',
-    // departmentFilter: 'Filter op afdeling',
-    // searchHosts: 'Doorzoek hosts',
-    // enterToken: 'Voer uw token in',
-    // size: 'Bestandsgrootte',
-    // user: 'Gebruiker',
-    // chooseScreen: 'Kies uw scherm',
-    // onlyLatestFiles: 'Toon alleen meest recente bestanden per host',
-    // dateRange: 'Zoek binnen 2 data',
-    // benchmarkTypes: 'Selecteer benchmark typen',
+// delete: 'Verwijder',
+// select: 'Selecteren',
+// filterFiles: 'Filter bestanden',
+// searchFiles: 'Zoek op bestandsnaam',
+// export: 'Exporteren',
+// visualize: 'Visualiseer',
+// download: 'Downloaden',
+// uploadFile: 'Bestand Uploaden',
+// runBenchmark: 'Benchmark Uitvoeren',
+// filesList: 'Bestandenlijst',
+// userOverview: 'Gebruikersoverzicht',
+// adminOverview: 'Beheerdersoverzicht',
+// fileTableDesc: 'Bekijk alle geuploade bestanden en beschikbare acties. Elk bestand kan gedownload worden als JSON, of gevisualiseerd als PNG of SVG',
+// dragAndDrop: 'Sleep uw bestand hier of klik op de onderstaande knop om uw JSON-bestand te uploaden.',
+// dragAndDropShort: 'Sleep uw bestand hier',
+// adminLogin: 'Admin Login',
+// orr: 'of',
+// back: '← Terug',
+// cancel: 'Annuleer',
+// uploading: 'Aan het uploaden...',
+// chooseFormat: 'Kies een formaat om te visualiseren',
+// name: 'Naam',
+// department: 'Afdeling',
+// chooseFile: 'Kies bestand',
+// date: 'Datum',
+// actions: 'Acties',
+// yes: 'Ja',
+// departmentFilter: 'Filter op afdeling',
+// searchHosts: 'Doorzoek hosts',
+// enterToken: 'Voer uw token in',
+// size: 'Bestandsgrootte',
+// user: 'Gebruiker',
+// chooseScreen: 'Kies uw scherm',
+// onlyLatestFiles: 'Toon alleen meest recente bestanden per host',
+// dateRange: 'Zoek binnen 2 data',
+// benchmarkTypes: 'Selecteer benchmark typen',

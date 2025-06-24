@@ -323,7 +323,7 @@ function AdminOverview() {
             <p>{t.searchByDepartment}</p>
             <Select
               isMulti
-              placeholder={t.select + "..."}
+              placeholder={t.select + '...'}
               options={optionsDepts}
               noOptionsMessage={() => t.noOptions}
               value={selectedDepts}
@@ -345,7 +345,7 @@ function AdminOverview() {
             <p>{t.searchByHost}</p>
             <Select
               isMulti
-              placeholder={t.select + "..."}
+              placeholder={t.select + '...'}
               options={optionsHosts}
               noOptionsMessage={() => t.noOptions}
               value={selectedHosts}
@@ -359,7 +359,7 @@ function AdminOverview() {
             <p>{t.searchByBenchmark}</p>
             <Select
               isMulti
-              placeholder={t.select + "..."}
+              placeholder={t.select + '...'}
               options={optionsBenchTypes}
               noOptionsMessage={() => t.noOptions}
               value={selectedBenchTypes}
@@ -367,7 +367,7 @@ function AdminOverview() {
               className="benchmark-filter-testid"
               classNamePrefix="react-select"
             />
-          </div>  
+          </div>
 
           <div className="section-header">
             <p>{t.searchByDateRange}</p>
@@ -406,9 +406,9 @@ function AdminOverview() {
                   t.search
                 )}
           </button>
-          
+
           {/* TODO: There must be a smarter way */}
-          <p>{t.showing + ' ' + totalNumberOfFiles +' ' + t.files}</p>
+          <p>{t.showing + ' ' + totalNumberOfFiles + ' ' + t.files}</p>
           <h2>{t.aggregation}</h2>
           <iframe id="aggregateFrame"></iframe>
           {files.length === 0 || (selectedFiles.length === 0 && !isAllFilesChecked)
