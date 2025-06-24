@@ -325,6 +325,7 @@ function AdminOverview() {
               isMulti
               placeholder={t.select + "..."}
               options={optionsDepts}
+              noOptionsMessage={() => t.noOptions}
               value={selectedDepts}
               onChange={setSelectedDepts}
               className="department-filter-testid"
@@ -346,6 +347,7 @@ function AdminOverview() {
               isMulti
               placeholder={t.select + "..."}
               options={optionsHosts}
+              noOptionsMessage={() => t.noOptions}
               value={selectedHosts}
               onChange={setSelectedHosts}
               className="hostname-filter-testid"
@@ -359,6 +361,7 @@ function AdminOverview() {
               isMulti
               placeholder={t.select + "..."}
               options={optionsBenchTypes}
+              noOptionsMessage={() => t.noOptions}
               value={selectedBenchTypes}
               onChange={setSelectedBenchTypes}
               className="benchmark-filter-testid"

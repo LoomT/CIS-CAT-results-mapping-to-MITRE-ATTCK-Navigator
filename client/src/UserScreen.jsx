@@ -104,13 +104,13 @@ function UserScreen() {
 
     // Check if department is selected
     if (!selectedDepartment) {
-      setErrorMessage(t.departmentRequired || 'Please select a department before uploading');
+      setErrorMessage(t.uploadDepartmentRequired);
       return;
     }
 
     // Make sure that the file is a JSON file
     if (!file.name.toLowerCase().endsWith('.json')) {
-      setErrorMessage(t.invalidFileType || 'Please upload a JSON file');
+      setErrorMessage(t.uploadInvalidFileType);
       return;
     }
 
@@ -150,7 +150,7 @@ function UserScreen() {
 
     const files = e.dataTransfer.files;
     if (files.length > 1) {
-      setErrorMessage(t.uploadLimitExceeded || 'You can only upload one file at a time. Please try again.');
+      setErrorMessage(t.uploadLimitExceeded);
       return;
     }
     if (files && files[0]) {
@@ -181,7 +181,7 @@ function UserScreen() {
     <div className="full-panel" data-testid="user-screen">
       {/* Top Center Title */}
       <div className="user-title" data-testid="user-screen-page-title">
-        Manual Upload
+        {t.homeFileUpload}
       </div>
 
       {/* Side-by-side Content Area */}
@@ -196,7 +196,7 @@ function UserScreen() {
           {/* Department Selector */}
           <div className="department-selector-section">
             <label className="department-label">
-              <p>{t.selectDepartment || 'Select Department'}</p>
+              <p>{t.selectDepartment}</p>
               <Select
                 value={selectedDepartment}
                 onChange={(value) => {
@@ -204,7 +204,8 @@ function UserScreen() {
                   setErrorMessage(''); // Clear error when department is selected
                 }}
                 options={departmentOptions}
-                placeholder={t.selectDepartmentPlaceholder || 'Select a department...'}
+                noOptionsMessage={() => t.noOptions}
+                placeholder={t.selectDepartmentPlaceholder + '...'}
                 className="department-select"
                 classNamePrefix="react-select"
                 isDisabled={departments.length === 1}
@@ -247,7 +248,7 @@ function UserScreen() {
                     className="btn-blue"
                     onClick={() => {
                       if (!selectedDepartment) {
-                        setErrorMessage(t.selectDepartmentFirst || 'Please select a department first');
+                        setErrorMessage(t.selectNoDepartment);
                       }
                       else {
                         document.getElementById('file-input').click();
@@ -258,7 +259,7 @@ function UserScreen() {
                     {t.chooseFile}
                   </button>
                   {!selectedDepartment && (
-                    <p className="upload-hint">{t.selectDepartmentFirst || 'Please select a department above'}</p>
+                    <p className="upload-hint">{t.selectNoDepartment}</p>
                   )}
                 </>
               )}
