@@ -630,6 +630,9 @@ function AdminOverview() {
                                             setIsExporting(false);
                                           });
                                       }
+                                      else {
+                                        setIsExporting(false);
+                                      }
                                     }, () => setIsExporting(false));
                                   }
                                 }}
