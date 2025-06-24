@@ -55,7 +55,7 @@ function UserScreen() {
     }
     catch (error) {
       console.error('Error fetching departments:', error);
-      setErrorMessage('Failed to load departments');
+      setErrorMessage(t.failedToLoadDepartments);
     }
   };
 

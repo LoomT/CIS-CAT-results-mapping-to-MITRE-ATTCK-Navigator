@@ -307,7 +307,7 @@ function AdminOverview() {
             <p>{t.searchByFilename}</p>
             <input
               type="text"
-              placeholder={t.seatchFilenameText}
+              placeholder={t.searchFilenameText}
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
               onKeyDown={(e) => {
