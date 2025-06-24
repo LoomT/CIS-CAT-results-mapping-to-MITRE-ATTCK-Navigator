@@ -103,7 +103,15 @@ function AuthProvider({ children }) {
 }
 
 function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState(() => {
+    // Load language from localStorage if available, else default to 'en'
+    return localStorage.getItem('appLanguage') || 'en';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('appLanguage', language);
+  }, [language]);
+
   return (
     <LanguageContext.Provider value={translations[language]}>
       <div id="main-content" className="full-panel">
