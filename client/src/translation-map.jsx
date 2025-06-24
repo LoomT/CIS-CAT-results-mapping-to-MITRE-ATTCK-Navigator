@@ -142,9 +142,7 @@ const translations = {
     deleteDep: 'Delete Department',
     noUsersAtDep: 'No users assigned to this department',
     removeUserFromDep: 'Remove user from department',
-    // user(s), idk how its in dutch
-    userSingular: 'user',
-    userPlural: 'users',
+    usersAssigned: num => (num !== 1 ? `${num} users assigned` : `${num} user assigned`),
     assigned: 'assigned',
   },
   nl: {
@@ -289,9 +287,7 @@ const translations = {
     deleteDep: 'TBT: Delete Department',
     noUsersAtDep: 'TBT: No users assigned to this department',
     removeUserFromDep: 'TBT: Remove user from department',
-    // user(s), idk how its in dutch
-    userSingular: 'TBT: user',
-    userPlural: 'TBT: users',
+    usersAssigned: num => (num !== 1 ? `${num} TBT: users assigned` : `${num} TBT: user assigned`),
     assigned: 'TBT: assigned',
   },
 };

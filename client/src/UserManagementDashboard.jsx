@@ -343,11 +343,7 @@ function UserManagementDashboard() {
 
                       <div className="department-stats">
                         <small>
-                          {getUsersByDepartment(department.id).length}
-                          {' '}
-                          {getUsersByDepartment(department.id).length !== 1 ? t.userPlural : t.userSingular}
-                          {' '}
-                          {t.assigned}
+                          {t.usersAssigned(getUsersByDepartment(department.id).length)}
                         </small>
                       </div>
                     </div>
