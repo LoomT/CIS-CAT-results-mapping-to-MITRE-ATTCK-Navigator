@@ -32,6 +32,7 @@ const translations = {
     remove: 'Remove',
     name: 'Name',
     date: 'Date',
+    create: 'Create',
 
     // Labels for landing screen
     homePickScreen: 'Pick a screen',
@@ -177,6 +178,7 @@ const translations = {
     remove: 'TBT: Remove',
     name: 'TBT: Name',
     date: 'TBT: Date',
+    create: 'TBT: Create',
 
     // Labels for landing screen
     homePickScreen: 'TBT: Pick a screen',

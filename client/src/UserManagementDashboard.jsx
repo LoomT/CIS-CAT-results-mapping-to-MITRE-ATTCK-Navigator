@@ -251,7 +251,7 @@ function UserManagementDashboard() {
                 onClick={createDepartment}
                 disabled={loading || !newDepartmentName.trim()}
               >
-                Create
+                {t.create}
               </button>
             </div>
           </div>
