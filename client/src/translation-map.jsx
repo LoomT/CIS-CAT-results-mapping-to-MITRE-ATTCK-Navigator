@@ -57,6 +57,7 @@ const translations = {
     searchByDateRange: 'Search within date range',
     searchByBenchmark: 'Filter by Benchmark',
     showNFiles: n => (n !== 1 ? `Showing ${n} files` : `Showing ${n} file`),
+    exportInProgress: 'Export in Progress',
 
     aggregation: 'Aggregation',
     noFilesSelected: 'No Files Selected',
@@ -203,6 +204,7 @@ const translations = {
     searchByDateRange: 'Zoeken binnen datumbereik',
     searchByBenchmark: 'Filter op benchmark',
     showNFiles: n => (n !== 1 ? `Weergegeven ${n} bestanden` : `Weergegeven ${n} bestanden`), // TODO: Check
+    exportInProgress: 'TBT: Export in Progress', // TODO: Translate
 
     aggregation: 'Aggregatie',
     noFilesSelected: 'Geen bestanden geselecteerd',

@@ -552,7 +552,7 @@ function AdminOverview() {
             {isExporting
               ? (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <h3 className="popup-heading">Export in Progress</h3>
+                    <h3 className="popup-heading">{t.exportInProgress}</h3>
                     <div className="loading-dots">
                       <span className="dot">.</span>
                       <span className="dot">.</span>
