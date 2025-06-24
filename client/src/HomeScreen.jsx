@@ -17,7 +17,7 @@ function HomeScreen() {
     return (
       <div className="small-panel">
         <div className="card">
-          <h2>Loading...</h2>
+          <h2>{t.loading}</h2>
         </div>
       </div>
     );
@@ -26,7 +26,7 @@ function HomeScreen() {
   return (
     <div className="small-panel">
       <div className="card padded">
-        <h2>{t.chooseScreen}</h2>
+        <h2>{t.homePickScreen}</h2>
         {/* Buttons for role selection - shown based on permissions */}
         <div className="button-container">
           {/* Admin button - shown if user is department admin or super admin */}
@@ -36,7 +36,7 @@ function HomeScreen() {
               data-testid="home-screen-admin-button"
               to="/admin"
             >
-              Department Reports
+              {t.homeViewReports}
             </Link>
           )}
 
@@ -47,7 +47,7 @@ function HomeScreen() {
               data-testid="home-screen-bearer-token-management"
               to="/admin/bearer-token-management"
             >
-              Bearer Token Management
+              {t.homeBearerTokenManagement}
             </Link>
           )}
 
@@ -58,7 +58,7 @@ function HomeScreen() {
               data-testid="home-screen-admin-user-management"
               to="/admin/user-management"
             >
-              Department and User Management
+              {t.homeUserDepartmentManagement}
             </Link>
           )}
 
@@ -68,8 +68,7 @@ function HomeScreen() {
             data-testid="home-screen-user-button"
             to="/manual-upload"
           >
-            Manual
-            Upload
+            {t.homeFileUpload}
           </Link>
         </div>
       </div>

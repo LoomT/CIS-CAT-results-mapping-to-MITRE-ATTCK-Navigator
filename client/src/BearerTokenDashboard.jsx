@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Select from 'react-select';
+import { LanguageContext } from './main.jsx';
 
 /**
  * BearerTokenDashboard Component
@@ -22,6 +23,8 @@ function BearerTokenDashboard() {
   const [newlyCreatedToken, setNewlyCreatedToken] = useState(null);
   const [showTokenPopup, setShowTokenPopup] = useState(false);
 
+  const t = useContext(LanguageContext);
+
   useEffect(() => {
     fetchTokens();
   }, []);
@@ -43,22 +46,22 @@ function BearerTokenDashboard() {
         }
       }
       else {
-        showMessage('Failed to fetch bearer tokens', 'error');
+        showMessage(t.tokenFailedFetch, 'error');
       }
     }
     catch (error) {
-      showMessage('Error fetching bearer tokens', 'error');
+      showMessage(t.errorFetchingTokens, 'error');
     }
   };
 
   const createToken = async () => {
     if (!selectedDepartment) {
-      showMessage('Please select a department', 'error');
+      showMessage(t.selectNoDepartment, 'error');
       return;
     }
 
     if (!newMachineName.trim()) {
-      showMessage('Machine name cannot be empty', 'error');
+      showMessage(t.machineNameEmpty, 'error');
       return;
     }
 
@@ -81,15 +84,15 @@ function BearerTokenDashboard() {
         setShowTokenPopup(true);
         setNewMachineName('');
         fetchTokens();
-        showMessage('Bearer token created successfully', 'success');
+        showMessage(t.tokenCreatedSuccessfully, 'success');
       }
       else {
         const error = await response.json();
-        showMessage(error.message || 'Failed to create bearer token', 'error');
+        showMessage(error.message || t.tokenFailedToCreate, 'error');
       }
     }
     catch (error) {
-      showMessage('Error creating bearer token', 'error');
+      showMessage(t.errorCreatingToken, 'error');
     }
     finally {
       setLoading(false);
@@ -97,7 +100,7 @@ function BearerTokenDashboard() {
   };
 
   const revokeToken = async (tokenId) => {
-    if (!window.confirm('Are you sure you want to revoke this token? This action cannot be undone.')) {
+    if (!window.confirm(t.tokenRevokeConfirmation)) {
       return;
     }
 
@@ -109,15 +112,15 @@ function BearerTokenDashboard() {
 
       if (response.ok) {
         fetchTokens();
-        showMessage('Token revoked successfully', 'success');
+        showMessage(t.tokenRevokedSuccessfully, 'success');
       }
       else {
         const error = await response.json();
-        showMessage(error.message || 'Failed to revoke token', 'error');
+        showMessage(error.message || t.failedToRevokeToken, 'error');
       }
     }
     catch (error) {
-      showMessage('Error revoking token', 'error');
+      showMessage(t.errorRevokingToken, 'error');
     }
     finally {
       setLoading(false);
@@ -126,9 +129,9 @@ function BearerTokenDashboard() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
-      showMessage('Token copied to clipboard', 'success');
+      showMessage(t.tokenCopied, 'success');
     }).catch(() => {
-      showMessage('Failed to copy token', 'error');
+      showMessage(t.tokenNotCopied, 'error');
     });
   };
 
@@ -154,7 +157,7 @@ function BearerTokenDashboard() {
   return (
     <div className="full-panel">
       {/* Top Title */}
-      <div className="user-title">Bearer Token Management</div>
+      <div className="user-title">{t.homeBearerTokenManagement}</div>
 
       {/* Message Display */}
       {message.text && (
@@ -166,16 +169,17 @@ function BearerTokenDashboard() {
       <div className="content-area">
         {/* Token Management Section */}
         <div className="card admin-side-section padded">
-          <h2>Create New Token</h2>
+          <h2>{t.createNewToken}</h2>
 
           {/* Department Selection */}
           <div className="section-header">
-            <p>Department</p>
+            <p>{t.department}</p>
             <Select
               value={selectedDepartment}
               onChange={setSelectedDepartment}
               options={departmentOptions}
-              placeholder="Select department..."
+              placeholder={t.selectDepartmentPlaceholder}
+              noOptionsMessage={() => t.noOptions}
               className="department-select"
               classNamePrefix="react-select"
               isDisabled={departments.length === 1}
@@ -184,11 +188,11 @@ function BearerTokenDashboard() {
 
           {/* Machine Name Input */}
           <div className="section-header">
-            <p>Machine Name</p>
+            <p>{t.machineName}</p>
             <div className="input-group">
               <input
                 type="text"
-                placeholder="e.g., Production Server 1"
+                placeholder={t.machineNamePlaceholder}
                 value={newMachineName}
                 onChange={e => setNewMachineName(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && createToken()}
@@ -198,43 +202,43 @@ function BearerTokenDashboard() {
                 onClick={createToken}
                 disabled={loading || !selectedDepartment || !newMachineName.trim()}
               >
-                Generate Token
+                {t.generateToken}
               </button>
             </div>
           </div>
 
           <div className="info-box">
-            <h3>Usage Instructions</h3>
-            <p>Bearer tokens allow automated systems to upload assessment results.</p>
-            <p>Configure your .wrapper.env file with:</p>
+            <h3>{t.usageInstructions}</h3>
+            <p>{t.usageInstructionsP1}</p>
+            <p>{t.usageInstructionsP2}</p>
             <code>
-              POST_URL=https://your-domain.com/api/files/
+              {'POST_URL=https://' + t.fakeURL + '/api/files/'}
               <br />
-              POST_BEARER=your-token-here
+              {'POST_BEARER=' + t.fakeToken}
             </code>
           </div>
         </div>
 
         {/* Tokens Table Section */}
         <div className="card file-table-section">
-          <h2>Active Bearer Tokens</h2>
+          <h2>{t.activeTokens}</h2>
 
           {filteredTokens.length === 0
             ? (
                 <div className="no-tokens">
-                  <p>No active tokens for the selected department.</p>
+                  <p>{t.noActiveTokensForDepartment}</p>
                 </div>
               )
             : (
                 <table className="files-table">
                   <thead>
                     <tr>
-                      <th>Machine Name</th>
-                      <th>Department</th>
-                      <th>Created</th>
-                      <th>Last Used</th>
-                      <th>Created By</th>
-                      <th>Actions</th>
+                      <th>{t.machineName}</th>
+                      <th>{t.department}</th>
+                      <th>{t.createdAt}</th>
+                      <th>{t.lastUsed}</th>
+                      <th>{t.createdBy}</th>
+                      <th>{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,7 +255,7 @@ function BearerTokenDashboard() {
                             onClick={() => revokeToken(token.id)}
                             disabled={loading}
                           >
-                            Revoke
+                            {t.revoke}
                           </button>
                         </td>
                       </tr>
@@ -266,21 +270,23 @@ function BearerTokenDashboard() {
       {showTokenPopup && newlyCreatedToken && (
         <div className="popup-overlay">
           <div className="popup">
-            <h3 className="popup-heading">Bearer Token Created</h3>
+            <h3 className="popup-heading">{t.tokenCreated}</h3>
             <div className="token-display">
               <p>
-                <strong>Important:</strong>
+                <strong>{t.important + ':'}</strong>
                 {' '}
-                This token will only be shown once. Please copy it now.
+                {t.displayMsg}
               </p>
               <div className="token-info">
                 <p>
-                  <strong>Machine:</strong>
+                  <strong>
+                    {t.machine + ':'}
+                  </strong>
                   {' '}
                   {newlyCreatedToken.machine_name}
                 </p>
                 <p>
-                  <strong>Department:</strong>
+                  <strong>{t.department + ':'}</strong>
                   {' '}
                   {departments.find(d => d.id === newlyCreatedToken.department.id)?.name}
                 </p>
@@ -291,7 +297,7 @@ function BearerTokenDashboard() {
                   className="btn-blue small-btn"
                   onClick={() => copyToClipboard(newlyCreatedToken.token)}
                 >
-                  Copy
+                  {t.copy}
                 </button>
               </div>
             </div>
@@ -302,7 +308,7 @@ function BearerTokenDashboard() {
                 setNewlyCreatedToken(null);
               }}
             >
-              Close
+              {t.close}
             </button>
           </div>
         </div>

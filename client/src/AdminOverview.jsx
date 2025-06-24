@@ -298,17 +298,17 @@ function AdminOverview() {
   return (
     <div className="full-panel">
       {/* Top Title */}
-      <div className="user-title">Department Report Overview</div>
+      <div className="user-title">{t.reportsOverview}</div>
 
       {/* Section with selectors (department toggle and search bar) */}
       <div className="content-area">
         <div className="card admin-side-section padded">
           <h2>{t.filterFiles}</h2>
           <div className="section-header">
-            <p>{t.searchFiles}</p>
+            <p>{t.searchByFilename}</p>
             <input
               type="text"
-              placeholder="Search files..."
+              placeholder={t.searchFilenameText}
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
               onKeyDown={(e) => {
@@ -321,10 +321,12 @@ function AdminOverview() {
           </div>
 
           <div className="section-header">
-            <p>{t.departmentFilter}</p>
+            <p>{t.searchByDepartment}</p>
             <Select
               isMulti
+              placeholder={t.select + '...'}
               options={optionsDepts}
+              noOptionsMessage={() => t.noOptions}
               value={selectedDepts}
               onChange={setSelectedDepts}
               className="department-filter-testid"
@@ -341,10 +343,12 @@ function AdminOverview() {
           {/* </div> */}
 
           <div className="section-header">
-            <p>{t.searchHosts}</p>
+            <p>{t.searchByHost}</p>
             <Select
               isMulti
+              placeholder={t.select + '...'}
               options={optionsHosts}
+              noOptionsMessage={() => t.noOptions}
               value={selectedHosts}
               onChange={setSelectedHosts}
               className="hostname-filter-testid"
@@ -353,14 +357,28 @@ function AdminOverview() {
           </div>
 
           <div className="section-header">
-            <p>{t.dateRange}</p>
-            <p>From</p>
+            <p>{t.searchByBenchmark}</p>
+            <Select
+              isMulti
+              placeholder={t.select + '...'}
+              options={optionsBenchTypes}
+              noOptionsMessage={() => t.noOptions}
+              value={selectedBenchTypes}
+              onChange={setSelectedBenchTypes}
+              className="benchmark-filter-testid"
+              classNamePrefix="react-select"
+            />
+          </div>
+
+          <div className="section-header">
+            <p>{t.searchByDateRange}</p>
+            <p>{t.from}</p>
             <input
               type="datetime-local"
               value={dateFrom}
               onChange={e => setDateFrom(e.target.value)}
             />
-            <p>To</p>
+            <p>{t.to}</p>
             <input
               type="datetime-local"
               value={dateTo}
@@ -368,17 +386,6 @@ function AdminOverview() {
             />
           </div>
 
-          <div className="section-header">
-            <p>{t.benchmarkTypes}</p>
-            <Select
-              isMulti
-              options={optionsBenchTypes}
-              value={selectedBenchTypes}
-              onChange={setSelectedBenchTypes}
-              className="benchmark-filter-testid"
-              classNamePrefix="react-select"
-            />
-          </div>
           <button
             className="btn-blue"
             data-testid="admin-overview-search-button"
@@ -388,7 +395,7 @@ function AdminOverview() {
             {isSearching
               ? (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span>Searching</span>
+                    <span>{t.searching}</span>
                     <div className="loading-dots">
                       <span className="dot">.</span>
                       <span className="dot">.</span>
@@ -397,36 +404,36 @@ function AdminOverview() {
                   </div>
                 )
               : (
-                  'Search'
+                  t.search
                 )}
           </button>
 
-          <p>{'Showing ' + totalNumberOfFiles + ' files'}</p>
-          <h2>Aggregation</h2>
+          <p>{t.showNFiles(totalNumberOfFiles)}</p>
+          <h2>{t.aggregation}</h2>
           <iframe id="aggregateFrame"></iframe>
           {files.length === 0 || (selectedFiles.length === 0 && !isAllFilesChecked)
             ? (
                 <>
-                  <p>No files selected</p>
+                  <p>{t.noFilesSelected}</p>
                   <div className="button-container">
                     <button className="btn-purple" disabled={true}>
                       <img src={exportIcon} alt="export" className="icon" />
-                      Export
+                      {t.export}
                     </button>
                     <button className="btn-blue" disabled={true}>
                       <img src={visualIcon} alt="visualize" className="icon" />
-                      Visualize
+                      {t.visualize}
                     </button>
                     <button className="btn-green" disabled={true}>
                       <img src={downloadIcon} alt="download" className="icon" />
-                      Download
+                      {t.download}
                     </button>
                   </div>
                 </>
               )
             : (
                 <>
-                  <p>{'Selected files: ' + (isAllFilesChecked ? totalNumberOfFiles : selectedFiles.length)}</p>
+                  <p>{t.selectedFiles + ': ' + (isAllFilesChecked ? totalNumberOfFiles : selectedFiles.length)}</p>
                   <div className="button-container">
                     <button
                       className="btn-purple"
@@ -435,7 +442,7 @@ function AdminOverview() {
                       }
                     >
                       <img src={exportIcon} alt="export" className="icon" />
-                      Export
+                      {t.export}
                     </button>
                     <button
                       className="btn-blue"
@@ -447,7 +454,7 @@ function AdminOverview() {
                       }
                     >
                       <img src={visualIcon} alt="visualize" className="icon" />
-                      Visualize
+                      {t.visualize}
                     </button>
                     <button
                       className="btn-green"
@@ -459,7 +466,7 @@ function AdminOverview() {
                       }
                     >
                       <img src={downloadIcon} alt="download" className="icon" />
-                      Download
+                      {t.download}
                     </button>
                   </div>
                 </>
@@ -530,7 +537,7 @@ function AdminOverview() {
           {/* End of results indicator */}
           {!hasMoreFiles && files.length > 0 && (
             <div style={{ textAlign: 'center', padding: '20px' }}>
-              <p>No more files to load</p>
+              <p>{t.noMoreFilesToLoad}</p>
             </div>
           )}
 
@@ -545,7 +552,7 @@ function AdminOverview() {
             {isExporting
               ? (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <h3 className="popup-heading">Export in Progress</h3>
+                    <h3 className="popup-heading">{t.exportInProgress}</h3>
                     <div className="loading-dots">
                       <span className="dot">.</span>
                       <span className="dot">.</span>
@@ -598,7 +605,7 @@ function AdminOverview() {
                                   }
                                 }}
                               >
-                                Aggregate PDF
+                                {t.exportAgrregatePDF}
                               </button>
                               <button
                                 className="popup-button"
@@ -637,7 +644,7 @@ function AdminOverview() {
                                   }
                                 }}
                               >
-                                All PDF
+                                {t.exportAllPDF}
                               </button>
                             </>
                           )

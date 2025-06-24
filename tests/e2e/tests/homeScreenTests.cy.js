@@ -11,7 +11,7 @@ describe('HomeScreen tests', () => {
     // Verify that we navigated to the User Overview screen
     cy.get('[data-testid="user-screen-page-title"]')
       .should('be.visible')
-      .should('have.text', 'Manual Upload');
+      .should('have.text', 'Manual File Upload');
 
     // Additional verification that we're on the User screen
     cy.get('[data-testid="user-screen"]').should('exist');

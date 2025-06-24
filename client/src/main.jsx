@@ -103,7 +103,15 @@ function AuthProvider({ children }) {
 }
 
 function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState(() => {
+    // Load language from localStorage if available, else default to 'en'
+    return localStorage.getItem('appLanguage') || 'en';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('appLanguage', language);
+  }, [language]);
+
   return (
     <LanguageContext.Provider value={translations[language]}>
       <div id="main-content" className="full-panel">
@@ -115,7 +123,7 @@ function LanguageProvider({ children }) {
           {/* Language Toggle */}
           <div className="nav-right">
             <button onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}>
-              {language === 'en' ? 'Nederlands' : 'English'}
+              {language === 'en' ? 'Dutch' : 'Engels'}
             </button>
           </div>
         </nav>
@@ -127,11 +135,12 @@ function LanguageProvider({ children }) {
 
 function UserDisplay() {
   const authStatus = React.useContext(AuthContext);
+  const t = useContext(LanguageContext);
 
   if (authStatus.loading) {
     return (
       <div className="user-display loading">
-        <span>Loading...</span>
+        <span>{t.loading}</span>
       </div>
     );
   }
@@ -139,15 +148,15 @@ function UserDisplay() {
   if (!authStatus.user) {
     return (
       <div className="user-display guest">
-        <span>Guest User</span>
+        <span>{t.roleGuestUser}</span>
       </div>
     );
   }
 
   const getRoleDisplay = () => {
-    if (authStatus.is_super_admin) return 'Super Admin';
-    if (authStatus.is_department_admin) return 'Department Admin';
-    return 'User';
+    if (authStatus.is_super_admin) return t.roleSuperAdmin;
+    if (authStatus.is_department_admin) return t.roleDepartmentAdmin;
+    return t.roleUser;
   };
 
   return (
@@ -168,7 +177,7 @@ function TitleUpdater() {
     const titles = {
       '/': t.titleMapper,
       '/manual-upload': t.titleFileUpload,
-      '/admin': t.titleDepartmentReports,
+      '/admin': t.titleReports,
       '/admin/user-management': t.titleUserDepartmentManagement,
       '/admin/bearer-token-management': t.titleBearerTokenManagement,
     };
