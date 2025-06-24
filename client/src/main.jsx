@@ -115,7 +115,7 @@ function LanguageProvider({ children }) {
           {/* Language Toggle */}
           <div className="nav-right">
             <button onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}>
-              {language === 'en' ? 'Nederlands' : 'English'}
+              {language === 'en' ? 'Dutch' : 'Engels'}
             </button>
           </div>
         </nav>
@@ -127,11 +127,12 @@ function LanguageProvider({ children }) {
 
 function UserDisplay() {
   const authStatus = React.useContext(AuthContext);
+  const t = useContext(LanguageContext);
 
   if (authStatus.loading) {
     return (
       <div className="user-display loading">
-        <span>Loading...</span>
+        <span></span>
       </div>
     );
   }
@@ -139,15 +140,15 @@ function UserDisplay() {
   if (!authStatus.user) {
     return (
       <div className="user-display guest">
-        <span>Guest User</span>
+        <span>{t.roleGuestUser}</span>
       </div>
     );
   }
 
   const getRoleDisplay = () => {
-    if (authStatus.is_super_admin) return 'Super Admin';
-    if (authStatus.is_department_admin) return 'Department Admin';
-    return 'User';
+    if (authStatus.is_super_admin) return t.roleSuperAdmin;
+    if (authStatus.is_department_admin) return t.roleDepartmentAdmin;
+    return t.roleUser;
   };
 
   return (
@@ -168,7 +169,7 @@ function TitleUpdater() {
     const titles = {
       '/': t.titleMapper,
       '/manual-upload': t.titleFileUpload,
-      '/admin': t.titleDepartmentReports,
+      '/admin': t.titleReports,
       '/admin/user-management': t.titleUserDepartmentManagement,
       '/admin/bearer-token-management': t.titleBearerTokenManagement,
     };
